@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tax Autopilot - Bianca's Tax Dashboard</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .progress-bar-container {
+      background: var(--border);
+      border-radius: 999px;
+      height: 10px;
+      margin: 1.5rem 0 2rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .progress-label {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .phase {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .phase:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .phase-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .phase-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .phase.completed .phase-number {
+      background: var(--success);
+    }
+
+    .phase-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .phase-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .phase-status {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .status-pending { background: #f1f5f9; color: var(--text-muted); }
+    .status-active { background: #eef2ff; color: var(--primary); }
+    .status-done { background: #ecfdf5; color: var(--success); }
+
+    .phase-body {
+      display: none;
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .phase.open .phase-body { display: block; }
+
+    .checklist {
+      list-style: none;
+      margin: 1rem 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+
+    .checklist input[type="checkbox"] {
+      margin-top: 0.25rem;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .prompt-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .prompt-box pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn:hover { background: var(--primary-dark); }
+    .copy-btn.copied { background: var(--success); }
+
+    .tip {
+      background: #fffbeb;
+      border-left: 3px solid var(--warning);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      color: #92400e;
+    }
+
+    .cpa-note {
+      background: #f0fdf4;
+      border-left: 3px solid var(--success);
+      padding: 0.75rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      color: #166534;
+    }
+
+    .section-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .arrow {
+      transition: transform 0.2s;
+      color: var(--text-muted);
+    }
+
+    .phase.open .arrow { transform: rotate(180deg); }
+
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+      header h1 { font-size: 1.5rem; }
+      .phase-header { padding: 1rem; }
+      .phase-body { padding: 0 1rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tax Autopilot</h1>
+      <p>Bianca's 2025 Tax Preparation Dashboard</p>
+    </header>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 of 12 tasks completed</div>
+
+    <!-- PHASE 1: Document Gathering -->
+    <div class="phase open" data-phase="1">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <div class="phase-header-left">
+          <div class="phase-number">1</div>
+          <div>
+            <div class="phase-title">Gather Documents</div>
+            <div class="phase-subtitle">Collect invoices, receipts, and tax forms from email &amp; Drive</div>
+          </div>
+        </div>
+        <span class="phase-status status-active" data-status>In Progress</span>
+        <svg class="arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+      </div>
+      <div class="phase-body">
+        <div class="tip">Before starting: Make sure you're logged into Google with the account that has your tax-related emails and Drive files. Open Gemini Advanced at gemini.google.com.</div>
+
+        <div class="section-label">Checklist</div>
+        <ul class="checklist">
+          <li><input type="checkbox" data-task="1"> Open Gemini Advanced and connect Gmail + Drive extensions</li>
+          <li><input type="checkbox" data-task="2"> Copy and paste Prompt 1 below into Gemini</li>
+          <li><input type="checkbox" data-task="3"> Review the document list Gemini returns</li>
+          <li><input type="checkbox" data-task="4"> Download/organize any missing documents manually</li>
+        </ul>
+
+        <div class="section-label">Prompt 1: Document Discovery</div>
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+          <pre>You are my tax preparation assistant. I need you to help me find ALL tax-relevant documents for my 2025 tax filing (tax year 2025, January 1 - December 31, 2025).
+
+**STEP 1: Search my Gmail for these document types:**
+- W-2 forms from employers
+- 1099 forms (1099-NEC, 1099-MISC, 1099-INT, 1099-DIV, 1099-B, 1099-K, 1099-R, 1099-G)
+- 1098 forms (mortgage interest, student loan interest, tuition)
+- Health insurance forms (1095-A, 1095-B, 1095-C)
+- Charitable donation receipts and acknowledgment letters
+- Business expense receipts over $75
+- Invoices I sent to clients
+- Bank and investment account annual statements
+- Property tax statements
+- Medical/dental expense receipts
+- Business mileage logs or fuel receipts
+- Home office related bills (internet, utilities)
+- Education expense receipts
+
+Search using terms like: "W-2", "1099", "tax form", "annual statement", "invoice", "receipt", "tax document", year:2025, year:2026 (for docs sent in early 2026 about 2025)
+
+**STEP 2: Search my Google Drive for:**
+- Any folders named "taxes", "tax 2025", "receipts", "finances", "accounting"
+- Spreadsheets with income or expense tracking
+- Scanned receipts or PDFs of tax forms
+- Any QuickBooks, FreshBooks, or Wave exports
+
+**OUTPUT FORMAT:**
+Create a structured summary table with these columns:
+| Document | Source (Email/Drive) | Date Found | Status | Notes |
+
+Then list any MISSING documents I should look for, based on common tax situations.
+
+After the search, tell me:
+1. Total documents found
+2. Categories covered
+3. Categories with NO documents (potential gaps)
+4. Recommended next steps</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2: Analysis & Workbook -->
+    <div class="phase" data-phase="2">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <div class="phase-header-left">
+          <div class="phase-number">2</div>
+          <div>
+            <div class="phase-title">Analyze &amp; Build Workbook</div>
+            <div class="phase-subtitle">Extract data, categorize, and create a structured tax workbook</div>
+          </div>
+        </div>
+        <span class="phase-status status-pending" data-status>Pending</span>
+        <svg class="arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+      </div>
+      <div class="phase-body">
+        <div class="tip">Run this prompt AFTER Phase 1 is complete. Use the same Gemini conversation so it has context from the document search.</div>
+
+        <div class="section-label">Checklist</div>
+        <ul class="checklist">
+          <li><input type="checkbox" data-task="5"> Copy and paste Prompt 2 into the same Gemini conversation</li>
+          <li><input type="checkbox" data-task="6"> Review the workbook Gemini creates in Google Sheets</li>
+          <li><input type="checkbox" data-task="7"> Verify key numbers (income totals, large deductions)</li>
+          <li><input type="checkbox" data-task="8"> Flag any corrections or missing items</li>
+        </ul>
+
+        <div class="section-label">Prompt 2: Analysis &amp; Workbook Creation</div>
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+          <pre>Now I need you to analyze all the documents we found and create a comprehensive tax workbook. Use the document list from our previous search.
+
+**STEP 1: Extract and categorize all financial data into these categories:**
+
+INCOME:
+- W-2 wages (list each employer, gross wages, federal/state tax withheld)
+- 1099-NEC / 1099-MISC freelance/contract income (list each payer and amount)
+- 1099-INT interest income
+- 1099-DIV dividend income (ordinary vs qualified)
+- 1099-B capital gains/losses
+- 1099-K payment platform income
+- Any other income sources
+
+DEDUCTIONS (organize by category):
+- Mortgage interest (1098)
+- State and local taxes paid (SALT)
+- Charitable donations (cash vs non-cash, with recipient names)
+- Medical/dental expenses (total)
+- Student loan interest (1098-E)
+- Business expenses (if self-employed):
+  * Home office (square footage method or actual expenses)
+  * Equipment and supplies
+  * Software and subscriptions
+  * Professional services
+  * Travel and meals (50% deductible)
+  * Mileage (67 cents/mile for 2025)
+  * Marketing and advertising
+  * Insurance (health, liability, E&O)
+
+CREDITS TO CHECK:
+- Child Tax Credit
+- Earned Income Credit
+- Education credits (American Opportunity, Lifetime Learning)
+- Energy efficiency credits
+- Estimated tax payments made
+
+**STEP 2: Create a Google Sheets workbook** with these tabs:
+1. "Income Summary" - all income by source with totals
+2. "Deductions" - all deductions categorized with totals
+3. "Receipts Log" - every receipt/invoice with date, vendor, amount, category
+4. "Tax Estimates" - rough estimate of taxable income and potential tax owed
+5. "Missing Items" - documents or info still needed
+6. "Questions for CPA" - edge cases or things I'm unsure about
+
+**STEP 3: Provide a preliminary analysis:**
+- Total estimated gross income
+- Total estimated deductions
+- Standard deduction vs itemized: which is better?
+- Estimated taxable income
+- Any red flags or audit risk areas
+- Estimated quarterly tax payments needed (if self-employed)</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3: CPA Handoff Package -->
+    <div class="phase" data-phase="3">
+      <div class="phase-header" onclick="togglePhase(this)">
+        <div class="phase-header-left">
+          <div class="phase-number">3</div>
+          <div>
+            <div class="phase-title">CPA Handoff Package</div>
+            <div class="phase-subtitle">Generate a complete, organized package for your CPA</div>
+          </div>
+        </div>
+        <span class="phase-status status-pending" data-status>Pending</span>
+        <svg class="arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/></svg>
+      </div>
+      <div class="phase-body">
+        <div class="section-label">Checklist</div>
+        <ul class="checklist">
+          <li><input type="checkbox" data-task="9"> Copy and paste Prompt 3 into the same Gemini conversation</li>
+          <li><input type="checkbox" data-task="10"> Review the CPA summary document</li>
+          <li><input type="checkbox" data-task="11"> Organize the Drive folder with all documents</li>
+          <li><input type="checkbox" data-task="12"> Share the folder with your CPA</li>
+        </ul>
+
+        <div class="section-label">Prompt 3: CPA Handoff Package</div>
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+          <pre>Now create a complete CPA handoff package. This should be professional, thorough, and save my CPA significant time.
+
+**STEP 1: Create a Google Doc titled "2025 Tax Preparation - CPA Handoff Package" with:**
+
+SECTION 1 - CLIENT OVERVIEW:
+- My name and filing status
+- Dependents (if any)
+- State(s) of residence during 2025
+- Any major life changes in 2025 (marriage, home purchase, new business, etc.)
+
+SECTION 2 - INCOME SUMMARY:
+- Table of ALL income sources with amounts
+- Total gross income
+- Note any income that may need special treatment
+
+SECTION 3 - DEDUCTION SUMMARY:
+- Standard vs itemized recommendation with amounts
+- Detailed breakdown by category
+- Supporting document reference for each deduction
+
+SECTION 4 - ESTIMATED TAX POSITION:
+- Estimated taxable income
+- Estimated federal tax liability
+- Estimated state tax liability
+- Total withholdings and estimated payments made
+- Estimated amount owed or refund expected
+
+SECTION 5 - QUESTIONS AND FLAGS:
+- Any items I'm unsure about the tax treatment
+- Potential audit risk areas
+- Year-over-year changes that may raise flags
+- Items where I need CPA guidance
+
+SECTION 6 - DOCUMENT INDEX:
+- Numbered list of every document included
+- For each: document name, type, what it covers, and file location in Drive
+
+**STEP 2: Create a Google Drive folder structure:**
+📁 Bianca Tax 2025 - CPA Package
+  📁 01 - Income Documents
+    📁 W-2s
+    📁 1099s
+    📁 Other Income
+  📁 02 - Deduction Documents
+    📁 Mortgage & Property
+    📁 Charitable
+    📁 Medical
+    📁 Business Expenses
+    📁 Education
+  📁 03 - Tax Forms Received
+  📁 04 - Workbook & Analysis
+  📁 05 - Prior Year Returns (if available)
+  📄 CPA Handoff Summary (the doc from Step 1)
+
+**STEP 3: Move/copy all the documents we found into the appropriate folders.**
+
+**STEP 4: Create a cover email draft** to send to my CPA with:
+- Brief intro
+- Link to the shared Drive folder
+- Summary of what's included
+- List of specific questions
+- Note about any missing items still being tracked down
+- Request for estimated timeline and fees</pre>
+        </div>
+
+        <div class="cpa-note">Once complete, you'll have a fully organized Drive folder you can share with your CPA via a single link. They'll have everything they need to prepare your return efficiently.</div>
+      </div>
+    </div>
+
+    <footer>
+      Tax Autopilot Dashboard &middot; Powered by Gemini + Google Workspace &middot; Not tax advice
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'taxAutopilotTasks';
+    const TOTAL_TASKS = 12;
+
+    function loadTasks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch { return {}; }
+    }
+
+    function saveTasks(tasks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function updateProgress() {
+      const tasks = loadTasks();
+      const completed = Object.values(tasks).filter(Boolean).length;
+      const pct = Math.round((completed / TOTAL_TASKS) * 100);
+
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent =
+        `${completed} of ${TOTAL_TASKS} tasks completed (${pct}%)`;
+
+      // Update phase statuses
+      document.querySelectorAll('.phase').forEach(phase => {
+        const phaseNum = phase.dataset.phase;
+        const checkboxes = phase.querySelectorAll('input[type="checkbox"]');
+        const checked = [...checkboxes].filter(cb => cb.checked).length;
+        const statusEl = phase.querySelector('[data-status]');
+
+        if (checked === checkboxes.length && checkboxes.length > 0) {
+          statusEl.textContent = 'Complete';
+          statusEl.className = 'phase-status status-done';
+          phase.classList.add('completed');
+        } else if (checked > 0) {
+          statusEl.textContent = 'In Progress';
+          statusEl.className = 'phase-status status-active';
+          phase.classList.remove('completed');
+        } else {
+          statusEl.textContent = 'Pending';
+          statusEl.className = 'phase-status status-pending';
+          phase.classList.remove('completed');
+        }
+      });
+    }
+
+    function togglePhase(header) {
+      header.closest('.phase').classList.toggle('open');
+    }
+
+    function copyPrompt(btn) {
+      const pre = btn.parentElement.querySelector('pre');
+      navigator.clipboard.writeText(pre.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    // Initialize checkboxes
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      const tasks = loadTasks();
+      const taskId = cb.dataset.task;
+      cb.checked = !!tasks[taskId];
+
+      cb.addEventListener('change', () => {
+        const tasks = loadTasks();
+        tasks[taskId] = cb.checked;
+        saveTasks(tasks);
+        updateProgress();
+      });
+    });
+
+    updateProgress();
+  </script>
+</body>
+</html>
