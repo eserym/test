@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esery Mondesir</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f0ece4;
+      --accent: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      --grain-opacity: 0.04;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: auto;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: crosshair;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== GRAIN OVERLAY ===== */
+    .grain {
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      animation: grainShift 0.5s steps(6) infinite;
+    }
+
+    @keyframes grainShift {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-5%, -10%); }
+      30% { transform: translate(3%, -15%); }
+      50% { transform: translate(12%, 9%); }
+      70% { transform: translate(9%, 4%); }
+      90% { transform: translate(-1%, 7%); }
+    }
+
+    /* ===== CUSTOM CURSOR ===== */
+    .cursor-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      mix-blend-mode: difference;
+      transition: transform 0.1s ease;
+    }
+
+    .cursor-ring {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--white);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      mix-blend-mode: difference;
+      transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
+    }
+
+    /* ===== WEBGL CANVAS ===== */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ===== LOADING SCREEN ===== */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--black);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-text {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-style: italic;
+      color: var(--light-grey);
+      letter-spacing: 0.05em;
+      overflow: hidden;
+    }
+
+    .loader-text span {
+      display: inline-block;
+      transform: translateY(100%);
+      animation: slideUp 0.6s ease forwards;
+    }
+
+    .loader-bar {
+      width: 120px;
+      height: 1px;
+      background: var(--grey);
+      margin-top: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 100%;
+      background: var(--white);
+      animation: loadProgress 2.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      to { transform: translateY(0); }
+    }
+
+    @keyframes loadProgress {
+      to { width: 100%; }
+    }
+
+    /* ===== HERO / ENTRY ===== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-name {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(3rem, 12vw, 10rem);
+      font-weight: 400;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .hero-name .char {
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-name .char:hover {
+      transform: translateY(-10px) rotate(-5deg) scale(1.1);
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--light-grey);
+      margin-top: 2rem;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--grey);
+      opacity: 0;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; }
+    }
+
+    /* ===== FRAGMENTED SECTIONS ===== */
+    .fragment-section {
+      position: relative;
+      min-height: 100vh;
+      z-index: 1;
+      padding: 10vh 0;
+    }
+
+    .fragment {
+      opacity: 0;
+      transform: translateY(80px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fragment.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== ENTRY POINTS GRID ===== */
+    .entry-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 40vh);
+      gap: 2px;
+      padding: 0 2px;
+      min-height: 80vh;
+    }
+
+    .entry-point {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--black);
+      border: 1px solid rgba(240, 236, 228, 0.05);
+      transition: border-color 0.4s ease;
+    }
+
+    .entry-point:hover {
+      border-color: rgba(240, 236, 228, 0.2);
+    }
+
+    .entry-point:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 3; }
+    .entry-point:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
+    .entry-point:nth-child(3) { grid-column: 3 / 4; grid-row: 1 / 2; }
+    .entry-point:nth-child(4) { grid-column: 2 / 4; grid-row: 2 / 3; }
+
+    .entry-point-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      background: linear-gradient(transparent 40%, rgba(10, 10, 10, 0.9));
+      transition: background 0.4s ease;
+    }
+
+    .entry-point:hover .entry-point-inner {
+      background: linear-gradient(transparent 20%, rgba(10, 10, 10, 0.95));
+    }
+
+    .entry-point-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .entry-point-title {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      transform: translateY(10px);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .entry-point:hover .entry-point-title {
+      transform: translateY(0);
+    }
+
+    .entry-point-number {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 0.7rem;
+      color: var(--grey);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .entry-point-media {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(0.6) contrast(1.1);
+    }
+
+    .entry-point:hover .entry-point-media {
+      opacity: 0.3;
+    }
+
+    /* ===== MANIFESTO / STATEMENT SECTION ===== */
+    .manifesto {
+      padding: 15vh 8vw;
+      max-width: 900px;
+    }
+
+    .manifesto-text {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 3.5rem);
+      line-height: 1.3;
+      font-weight: 400;
+    }
+
+    .manifesto-text .word {
+      display: inline-block;
+      opacity: 0.15;
+      transition: opacity 0.5s ease;
+      margin-right: 0.2em;
+    }
+
+    .manifesto-text .word.lit {
+      opacity: 1;
+    }
+
+    /* ===== HORIZONTAL SCROLL STRIP ===== */
+    .strip-container {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .strip {
+      display: flex;
+      gap: 4px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    .strip-item {
+      flex-shrink: 0;
+      width: 300px;
+      height: 400px;
+      background: rgba(240, 236, 228, 0.03);
+      border: 1px solid rgba(240, 236, 228, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease;
+    }
+
+    .strip-item:hover {
+      border-color: rgba(240, 236, 228, 0.15);
+    }
+
+    .strip-item-placeholder {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--grey);
+      text-align: center;
+      padding: 2rem;
+      white-space: normal;
+    }
+
+    .strip-label {
+      position: absolute;
+      bottom: 1rem;
+      left: 1.5rem;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--light-grey);
+    }
+
+    /* ===== FLOATING FRAGMENTS ===== */
+    .float-section {
+      position: relative;
+      min-height: 150vh;
+      padding: 10vh 0;
+    }
+
+    .floating-block {
+      position: absolute;
+      opacity: 0;
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .floating-block.visible {
+      opacity: 1;
+    }
+
+    .floating-block--text {
+      max-width: 350px;
+      padding: 2rem;
+    }
+
+    .floating-block--text p {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--light-grey);
+    }
+
+    .floating-block--visual {
+      width: 250px;
+      height: 350px;
+      background: rgba(240, 236, 228, 0.02);
+      border: 1px solid rgba(240, 236, 228, 0.05);
+    }
+
+    .floating-block--tag {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--grey);
+      writing-mode: vertical-rl;
+      padding: 1rem;
+    }
+
+    /* ===== BOTTOM NAV / COLOPHON ===== */
+    .colophon {
+      padding: 8vh 4vw;
+      border-top: 1px solid rgba(240, 236, 228, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 1;
+      position: relative;
+    }
+
+    .colophon-left {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--grey);
+      line-height: 2;
+    }
+
+    .colophon-right {
+      text-align: right;
+    }
+
+    .colophon-right a {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--light-grey);
+      text-decoration: none;
+      padding: 0.3rem 0;
+      transition: color 0.3s ease;
+    }
+
+    .colophon-right a:hover {
+      color: var(--white);
+    }
+
+    /* ===== SIDE MARKERS ===== */
+    .side-marker {
+      position: fixed;
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--grey);
+      z-index: 100;
+      mix-blend-mode: difference;
+    }
+
+    .side-marker--left {
+      left: 1.5rem;
+      top: 50%;
+      transform: rotate(-90deg) translateX(-50%);
+      transform-origin: left center;
+    }
+
+    .side-marker--right {
+      right: 1.5rem;
+      top: 50%;
+      transform: rotate(90deg) translateX(50%);
+      transform-origin: right center;
+    }
+
+    /* ===== SECTION DIVIDER ===== */
+    .divider {
+      width: 100%;
+      padding: 4vh 4vw;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 1;
+      position: relative;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(240, 236, 228, 0.08);
+    }
+
+    .divider-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--grey);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .entry-points {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      .entry-point { grid-column: auto !important; grid-row: auto !important; min-height: 40vh; }
+      .manifesto { padding: 10vh 6vw; }
+      .floating-block { position: relative !important; top: auto !important; left: auto !important; right: auto !important; margin: 4vh 4vw; }
+      .colophon { flex-direction: column; gap: 2rem; align-items: flex-start; }
+      .side-marker { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GRAIN -->
+  <div class="grain"></div>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- WEBGL BACKGROUND -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="loader-text">
+      <span>entering the space</span>
+    </div>
+    <div class="loader-bar"></div>
+  </div>
+
+  <!-- SIDE MARKERS -->
+  <div class="side-marker side-marker--left">Artist / Filmmaker / Writer</div>
+  <div class="side-marker side-marker--right">Montreal, QC</div>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <h1 class="hero-name" id="heroName"></h1>
+      <p class="hero-subtitle" id="heroSubtitle">Artist-Filmmaker &middot; Writer &middot; Educator</p>
+    </div>
+    <div class="hero-scroll-hint">Scroll to enter</div>
+  </section>
+
+  <!-- ENTRY POINTS -->
+  <section class="fragment-section">
+    <div class="divider fragment">
+      <div class="divider-line"></div>
+      <span class="divider-label">Enter anywhere</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="entry-points fragment">
+      <div class="entry-point" data-entry="work">
+        <div class="entry-point-media" style="background-color: #1a1a2e;"></div>
+        <div class="entry-point-inner">
+          <span class="entry-point-label">Film / Video</span>
+          <h2 class="entry-point-title">The Work</h2>
+        </div>
+        <span class="entry-point-number">001</span>
+      </div>
+
+      <div class="entry-point" data-entry="process">
+        <div class="entry-point-media" style="background-color: #1a0f0a;"></div>
+        <div class="entry-point-inner">
+          <span class="entry-point-label">Research / Process</span>
+          <h2 class="entry-point-title">Behind the<br>Surface</h2>
+        </div>
+        <span class="entry-point-number">002</span>
+      </div>
+
+      <div class="entry-point" data-entry="story">
+        <div class="entry-point-media" style="background-color: #0a1a1a;"></div>
+        <div class="entry-point-inner">
+          <span class="entry-point-label">Personal / Narrative</span>
+          <h2 class="entry-point-title">Origin<br>Story</h2>
+        </div>
+        <span class="entry-point-number">003</span>
+      </div>
+
+      <div class="entry-point" data-entry="connect">
+        <div class="entry-point-media" style="background-color: #1a0a1a;"></div>
+        <div class="entry-point-inner">
+          <span class="entry-point-label">Collaborate / Co-create</span>
+          <h2 class="entry-point-title">Enter the Conversation</h2>
+        </div>
+        <span class="entry-point-number">004</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="fragment-section">
+    <div class="manifesto fragment">
+      <p class="manifesto-text" id="manifesto">
+        I make films that fracture time. I write to remember what the body already knows. I teach because art is not a solo act. The work lives between languages, between geographies, between what is said and what remains unspoken. This is not a portfolio. This is a window left open.
+      </p>
+    </div>
+  </section>
+
+  <!-- HORIZONTAL STRIP (WORK PREVIEW) -->
+  <section class="strip-container fragment-section">
+    <div class="divider fragment" style="position: relative; z-index: 2;">
+      <div class="divider-line"></div>
+      <span class="divider-label">Selected work</span>
+      <div class="divider-line"></div>
+    </div>
+    <div class="strip" id="strip">
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Choublak<br><small>Exhibition, Leonard & Bina Ellen</small></span>
+        <span class="strip-label">2024</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Film Project II<br><small>Your next work here</small></span>
+        <span class="strip-label">2023</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Film Project III<br><small>Description</small></span>
+        <span class="strip-label">2022</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Writing / Text<br><small>Published works</small></span>
+        <span class="strip-label">Ongoing</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Teaching<br><small>Workshops & lectures</small></span>
+        <span class="strip-label">Ongoing</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-item-placeholder">Collaborative Work<br><small>Community projects</small></span>
+        <span class="strip-label">Ongoing</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOATING FRAGMENTS -->
+  <section class="float-section fragment-section">
+    <div class="floating-block floating-block--tag" style="top: 5vh; left: 8vw;">
+      Research
+    </div>
+    <div class="floating-block floating-block--text" style="top: 15vh; left: 15vw;">
+      <p>The creative process is not linear. It spirals. It returns to the same wound with new eyes. Each project is a fragment of something larger that refuses to be named.</p>
+    </div>
+    <div class="floating-block floating-block--visual" style="top: 10vh; right: 10vw;">
+    </div>
+    <div class="floating-block floating-block--text" style="top: 65vh; right: 12vw;">
+      <p>Between Port-au-Prince and Montreal, between Kreyol and French, between film and text -- the work exists in the gaps. The in-between is not empty. It vibrates.</p>
+    </div>
+    <div class="floating-block floating-block--tag" style="top: 80vh; left: 5vw;">
+      Memory
+    </div>
+    <div class="floating-block floating-block--visual" style="top: 70vh; left: 25vw; width: 200px; height: 280px;">
+    </div>
+  </section>
+
+  <!-- COLOPHON -->
+  <footer class="colophon fragment">
+    <div class="colophon-left">
+      Esery Mondesir<br>
+      Artist-Filmmaker, Writer, Educator<br>
+      Montreal, QC<br>
+      <br>
+      &copy; 2024 -- ongoing
+    </div>
+    <div class="colophon-right">
+      <a href="#">Vimeo</a>
+      <a href="#">Instagram</a>
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+
+  <!-- Three.js for WebGL -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    // =============================================
+    // CUSTOM CURSOR
+    // =============================================
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorRing = document.getElementById('cursorRing');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.left = mouseX - 4 + 'px';
+      cursorDot.style.top = mouseY - 4 + 'px';
+    });
+
+    function animateCursor() {
+      ringX += (mouseX - ringX) * 0.08;
+      ringY += (mouseY - ringY) * 0.08;
+      cursorRing.style.left = ringX - 20 + 'px';
+      cursorRing.style.top = ringY - 20 + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Expand cursor on interactive elements
+    document.querySelectorAll('.entry-point, a, .strip-item').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursorRing.style.width = '70px';
+        cursorRing.style.height = '70px';
+        cursorRing.style.left = ringX - 35 + 'px';
+        cursorRing.style.top = ringY - 35 + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursorRing.style.width = '40px';
+        cursorRing.style.height = '40px';
+      });
+    });
+
+    // =============================================
+    // WEBGL BACKGROUND (DISTORTION MESH)
+    // =============================================
+    (function initWebGL() {
+      const canvas = document.getElementById('webgl-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.z = 2.5;
+
+      // Create a distortion plane with custom shader
+      const geometry = new THREE.PlaneGeometry(6, 6, 128, 128);
+
+      const vertexShader = `
+        uniform float uTime;
+        uniform float uScrollProgress;
+        uniform vec2 uMouse;
+        varying vec2 vUv;
+        varying float vElevation;
+
+        void main() {
+          vUv = uv;
+
+          vec3 pos = position;
+
+          // Organic wave distortion
+          float wave1 = sin(pos.x * 2.0 + uTime * 0.3) * cos(pos.y * 1.5 + uTime * 0.2) * 0.15;
+          float wave2 = sin(pos.x * 3.0 - uTime * 0.4 + uScrollProgress * 2.0) * 0.08;
+          float wave3 = cos(pos.y * 2.5 + uTime * 0.25) * sin(pos.x * 1.8 + uScrollProgress) * 0.1;
+
+          // Mouse influence
+          float dist = distance(uv, uMouse);
+          float mouseEffect = smoothstep(0.5, 0.0, dist) * 0.2;
+
+          pos.z += wave1 + wave2 + wave3 + mouseEffect;
+          vElevation = pos.z;
+
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+      `;
+
+      const fragmentShader = `
+        uniform float uTime;
+        uniform float uScrollProgress;
+        varying vec2 vUv;
+        varying float vElevation;
+
+        void main() {
+          // Dynamic color based on scroll and elevation
+          vec3 colorA = vec3(0.04, 0.04, 0.06);  // near-black blue
+          vec3 colorB = vec3(0.08, 0.03, 0.02);   // dark warm
+          vec3 colorC = vec3(0.77, 0.25, 0.18);   // accent red
+
+          float mixFactor = smoothstep(-0.2, 0.3, vElevation);
+          vec3 color = mix(colorA, colorB, uScrollProgress);
+          color = mix(color, colorC, mixFactor * 0.15);
+
+          // Subtle grid lines
+          float gridX = smoothstep(0.98, 1.0, abs(sin(vUv.x * 40.0)));
+          float gridY = smoothstep(0.98, 1.0, abs(sin(vUv.y * 40.0)));
+          color += (gridX + gridY) * 0.015;
+
+          gl_FragColor = vec4(color, 0.6);
+        }
+      `;
+
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uScrollProgress: { value: 0 },
+          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+        },
+        transparent: true,
+        wireframe: false,
+      });
+
+      const plane = new THREE.Mesh(geometry, material);
+      scene.add(plane);
+
+      // Normalized mouse for shader
+      let shaderMouseX = 0.5, shaderMouseY = 0.5;
+      document.addEventListener('mousemove', (e) => {
+        shaderMouseX = e.clientX / window.innerWidth;
+        shaderMouseY = 1.0 - (e.clientY / window.innerHeight);
+      });
+
+      // Scroll progress
+      function getScrollProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        return docHeight > 0 ? scrollTop / docHeight : 0;
+      }
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        material.uniforms.uTime.value += 0.01;
+        material.uniforms.uScrollProgress.value += (getScrollProgress() - material.uniforms.uScrollProgress.value) * 0.05;
+        material.uniforms.uMouse.value.x += (shaderMouseX - material.uniforms.uMouse.value.x) * 0.03;
+        material.uniforms.uMouse.value.y += (shaderMouseY - material.uniforms.uMouse.value.y) * 0.03;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    })();
+
+    // =============================================
+    // HERO TEXT ANIMATION (character split)
+    // =============================================
+    (function initHeroText() {
+      const name = "Esery Mondesir";
+      const heroEl = document.getElementById('heroName');
+      const chars = name.split('');
+
+      heroEl.innerHTML = chars.map((char, i) => {
+        if (char === ' ') return '<span class="char">&nbsp;</span>';
+        return `<span class="char" style="animation-delay: ${i * 0.04}s">${char}</span>`;
+      }).join('');
+    })();
+
+    // =============================================
+    // LOADER
+    // =============================================
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+
+        // Animate hero in
+        setTimeout(() => {
+          const heroName = document.getElementById('heroName');
+          const heroSub = document.getElementById('heroSubtitle');
+          heroName.style.opacity = '1';
+          heroName.style.transform = 'translateY(0)';
+          heroName.style.transition = 'opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          setTimeout(() => {
+            heroSub.style.opacity = '1';
+            heroSub.style.transform = 'translateY(0)';
+            heroSub.style.transition = 'opacity 1s ease 0.3s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s';
+          }, 300);
+        }, 400);
+      }, 2800);
+    });
+
+    // =============================================
+    // SCROLL REVEAL (fragments)
+    // =============================================
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.fragment, .floating-block').forEach(el => observer.observe(el));
+
+    // =============================================
+    // MANIFESTO WORD REVEAL ON SCROLL
+    // =============================================
+    (function initManifesto() {
+      const manifestoEl = document.getElementById('manifesto');
+      const text = manifestoEl.textContent.trim();
+      const words = text.split(/\s+/);
+
+      manifestoEl.innerHTML = words.map(w => `<span class="word">${w}</span>`).join(' ');
+
+      const wordEls = manifestoEl.querySelectorAll('.word');
+
+      function updateManifesto() {
+        const rect = manifestoEl.getBoundingClientRect();
+        const windowH = window.innerHeight;
+        const progress = Math.max(0, Math.min(1, 1 - (rect.top / (windowH * 0.7))));
+        const wordsToLight = Math.floor(progress * wordEls.length);
+
+        wordEls.forEach((word, i) => {
+          word.classList.toggle('lit', i < wordsToLight);
+        });
+      }
+
+      window.addEventListener('scroll', updateManifesto, { passive: true });
+      updateManifesto();
+    })();
+
+    // =============================================
+    // HORIZONTAL STRIP (drag + scroll)
+    // =============================================
+    (function initStrip() {
+      const strip = document.getElementById('strip');
+      let isDragging = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      let currentX = 0;
+
+      strip.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX;
+        scrollLeft = currentX;
+        strip.style.cursor = 'grabbing';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.pageX - startX;
+        currentX = scrollLeft + dx;
+        strip.style.transform = `translateY(-50%) translateX(${currentX}px)`;
+      });
+
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        strip.style.cursor = 'grab';
+      });
+
+      strip.style.cursor = 'grab';
+    })();
+
+    // =============================================
+    // ENTRY POINT CLICK FEEDBACK
+    // =============================================
+    document.querySelectorAll('.entry-point').forEach(ep => {
+      ep.addEventListener('click', () => {
+        const entry = ep.dataset.entry;
+        // Flash effect
+        ep.style.background = 'rgba(196, 64, 47, 0.1)';
+        setTimeout(() => { ep.style.background = ''; }, 400);
+        console.log(`Navigating to: ${entry}`);
+        // Future: route to section/page
+      });
+    });
+
+    // =============================================
+    // PARALLAX on floating blocks
+    // =============================================
+    (function initParallax() {
+      const blocks = document.querySelectorAll('.floating-block');
+      window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        blocks.forEach((block, i) => {
+          const speed = 0.02 + (i % 3) * 0.015;
+          const offset = scrollY * speed;
+          block.style.transform = `translateY(${-offset}px)`;
+        });
+      }, { passive: true });
+    })();
+  </script>
+
+</body>
+</html>
