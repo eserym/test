@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threshold A — La Retenue</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      /* door mood tints */
+      --tint-watch: #10121e;
+      --tint-listen: #1c1410;
+      --tint-read: #101a16;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--ink);
+      color: var(--bone);
+      font-family: 'Space Grotesk', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 50; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.6s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.8rem 2.2rem;
+      mix-blend-mode: difference;
+    }
+    .site-name {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.05rem; letter-spacing: 0.08em; font-weight: 400;
+    }
+    .lang-switch { display: flex; gap: 0.4rem; }
+    .lang-switch button {
+      background: none; border: none; color: var(--light-grey);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem;
+      text-transform: uppercase; letter-spacing: 0.18em;
+      padding: 0.35rem 0.5rem; cursor: pointer; transition: color 0.3s;
+    }
+    .lang-switch button.active { color: var(--bone); text-decoration: underline; text-underline-offset: 4px; }
+    .lang-switch button:hover { color: var(--bone); }
+
+    /* ===== TRIPTYCH ===== */
+    .doors {
+      display: flex; height: 100vh; width: 100%;
+    }
+    .door {
+      position: relative; flex: 1; cursor: pointer;
+      display: flex; align-items: flex-end;
+      border-right: 1px solid rgba(240,236,228,0.07);
+      background: var(--ink);
+      transition: flex 0.9s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.9s ease;
+      overflow: hidden;
+    }
+    .door:last-of-type { border-right: none; }
+    .door:hover { flex: 2.2; }
+    .door[data-door="watch"]:hover  { background: var(--tint-watch); }
+    .door[data-door="listen"]:hover { background: var(--tint-listen); }
+    .door[data-door="read"]:hover   { background: var(--tint-read); }
+
+    .door-inner { padding: 3rem 2.2rem; width: 100%; position: relative; z-index: 2; }
+    .door-index {
+      font-size: 0.6rem; color: var(--grey); letter-spacing: 0.3em;
+      display: block; margin-bottom: 1rem; font-variant-numeric: tabular-nums;
+    }
+    .door-title {
+      font-family: 'EB Garamond', serif; font-weight: 400;
+      font-size: clamp(2rem, 4.5vw, 4rem); line-height: 1;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-origin: left bottom;
+    }
+    .door:hover .door-title { transform: translateY(-6px); }
+    .door-sub {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.28em;
+      color: var(--light-grey); margin-top: 0.9rem;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.6s ease 0.15s, transform 0.6s ease 0.15s;
+    }
+    .door:hover .door-sub { opacity: 1; transform: translateY(0); }
+
+    /* vertical hairline that breathes */
+    .door::after {
+      content: ''; position: absolute; top: 18%; left: 2.2rem;
+      width: 1px; height: 0; background: var(--choublak);
+      transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .door:hover::after { height: 30%; }
+
+    /* faint breathing of resting doors */
+    @keyframes breathe { 0%,100% { opacity: 1; } 50% { opacity: 0.86; } }
+    .door-title { animation: breathe 7s ease-in-out infinite; }
+    .door:nth-child(2) .door-title { animation-delay: -2.3s; }
+    .door:nth-child(3) .door-title { animation-delay: -4.7s; }
+
+    /* ===== DERIVE STRIP ===== */
+    .derive {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+      display: flex; justify-content: center; align-items: center;
+      padding: 1rem; cursor: pointer;
+      border-top: 1px solid rgba(240,236,228,0.07);
+      background: rgba(10,10,10,0.75); backdrop-filter: blur(6px);
+      transition: background 0.5s ease;
+    }
+    .derive:hover { background: rgba(196,64,47,0.12); }
+    .derive-label {
+      font-family: 'EB Garamond', serif; font-style: italic;
+      font-size: 0.95rem; color: var(--light-grey);
+      letter-spacing: 0.06em; transition: color 0.4s ease;
+    }
+    .derive:hover .derive-label { color: var(--bone); }
+    .derive-arrow { margin-left: 0.7rem; color: var(--choublak); font-style: normal; }
+
+    /* ===== TAGLINE ===== */
+    .tagline {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 30; pointer-events: none; text-align: center;
+      font-family: 'EB Garamond', serif; font-style: italic;
+      font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+      color: rgba(240,236,228,0.35); letter-spacing: 0.1em;
+      mix-blend-mode: difference;
+      transition: opacity 0.6s ease;
+    }
+    .doors:hover ~ .tagline, .doors:hover + .tagline { opacity: 0; }
+
+    @media (max-width: 768px) {
+      body { overflow-y: auto; }
+      .doors { flex-direction: column; height: auto; min-height: 100vh; padding-top: 5rem; padding-bottom: 4rem; }
+      .door { min-height: 26vh; border-right: none; border-bottom: 1px solid rgba(240,236,228,0.07); }
+      .door:hover { flex: 1; }
+      .tagline { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grain { animation: none; }
+      .door-title { animation: none; }
+      .door, .door-title, .door-sub, .door::after { transition-duration: 0.01s; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header>
+    <div class="site-name">Ésery Mondésir</div>
+    <nav class="lang-switch" id="langSwitch" aria-label="Language">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="fr">FR</button>
+      <button data-lang="ht">KREYÒL</button>
+    </nav>
+  </header>
+
+  <main class="doors" id="doors">
+    <div class="door" data-door="watch" role="link" tabindex="0">
+      <div class="door-inner">
+        <span class="door-index">001</span>
+        <h2 class="door-title" data-i18n="watch">Watch</h2>
+        <p class="door-sub" data-i18n="watchSub">Films &amp; video works</p>
+      </div>
+    </div>
+    <div class="door" data-door="listen" role="link" tabindex="0">
+      <div class="door-inner">
+        <span class="door-index">002</span>
+        <h2 class="door-title" data-i18n="listen">Listen</h2>
+        <p class="door-sub" data-i18n="listenSub">Voice &amp; sound</p>
+      </div>
+    </div>
+    <div class="door" data-door="read" role="link" tabindex="0">
+      <div class="door-inner">
+        <span class="door-index">003</span>
+        <h2 class="door-title" data-i18n="read">Read</h2>
+        <p class="door-sub" data-i18n="readSub">Writing &amp; research</p>
+      </div>
+    </div>
+  </main>
+
+  <p class="tagline" data-i18n="tagline">a window left open</p>
+
+  <div class="derive" role="link" tabindex="0">
+    <span class="derive-label" data-i18n="drift">or let the site drift you</span>
+    <span class="derive-arrow">&rarr;</span>
+  </div>
+
+  <script>
+    const I18N = {
+      en: { watch: 'Watch', listen: 'Listen', read: 'Read',
+            watchSub: 'Films & video works', listenSub: 'Voice & sound', readSub: 'Writing & research',
+            tagline: 'a window left open', drift: 'or let the site drift you' },
+      fr: { watch: 'Regarder', listen: 'Écouter', read: 'Lire',
+            watchSub: 'Films & œuvres vidéo', listenSub: 'Voix & son', readSub: 'Écriture & recherche',
+            tagline: 'une fenêtre laissée ouverte', drift: 'ou laissez le site vous porter' },
+      ht: { watch: 'Gade', listen: 'Koute', read: 'Li',
+            watchSub: 'Fim & videyo', listenSub: 'Vwa & son', readSub: 'Ekriti & rechèch',
+            tagline: 'yon fenèt kite louvri', drift: 'oswa kite sit la mennen w' }
+    };
+
+    function setLang(lang) {
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (dict[key]) el.textContent = dict[key];
+      });
+      document.documentElement.lang = lang;
+      document.querySelectorAll('#langSwitch button').forEach(b =>
+        b.classList.toggle('active', b.dataset.lang === lang));
+      try { localStorage.setItem('em-lang', lang); } catch (e) {}
+    }
+
+    document.querySelectorAll('#langSwitch button').forEach(btn =>
+      btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+
+    try { const saved = localStorage.getItem('em-lang'); if (saved) setLang(saved); } catch (e) {}
+
+    // Door click: flash feedback (routing comes in the production build)
+    document.querySelectorAll('.door, .derive').forEach(el => {
+      el.addEventListener('click', () => {
+        el.style.outline = '1px solid rgba(196,64,47,0.6)';
+        setTimeout(() => { el.style.outline = ''; }, 350);
+      });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') el.click(); });
+    });
+  </script>
+</body>
+</html>

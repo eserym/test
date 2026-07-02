@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threshold C — La Rupture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--ink); color: var(--bone);
+      font-family: 'Space Grotesk', sans-serif;
+      height: 100vh; overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 50; opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.4s steps(5) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-5%,-9%); }
+      40% { transform: translate(5%,-5%); } 60% { transform: translate(-5%,7%); } 80% { transform: translate(7%,3%); }
+    }
+
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.6rem 2rem; mix-blend-mode: difference;
+    }
+    .site-name { font-family: 'EB Garamond', serif; font-size: 1.05rem; letter-spacing: 0.08em; }
+    .lang-switch { display: flex; gap: 0.4rem; }
+    .lang-switch button {
+      background: none; border: none; color: var(--light-grey);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem;
+      text-transform: uppercase; letter-spacing: 0.18em;
+      padding: 0.35rem 0.5rem; cursor: pointer; transition: color 0.3s;
+    }
+    .lang-switch button.active { color: var(--bone); text-decoration: underline; text-underline-offset: 4px; }
+    .lang-switch button:hover { color: var(--bone); }
+
+    /* ===== FRACTURED TITLE ===== */
+    .shatter {
+      position: fixed; top: 8vh; left: 0; right: 0; z-index: 5;
+      text-align: center; pointer-events: none;
+      font-family: 'EB Garamond', serif; font-weight: 400;
+      font-size: clamp(2.6rem, 9vw, 7.5rem); line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .shatter .ch {
+      display: inline-block; position: relative;
+      animation: twitch 6s steps(1) infinite;
+    }
+    /* each character sits slightly wrong */
+    .shatter .ch:nth-child(3n)   { transform: translateY(-0.06em) rotate(1.2deg); }
+    .shatter .ch:nth-child(3n+1) { transform: translateY(0.05em) rotate(-0.8deg); }
+    .shatter .ch:nth-child(5n)   { transform: translateY(0.1em) rotate(2deg); color: var(--choublak); }
+    .shatter .ch:nth-child(7n)   { transform: translateY(-0.1em) rotate(-1.6deg); }
+    @keyframes twitch {
+      0%, 92%, 100% { opacity: 1; }
+      93% { opacity: 0.4; transform: translate(0.04em, -0.03em) skewX(3deg); }
+      94% { opacity: 1; }
+    }
+
+    /* ===== SCRAP DOORS ===== */
+    .scraps { position: fixed; inset: 0; z-index: 10; }
+    .scrap {
+      position: absolute; cursor: pointer;
+      padding: 1.6rem 2rem 1.8rem;
+      background: var(--ink);
+      border: 1px solid rgba(240,236,228,0.15);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease, background 0.3s ease;
+      will-change: transform;
+    }
+    /* torn-paper edges via clip-path */
+    .scrap[data-door="watch"] {
+      top: 34vh; left: 8vw; transform: rotate(-3.5deg);
+      clip-path: polygon(0 4%, 7% 0, 96% 2%, 100% 88%, 91% 100%, 3% 97%);
+    }
+    .scrap[data-door="listen"] {
+      top: 48vh; left: 42vw; transform: rotate(2.2deg);
+      clip-path: polygon(2% 0, 100% 5%, 97% 94%, 88% 100%, 0 96%, 3% 12%);
+    }
+    .scrap[data-door="read"] {
+      top: 30vh; right: 9vw; transform: rotate(4.5deg);
+      clip-path: polygon(0 8%, 93% 0, 100% 92%, 8% 100%, 2% 55%);
+    }
+    .scrap:hover {
+      border-color: var(--choublak);
+      background: #120b0a;
+      z-index: 30;
+    }
+    .scrap[data-door="watch"]:hover  { transform: rotate(1deg) scale(1.06); }
+    .scrap[data-door="listen"]:hover { transform: rotate(-1.5deg) scale(1.06); }
+    .scrap[data-door="read"]:hover   { transform: rotate(-2deg) scale(1.06); }
+
+    .scrap-index {
+      font-size: 0.55rem; color: var(--choublak); letter-spacing: 0.35em;
+      display: block; margin-bottom: 0.6rem;
+    }
+    .scrap-title {
+      font-family: 'EB Garamond', serif; font-weight: 400;
+      font-size: clamp(1.9rem, 4vw, 3.2rem); line-height: 0.95;
+    }
+    .scrap-sub {
+      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.3em;
+      color: var(--light-grey); margin-top: 0.7rem;
+    }
+
+    /* slow independent sway per scrap */
+    @keyframes swayA { 0%,100% { margin-top: 0; } 50% { margin-top: -14px; } }
+    @keyframes swayB { 0%,100% { margin-left: 0; } 50% { margin-left: 12px; } }
+    @keyframes swayC { 0%,100% { margin-top: 0; } 50% { margin-top: 10px; } }
+    .scrap[data-door="watch"]  { animation: swayA 9s ease-in-out infinite; }
+    .scrap[data-door="listen"] { animation: swayB 11s ease-in-out infinite; }
+    .scrap[data-door="read"]   { animation: swayC 8s ease-in-out infinite; }
+
+    /* ===== MARQUEE ===== */
+    .marquee {
+      position: fixed; bottom: 4.6rem; left: 0; right: 0; z-index: 8;
+      overflow: hidden; white-space: nowrap; pointer-events: none;
+      border-top: 1px solid rgba(240,236,228,0.08);
+      border-bottom: 1px solid rgba(240,236,228,0.08);
+      padding: 0.5rem 0; opacity: 0.5;
+    }
+    .marquee-inner {
+      display: inline-block; animation: marquee 28s linear infinite;
+      font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.4em; color: var(--grey);
+    }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ===== DERIVE ===== */
+    .derive {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+      display: flex; justify-content: center; align-items: center;
+      padding: 1rem; cursor: pointer;
+      background: rgba(10,10,10,0.8); backdrop-filter: blur(6px);
+      transition: background 0.4s ease;
+    }
+    .derive:hover { background: rgba(196,64,47,0.16); }
+    .derive-label {
+      font-family: 'EB Garamond', serif; font-style: italic;
+      font-size: 0.95rem; color: var(--light-grey); transition: color 0.3s ease;
+    }
+    .derive:hover .derive-label { color: var(--bone); }
+    .derive-arrow { margin-left: 0.7rem; color: var(--choublak); font-style: normal; }
+
+    @media (max-width: 768px) {
+      body { overflow-y: auto; }
+      .scraps { position: relative; padding: 34vh 1.5rem 8rem; display: flex; flex-direction: column; gap: 1.4rem; }
+      .scrap { position: relative !important; top: auto !important; left: auto !important; right: auto !important; animation: none; }
+      .marquee { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grain, .shatter .ch, .scrap, .marquee-inner { animation: none !important; }
+      .scrap { transition-duration: 0.01s; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header>
+    <div class="site-name">Ésery Mondésir</div>
+    <nav class="lang-switch" id="langSwitch" aria-label="Language">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="fr">FR</button>
+      <button data-lang="ht">KREYÒL</button>
+    </nav>
+  </header>
+
+  <h1 class="shatter" id="shatter" aria-label="Ésery Mondésir">Ésery Mondésir</h1>
+
+  <main class="scraps">
+    <div class="scrap" data-door="watch" role="link" tabindex="0">
+      <span class="scrap-index">001</span>
+      <h2 class="scrap-title" data-i18n="watch">Watch</h2>
+      <p class="scrap-sub" data-i18n="watchSub">Films &amp; video works</p>
+    </div>
+    <div class="scrap" data-door="listen" role="link" tabindex="0">
+      <span class="scrap-index">002</span>
+      <h2 class="scrap-title" data-i18n="listen">Listen</h2>
+      <p class="scrap-sub" data-i18n="listenSub">Voice &amp; sound</p>
+    </div>
+    <div class="scrap" data-door="read" role="link" tabindex="0">
+      <span class="scrap-index">003</span>
+      <h2 class="scrap-title" data-i18n="read">Read</h2>
+      <p class="scrap-sub" data-i18n="readSub">Writing &amp; research</p>
+    </div>
+  </main>
+
+  <div class="marquee"><div class="marquee-inner" id="marquee"></div></div>
+
+  <div class="derive" role="link" tabindex="0">
+    <span class="derive-label" data-i18n="drift">or let the site drift you</span>
+    <span class="derive-arrow">&rarr;</span>
+  </div>
+
+  <script>
+    // ===== i18n =====
+    const I18N = {
+      en: { watch: 'Watch', listen: 'Listen', read: 'Read',
+            watchSub: 'Films & video works', listenSub: 'Voice & sound', readSub: 'Writing & research',
+            drift: 'or let the site drift you',
+            marquee: 'artist-filmmaker · writer · educator · between port-au-prince and montréal · the in-between is not empty — it vibrates · ' },
+      fr: { watch: 'Regarder', listen: 'Écouter', read: 'Lire',
+            watchSub: 'Films & œuvres vidéo', listenSub: 'Voix & son', readSub: 'Écriture & recherche',
+            drift: 'ou laissez le site vous porter',
+            marquee: 'artiste-cinéaste · écrivain · pédagogue · entre port-au-prince et montréal · l’entre-deux n’est pas vide — il vibre · ' },
+      ht: { watch: 'Gade', listen: 'Koute', read: 'Li',
+            watchSub: 'Fim & videyo', listenSub: 'Vwa & son', readSub: 'Ekriti & rechèch',
+            drift: 'oswa kite sit la mennen w',
+            marquee: 'atis-sineyas · ekriven · edikatè · ant pòtoprens ak monreyal · espas nan mitan an pa vid — li vibre · ' }
+    };
+    function setLang(lang) {
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        if (dict[el.dataset.i18n]) el.textContent = dict[el.dataset.i18n];
+      });
+      document.getElementById('marquee').textContent = dict.marquee.repeat(4);
+      document.documentElement.lang = lang;
+      document.querySelectorAll('#langSwitch button').forEach(b =>
+        b.classList.toggle('active', b.dataset.lang === lang));
+      try { localStorage.setItem('em-lang', lang); } catch (e) {}
+    }
+    document.querySelectorAll('#langSwitch button').forEach(btn =>
+      btn.addEventListener('click', () => setLang(btn.dataset.lang)));
+
+    // ===== fractured title: split into chars =====
+    (function () {
+      const el = document.getElementById('shatter');
+      const text = el.textContent;
+      el.innerHTML = text.split('').map((c, i) =>
+        c === ' ' ? '<span class="ch">&nbsp;</span>'
+                  : `<span class="ch" style="animation-delay:${(i * 0.37) % 6}s">${c}</span>`
+      ).join('');
+    })();
+
+    let lang = 'en';
+    try { lang = localStorage.getItem('em-lang') || 'en'; } catch (e) {}
+    setLang(lang);
+
+    // ===== scraps repel slightly from the cursor =====
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced) {
+      const scraps = document.querySelectorAll('.scrap');
+      document.addEventListener('mousemove', e => {
+        scraps.forEach(s => {
+          if (s.matches(':hover')) { s.style.marginLeft = ''; s.style.marginTop = ''; return; }
+          const r = s.getBoundingClientRect();
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          const dx = cx - e.clientX, dy = cy - e.clientY;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 260 && dist > 0) {
+            const f = (260 - dist) / 260 * 18;
+            s.style.marginLeft = (dx / dist * f) + 'px';
+            s.style.marginTop = (dy / dist * f) + 'px';
+          } else {
+            s.style.marginLeft = ''; s.style.marginTop = '';
+          }
+        });
+      }, { passive: true });
+    }
+
+    // click feedback
+    document.querySelectorAll('.scrap, .derive').forEach(el => {
+      el.addEventListener('click', () => {
+        el.style.outline = '1px solid rgba(196,64,47,0.7)';
+        setTimeout(() => { el.style.outline = ''; }, 350);
+      });
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') el.click(); });
+    });
+  </script>
+</body>
+</html>

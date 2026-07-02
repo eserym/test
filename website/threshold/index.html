@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threshold Variations — Phase 1</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+    :root { --ink:#0a0a0a; --bone:#f0ece4; --choublak:#c4402f; --grey:#4a4a4a; --light-grey:#8a8a8a; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--ink); color:var(--bone); font-family:'Space Grotesk',sans-serif; min-height:100vh; padding:8vh 6vw; -webkit-font-smoothing:antialiased; }
+    h1 { font-family:'EB Garamond',serif; font-weight:400; font-size:clamp(2rem,5vw,3.5rem); margin-bottom:0.5rem; }
+    .sub { color:var(--light-grey); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.25em; margin-bottom:6vh; }
+    .options { display:grid; gap:1px; background:rgba(240,236,228,0.1); border:1px solid rgba(240,236,228,0.1); }
+    a.option { display:block; text-decoration:none; color:var(--bone); background:var(--ink); padding:2.5rem 2rem; transition:background 0.4s ease; }
+    a.option:hover { background:#141210; }
+    .option-tag { font-size:0.6rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--choublak); }
+    .option-title { font-family:'EB Garamond',serif; font-weight:400; font-size:clamp(1.6rem,3.5vw,2.4rem); margin:0.6rem 0; }
+    .option-desc { color:var(--light-grey); font-size:0.9rem; line-height:1.65; max-width:56ch; }
+    .option-refs { margin-top:1rem; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--grey); }
+    .note { margin-top:6vh; font-family:'EB Garamond',serif; font-style:italic; color:var(--light-grey); font-size:1rem; max-width:60ch; line-height:1.7; }
+  </style>
+</head>
+<body>
+  <h1>The Threshold — three intensities</h1>
+  <p class="sub">Phase 1 · design language exploration · Ésery Mondésir</p>
+
+  <div class="options">
+    <a class="option" href="variation-a.html">
+      <span class="option-tag">Variation A</span>
+      <h2 class="option-title">La Retenue — restraint</h2>
+      <p class="option-desc">A cinematic triptych. Three tall doors share the screen; hovering one slowly opens it wider and tints the room. The calmest of the three — fragmentation is implied, not performed.</p>
+      <p class="option-refs">leaning: Salomon Ligthelm</p>
+    </a>
+    <a class="option" href="variation-b.html">
+      <span class="option-tag">Variation B</span>
+      <h2 class="option-title">La Dérive — drift</h2>
+      <p class="option-desc">The doors float untethered over a breathing color field. Hovering a door tints the entire atmosphere toward its mood. The name sits behind everything like a watermark of the self.</p>
+      <p class="option-refs">leaning: Má Sài Gòn</p>
+    </a>
+    <a class="option" href="variation-c.html">
+      <span class="option-tag">Variation C</span>
+      <h2 class="option-title">La Rupture — rupture</h2>
+      <p class="option-desc">Torn scraps at wrong angles, a title that twitches, doors that shy away from the cursor before letting you in. The most unstable — the site itself misbehaves, deliberately.</p>
+      <p class="option-refs">leaning: Dada Data</p>
+    </a>
+  </div>
+
+  <p class="note">All three share the same bones: three doors (Watch / Listen / Read), the Dérive escape hatch, the EN·FR·Kreyòl switcher, grain, and the choublak red. They differ only in how much instability the surface admits. The final Threshold can also blend two — e.g. B's mood tinting inside A's restraint.</p>
+</body>
+</html>
