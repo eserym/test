@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kat Grenn Pwomennen — Ayiti at the center</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      --warm: #d9a066;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      background: #040404;
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+    body.dragging { cursor: grabbing; }
+
+    #sky { position: fixed; inset: 0; display: block; }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    .title {
+      position: fixed; top: 2rem; left: 0; right: 0; z-index: 60;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 1rem; color: rgba(240,236,228,0.45);
+      letter-spacing: 0.08em;
+    }
+    .title .sub {
+      display: block; margin-top: 0.4rem;
+      font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.58rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    #label {
+      position: fixed; z-index: 60; pointer-events: none;
+      font-style: italic; font-size: 1.05rem; color: var(--bone);
+      text-shadow: 0 0 14px rgba(0,0,0,0.95);
+      opacity: 0; transition: opacity 0.25s ease;
+      transform: translate(-50%, -200%);
+      white-space: nowrap; text-align: center;
+    }
+    #label .kind {
+      display: block; font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--warm); margin-top: 0.3rem;
+    }
+    #label.visible { opacity: 1; }
+
+    .legend {
+      position: fixed; bottom: 2.4rem; left: 2.2rem; z-index: 60;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
+      letter-spacing: 0.14em; color: var(--light-grey); line-height: 2.1;
+      pointer-events: none;
+    }
+    .legend .dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      margin-right: 0.6rem; vertical-align: middle;
+    }
+
+    .mode {
+      position: fixed; bottom: 2.4rem; right: 2.2rem; z-index: 60;
+      background: none; border: 1px solid rgba(240,236,228,0.2);
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase;
+      padding: 0.7rem 1.1rem; cursor: pointer;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+    .mode:hover { color: var(--bone); border-color: rgba(217,160,102,0.7); }
+
+    .hint {
+      position: fixed; bottom: 2.4rem; left: 0; right: 0; z-index: 55;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 0.88rem;
+      color: rgba(240,236,228,0.35);
+      transition: opacity 1.5s ease;
+    }
+    .hint.gone { opacity: 0; }
+
+    .open-node {
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(4,4,4,0.94);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+    .open-node.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    .open-inner { max-width: 560px; padding: 2rem; text-align: center; }
+    .open-inner .kind {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+      display: block; margin-bottom: 1.2rem;
+    }
+    .open-inner h2 { font-weight: 400; font-style: italic; font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 0.5rem; }
+    .open-inner .dist {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
+      letter-spacing: 0.25em; color: var(--grey); margin-bottom: 1.4rem;
+    }
+    .open-inner p { color: rgba(240,236,228,0.72); line-height: 1.8; margin-bottom: 1rem; }
+    .open-inner .note {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.64rem;
+      letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
+    }
+    .open-close {
+      position: fixed; top: 1.6rem; right: 2rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease;
+    }
+    .open-close:hover { color: var(--bone); }
+
+    @media (max-width: 700px) {
+      .legend { display: none; }
+      .hint { bottom: 5.6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="sky"></canvas>
+  <div class="grain"></div>
+
+  <p class="title">Kat Grenn Pwomennen
+    <span class="sub">the world, with Ayiti at its center</span>
+  </p>
+
+  <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
+
+  <div class="legend">
+    <span class="dot" style="background:#f0ece4"></span>Ayiti — kè a, the core<br>
+    <span class="dot" style="background:#d9a066"></span>kominote — where Haiti's children settled<br>
+    <span class="dot" style="background:#c4402f"></span>travay — where the work was made or shown<br>
+    <span class="dot" style="background:linear-gradient(90deg,#d9a066,#c4402f)"></span>tou de — both
+  </div>
+
+  <button class="mode" id="modeBtn">Kat ⇄ Fanmi</button>
+
+  <p class="hint" id="hint">trennen pou w vire &middot; drag to turn &middot; klike sou yon vil &middot; click a city</p>
+
+  <div class="open-node" id="openNode" role="dialog" aria-modal="true">
+    <button class="open-close" id="openClose">Tounen — return</button>
+    <div class="open-inner" id="openInner"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ================================================================
+    // KAT GRENN PWOMENNEN — the diaspora as a galaxy.
+    // Azimuthal-equidistant world: every position is its TRUE distance
+    // and bearing from Port-au-Prince. Ayiti is the galactic core.
+    // Routes are curved filaments; communities glow amber, work glows red.
+    // ================================================================
+
+    const PAP = { lat: 18.5944, lon: -72.3074 };
+
+    // type: kominote (community) | travay (work) | toude (both)
+    const CITIES = [
+      { name: 'Miami — Little Haiti', lat: 25.7617, lon: -80.1918, type: 'toude', size: 22,
+        body: 'Little Haiti, Krome, Third Horizon, PAMM. A community and a stage — and a wound (WelKrome).' },
+      { name: 'New York — Brooklyn', lat: 40.6782, lon: -73.9442, type: 'kominote', size: 22,
+        body: 'Flatbush, the largest Haitian community outside the island.' },
+      { name: 'Boston', lat: 42.3601, lon: -71.0589, type: 'kominote', size: 15,
+        body: 'Mattapan, Hyde Park — dekabès New England.' },
+      { name: 'Montréal', lat: 45.5017, lon: -73.5673, type: 'toude', size: 20,
+        body: 'Community and practice: Choublak at Leonard & Bina Ellen (2024–25).' },
+      { name: 'Toronto', lat: 43.6532, lon: -79.3832, type: 'toude', size: 18,
+        body: 'Where the artist teaches and works.' },
+      { name: 'La Havane', lat: 23.1136, lon: -82.3666, type: 'travay', size: 16,
+        body: 'Una Sola Sangre — Haitians in Cuba, familial memory across generations.' },
+      { name: 'Santiago de Cuba', lat: 20.0247, lon: -75.8219, type: 'kominote', size: 13,
+        body: 'Descendants of cane-cutters — one blood.' },
+      { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312, type: 'kominote', size: 16,
+        body: 'The nearest elsewhere — the island shared and divided.' },
+      { name: 'Tijuana', lat: 32.5149, lon: -117.0382, type: 'travay', size: 16,
+        body: 'What Happens to a Dream Deferred — asylum seekers at the border.' },
+      { name: 'Paris', lat: 48.8566, lon: 2.3522, type: 'kominote', size: 15,
+        body: 'The old metropole; the community across the water.' },
+      { name: 'Cayenne', lat: 4.9224, lon: -52.3134, type: 'kominote', size: 12,
+        body: 'Guyane — a newer route of the seed.' },
+      { name: 'Nassau', lat: 25.0443, lon: -77.3504, type: 'kominote', size: 12,
+        body: 'The Bahamas — closest crossing, oldest boats.' },
+      { name: 'Santiago (Chile)', lat: -33.4489, lon: -70.6693, type: 'kominote', size: 13,
+        body: 'The long southern road after 2010.' },
+      { name: 'São Paulo', lat: -23.5505, lon: -46.6333, type: 'kominote', size: 13,
+        body: 'Brazil — a waystation that became a home, then a departure again.' },
+      { name: 'Pointe-à-Pitre', lat: 16.2415, lon: -61.5328, type: 'kominote', size: 11,
+        body: 'Guadeloupe — kin across the arc of islands.' },
+    ];
+
+    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184' };
+
+    // ---------- azimuthal equidistant from Port-au-Prince ----------
+    const R_EARTH = 6371;
+    function toRad(d) { return d * Math.PI / 180; }
+    function distBearing(lat1, lon1, lat2, lon2) {
+      const p1 = toRad(lat1), p2 = toRad(lat2), dl = toRad(lon2 - lon1);
+      const d = Math.acos(Math.min(1, Math.sin(p1) * Math.sin(p2) + Math.cos(p1) * Math.cos(p2) * Math.cos(dl))) * R_EARTH;
+      const y = Math.sin(dl) * Math.cos(p2);
+      const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+      return { d, brg: Math.atan2(y, x) };
+    }
+    const SCALE = 700 / 8200; // fit ~8200km (Paris) within radius 700
+
+    // ---------- scene ----------
+    const canvas = document.getElementById('sky');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x040404, 0.00045);
+    const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 1, 8000);
+
+    function glowTexture(hex, soft) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      if (soft) {
+        g.addColorStop(0, hex + '55'); g.addColorStop(0.5, hex + '22'); g.addColorStop(1, hex + '00');
+      } else {
+        g.addColorStop(0, hex); g.addColorStop(0.25, hex + 'cc'); g.addColorStop(0.6, hex + '33'); g.addColorStop(1, hex + '00');
+      }
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // ---------- nebula (soft amber gas behind the plane) ----------
+    const nebulaTex = [glowTexture('#d9a066', true), glowTexture('#c4402f', true), glowTexture('#6a6f8a', true)];
+    const nebulae = [];
+    for (let i = 0; i < 14; i++) {
+      const m = new THREE.SpriteMaterial({
+        map: nebulaTex[i % 3], transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.5,
+      });
+      const s = new THREE.Sprite(m);
+      const a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 620;
+      s.position.set(Math.cos(a) * r, (Math.random() - 0.5) * 120 - 60, Math.sin(a) * r);
+      s.scale.setScalar(360 + Math.random() * 520);
+      s.userData.rot = (Math.random() - 0.5) * 0.0004;
+      scene.add(s); nebulae.push(s);
+    }
+
+    // ---------- distance rings (1000 / 2500 / 5000 / 7500 km) ----------
+    [1000, 2500, 5000, 7500].forEach(km => {
+      const r = km * SCALE, pts = [];
+      for (let i = 0; i <= 128; i++) {
+        const a = (i / 128) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+      }
+      const g = new THREE.BufferGeometry().setFromPoints(pts);
+      scene.add(new THREE.Line(g, new THREE.LineBasicMaterial({
+        color: 0xf0ece4, transparent: true, opacity: 0.05
+      })));
+    });
+
+    // ---------- nodes ----------
+    const nodes = [];
+    function addNode(data, pos, colorKey, size) {
+      const mat = new THREE.SpriteMaterial({
+        map: glowTexture(COLORS[colorKey]), transparent: true,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const s = new THREE.Sprite(mat);
+      s.position.copy(pos);
+      s.scale.setScalar(size);
+      s.userData = data;
+      data.sprite = s; data.baseSize = size; data.phase = Math.random() * Math.PI * 2;
+      data.geoPos = pos.clone(); // map layout position
+      scene.add(s);
+      nodes.push(data);
+    }
+
+    // core: Ayiti
+    const core = { name: 'Ayiti — Pòtoprens', kind: 'kè a — the core', type: 'core',
+      body: 'Where every line begins. The tree the seeds fell from. In this projection, every distance and every direction is true — measured from here.' , dist: 0 };
+    addNode(core, new THREE.Vector3(0, 0, 0), 'core', 34);
+
+    // cities
+    CITIES.forEach(c => {
+      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
+      c.dist = Math.round(d);
+      c.kind = c.type === 'kominote' ? 'kominote — community'
+             : c.type === 'travay' ? 'travay — the work'
+             : 'kominote + travay';
+      const x = Math.sin(brg) * d * SCALE;
+      const z = -Math.cos(brg) * d * SCALE;
+      const y = (Math.random() - 0.5) * 26; // slight galactic thickness
+      addNode(c, new THREE.Vector3(x, y, z), c.type, c.size);
+    });
+
+    // ---------- alternative layout: FANMI (kinship rings, not geography) ----------
+    // toude = inner ring, travay = middle, kominote = outer — golden-angle spread
+    (function fanmiLayout() {
+      const rings = { toude: 170, travay: 320, kominote: 480 };
+      const GA = Math.PI * (3 - Math.sqrt(5));
+      const counts = {};
+      nodes.forEach((n, i) => {
+        if (n.type === 'core') { n.altPos = new THREE.Vector3(0, 0, 0); return; }
+        counts[n.type] = (counts[n.type] || 0) + 1;
+        const k = counts[n.type];
+        const a = k * GA * 2.4;
+        const r = rings[n.type] + (k % 3) * 36;
+        n.altPos = new THREE.Vector3(Math.cos(a) * r, (Math.random() - 0.5) * 90, Math.sin(a) * r);
+      });
+    })();
+
+    let mode = 'kat'; // kat = geographic | fanmi = kinship
+    document.getElementById('modeBtn').addEventListener('click', () => {
+      mode = mode === 'kat' ? 'fanmi' : 'kat';
+    });
+
+    // ---------- filaments (curved routes from Ayiti to each city) ----------
+    const filaments = [];
+    function makeFilament(node) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(new Array(25 * 3).fill(0), 3));
+      const line = new THREE.Line(g, new THREE.LineBasicMaterial({
+        color: new THREE.Color(COLORS[node.type]), transparent: true,
+        opacity: node.type === 'kominote' ? 0.22 : 0.34,
+        blending: THREE.AdditiveBlending,
+      }));
+      scene.add(line);
+      filaments.push({ node, line });
+    }
+    nodes.forEach(n => { if (n.type !== 'core') makeFilament(n); });
+
+    function updateFilaments() {
+      const a = new THREE.Vector3(0, 0, 0);
+      filaments.forEach(f => {
+        const b = f.node.sprite.position;
+        const mid = a.clone().add(b).multiplyScalar(0.5);
+        mid.y += b.distanceTo(a) * 0.16; // the bow — a route through air, not ground
+        const attr = f.line.geometry.attributes.position;
+        for (let i = 0; i <= 24; i++) {
+          const t = i / 24;
+          const p = new THREE.Vector3()
+            .addScaledVector(a, (1 - t) * (1 - t))
+            .addScaledVector(mid, 2 * (1 - t) * t)
+            .addScaledVector(b, t * t);
+          attr.setXYZ(i, p.x, p.y, p.z);
+        }
+        attr.needsUpdate = true;
+      });
+    }
+
+    // ---------- dust ----------
+    (function dust() {
+      const N = 3000, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const r = 900 + Math.random() * 3000;
+        const t = Math.random() * Math.PI * 2;
+        const p = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(p) * Math.cos(t);
+        pos[i * 3 + 1] = r * Math.cos(p);
+        pos[i * 3 + 2] = r * Math.sin(p) * Math.sin(t);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+        color: 0x8a8a8a, size: 1.3, transparent: true, opacity: 0.3
+      })));
+    })();
+
+    // ---------- camera ----------
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let theta = -0.4, phi = 0.95, radius = 1150;
+    let targetTheta = theta, targetPhi = phi, targetRadius = radius;
+    const lookAt = new THREE.Vector3(0, 0, 0), targetLookAt = new THREE.Vector3(0, 0, 0);
+    let interacted = false;
+
+    function applyCamera() {
+      theta += (targetTheta - theta) * 0.06;
+      phi += (targetPhi - phi) * 0.06;
+      radius += (targetRadius - radius) * 0.06;
+      lookAt.lerp(targetLookAt, 0.06);
+      camera.position.set(
+        lookAt.x + radius * Math.sin(phi) * Math.cos(theta),
+        lookAt.y + radius * Math.cos(phi),
+        lookAt.z + radius * Math.sin(phi) * Math.sin(theta)
+      );
+      camera.lookAt(lookAt);
+    }
+
+    let dragging = false, moved = 0, last = null, pinchDist = null;
+    function pxy(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+
+    addEventListener('mousedown', e => { dragging = true; moved = 0; last = pxy(e); document.body.classList.add('dragging'); });
+    addEventListener('mousemove', e => {
+      if (dragging) {
+        const p = pxy(e);
+        targetTheta += (p.x - last.x) * 0.005;
+        targetPhi = Math.min(1.45, Math.max(0.25, targetPhi - (p.y - last.y) * 0.004));
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p; interacted = true; hideHint();
+      }
+      onHover(e);
+    });
+    addEventListener('mouseup', () => { dragging = false; document.body.classList.remove('dragging'); });
+    addEventListener('wheel', e => {
+      targetRadius = Math.min(2600, Math.max(180, targetRadius + e.deltaY * 0.8));
+      interacted = true; hideHint();
+    }, { passive: true });
+    addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      } else { dragging = true; moved = 0; last = pxy(e); }
+      interacted = true; hideHint();
+    }, { passive: true });
+    addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && pinchDist) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        targetRadius = Math.min(2600, Math.max(180, targetRadius * pinchDist / d));
+        pinchDist = d;
+      } else if (dragging) {
+        const p = pxy(e);
+        targetTheta += (p.x - last.x) * 0.006;
+        targetPhi = Math.min(1.45, Math.max(0.25, targetPhi - (p.y - last.y) * 0.005));
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p;
+      }
+    }, { passive: true });
+    addEventListener('touchend', () => {
+      if (dragging && moved < 8 && last) tryPick(last.x, last.y);
+      dragging = false; pinchDist = null;
+    });
+
+    // ---------- picking ----------
+    const ray = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const label = document.getElementById('label');
+    const labelText = document.getElementById('labelText');
+    const labelKind = document.getElementById('labelKind');
+    let hovered = null;
+
+    function pick(x, y) {
+      mouse.x = (x / innerWidth) * 2 - 1;
+      mouse.y = -(y / innerHeight) * 2 + 1;
+      ray.setFromCamera(mouse, camera);
+      const hits = ray.intersectObjects(nodes.map(n => n.sprite));
+      return hits.length ? hits[0].object.userData : null;
+    }
+    function onHover(e) {
+      const n = pick(e.clientX, e.clientY);
+      hovered = n;
+      if (n) {
+        labelText.textContent = n.name;
+        labelKind.textContent = (n.kind || '') + (n.dist ? ' · ' + n.dist.toLocaleString() + ' km' : '');
+        label.style.left = e.clientX + 'px';
+        label.style.top = e.clientY + 'px';
+        label.classList.add('visible');
+        document.body.style.cursor = 'pointer';
+      } else {
+        label.classList.remove('visible');
+        document.body.style.cursor = dragging ? 'grabbing' : 'grab';
+      }
+    }
+    addEventListener('click', e => { if (moved <= 8) tryPick(e.clientX, e.clientY); });
+
+    function tryPick(x, y) {
+      const n = pick(x, y);
+      if (!n) return;
+      targetLookAt.copy(n.sprite.position);
+      targetRadius = 260;
+      setTimeout(() => openNode(n), 700);
+    }
+
+    // ---------- overlay ----------
+    const openNodeEl = document.getElementById('openNode');
+    const openInner = document.getElementById('openInner');
+    function openNode(n) {
+      openInner.innerHTML =
+        `<span class="kind">${n.kind}</span><h2>${n.name}</h2>` +
+        (n.dist ? `<p class="dist">${n.dist.toLocaleString()} km soti Pòtoprens — from Port-au-Prince</p>` : '') +
+        `<p>${n.body}</p>` +
+        `<p class="note">${n.type === 'core' ? 'the journey begins and returns here' :
+          'films, sounds, memories and community stories gathered in this city open here'}</p>`;
+      openNodeEl.classList.add('visible');
+      document.getElementById('openClose').focus();
+    }
+    function closeNode() {
+      openNodeEl.classList.remove('visible');
+      targetLookAt.set(0, 0, 0);
+      targetRadius = 1150;
+    }
+    document.getElementById('openClose').addEventListener('click', closeNode);
+    addEventListener('keydown', e => { if (e.key === 'Escape') closeNode(); });
+
+    // ---------- HUD ----------
+    let hintHidden = false;
+    function hideHint() {
+      if (hintHidden) return;
+      hintHidden = true;
+      setTimeout(() => document.getElementById('hint').classList.add('gone'), 3500);
+    }
+
+    // ---------- loop ----------
+    let t = 0;
+    function frame() {
+      t += 0.016;
+      if (!interacted && !reduced) targetTheta += 0.0005;
+
+      // layout morph: kat (geography) <-> fanmi (kinship)
+      nodes.forEach(n => {
+        const goal = (mode === 'kat') ? n.geoPos : (n.altPos || n.geoPos);
+        n.sprite.position.lerp(goal, 0.045);
+        const pulse = 1 + Math.sin(t * 1.1 + n.phase) * (n.type === 'core' ? 0.1 : 0.07);
+        n.sprite.scale.setScalar(n.baseSize * pulse * (hovered === n ? 1.5 : 1));
+      });
+      updateFilaments();
+      nebulae.forEach(s => { s.material.rotation += s.userData.rot; });
+
+      applyCamera();
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    frame();
+
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+</body>
+</html>
