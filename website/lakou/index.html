@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lakou a — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      --warm: #d9a066;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      background: #050505;
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+    body.dragging { cursor: grabbing; }
+
+    #sky { position: fixed; inset: 0; display: block; }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    /* hover label */
+    #label {
+      position: fixed; z-index: 60; pointer-events: none;
+      font-style: italic; font-size: 1rem; color: var(--bone);
+      text-shadow: 0 0 12px rgba(0,0,0,0.9);
+      opacity: 0; transition: opacity 0.25s ease;
+      transform: translate(-50%, -180%);
+      white-space: nowrap; text-align: center;
+    }
+    #label .kind {
+      display: block; font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--light-grey); margin-top: 0.25rem;
+    }
+    #label.visible { opacity: 1; }
+
+    .hint {
+      position: fixed; bottom: 2.6rem; left: 0; right: 0; z-index: 60;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 0.9rem;
+      color: rgba(240,236,228,0.38); line-height: 2;
+      transition: opacity 1.5s ease;
+    }
+    .hint.gone { opacity: 0; }
+
+    .title {
+      position: fixed; top: 2rem; left: 0; right: 0; z-index: 60;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 1rem; color: rgba(240,236,228,0.4);
+      letter-spacing: 0.1em;
+      transition: opacity 1.5s ease;
+    }
+
+    /* node overlay */
+    .open-node {
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(5,5,5,0.94);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+    .open-node.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    .open-inner { max-width: 560px; padding: 2rem; text-align: center; }
+    .open-inner .kind {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+      display: block; margin-bottom: 1.2rem;
+    }
+    .open-inner h2 { font-weight: 400; font-style: italic; font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1.4rem; }
+    .open-inner p { color: rgba(240,236,228,0.72); line-height: 1.8; margin-bottom: 1rem; }
+    .open-inner .note {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.66rem;
+      letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
+    }
+    .open-close {
+      position: fixed; top: 1.6rem; right: 2rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease;
+    }
+    .open-close:hover { color: var(--bone); }
+
+    @media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
+  </style>
+</head>
+<body>
+  <canvas id="sky"></canvas>
+  <div class="grain"></div>
+
+  <p class="title">Lakou a — the yard, seen as a sky</p>
+
+  <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
+
+  <p class="hint" id="hint">
+    trennen pou w vire syèl la &middot; drag to turn the sky &middot; molette pou apwoche &middot; scroll to draw near<br>
+    <span style="font-size:0.75rem; opacity:0.7">klike sou yon zetwal &middot; click a star</span>
+  </p>
+
+  <div class="open-node" id="openNode" role="dialog" aria-modal="true">
+    <button class="open-close" id="openClose">Tounen — return</button>
+    <div class="open-inner" id="openInner"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // ================================================================
+    // LAKOU A — the yard as a constellation.
+    // Every star is a data point; lines are kinship. No ground, no world.
+    // The poto mitan stands at the center; everything gathers around it.
+    // ================================================================
+
+    const COLORS = {
+      poto:     '#f0ece4',
+      ancestor: '#d9a066',
+      film:     '#c4402f',
+      text:     '#b9c4d6',
+      sound:    '#d9a066',
+    };
+
+    // ---------------- DATA ----------------
+    const NODES = [
+      { id: 'poto', kind: 'poto mitan', label: 'Poto Mitan', pos: [0, 0, 0], size: 34,
+        body: 'The center post. In the lakou, everything gathers around it — the dances, the councils, the stories. Here, it is the heart of the archive: begin anywhere, all paths pass through it.' },
+
+      // ancestors — the inner ring
+      { id: 'grann', kind: 'zansèt — ancestor', label: 'Grann', pos: [190, 150, -90], size: 26,
+        body: 'She taught that a door is never just a door. Click through to her whole branch — another tree. She appears wherever a visitor hesitates at a threshold.' },
+      { id: 'manman', kind: 'zansèt — ancestor', label: 'Manman', pos: [-230, 110, 150], size: 24,
+        body: '[Placeholder — her story, her voice, her branch of the tree.]' },
+      { id: 'papa', kind: 'zansèt — ancestor', label: 'Papa', pos: [110, -210, 190], size: 24,
+        body: '[Placeholder — his story, his voice, his branch of the tree.]' },
+
+      // films — a western constellation
+      { id: 'una', kind: 'fim — film', label: 'Una Sola Sangre', year: '2022', pos: [-480, 190, -260], size: 17,
+        body: 'Haitians in Cuba — familial memory and political displacement across generations.' },
+      { id: 'dream', kind: 'fim — film', label: 'What Happens to a Dream Deferred', year: '2022', pos: [-560, 40, -80], size: 17,
+        body: 'Asylum seekers in Mexico — glitch, cellphone footage, WhatsApp voice notes.' },
+      { id: 'kale', kind: 'fim — film', label: 'Kale Kann Kale', year: '2023', pos: [-420, 320, -60], size: 15,
+        body: 'Hand-processed 16mm, flicker — the violent history of sugarcane.' },
+      { id: 'marks', kind: 'fim — film', label: 'The Marks Remember', year: '2023', pos: [-350, 220, 130], size: 15,
+        body: '16mm and plant-based dyes — colonial labor, transnational memory.' },
+      { id: 'death', kind: 'fim — film', label: 'Of What Death We Die', year: '2022', pos: [-620, -120, 60], size: 15,
+        body: 'The AIDS crisis in Haiti — mourning reclaimed through fragmentation.' },
+      { id: 'katherine', kind: 'fim — film', label: 'Katherine', year: '2020', pos: [-260, 380, 220], size: 14,
+        body: 'Katherine Dunham re-filmed, processed in coffee — Black feminist presence.' },
+      { id: 'choublak', kind: 'ekspozisyon — exhibition', label: 'Choublak', year: '2024–25', pos: [-120, 260, -300], size: 19,
+        body: 'Solo exhibition, Leonard & Bina Ellen Gallery — intergenerational storytelling, community-engaged.' },
+
+      // texts — an upper constellation
+      { id: 'bwapiwo', kind: 'pawòl — words', label: 'Bwa pi wo di li wè lwen…', pos: [180, 420, 120], size: 13,
+        body: '“The tallest tree claims to see far…” — the proverb’s first voice: rootedness, the one who stays.' },
+      { id: 'grenn', kind: 'pawòl — words', label: '…men grenn pwomennen di li wè pi lwen', pos: [370, 340, -60], size: 16,
+        body: '“…but the wandering seed asserts it sees farther.” The persona of this whole place.' },
+      { id: 'vibre', kind: 'pawòl — words', label: 'Espas nan mitan an pa vid — li vibre', pos: [520, 180, 160], size: 12,
+        body: 'The in-between is not empty — it vibrates.' },
+      { id: 'ritm', kind: 'pawòl — words', label: 'Se pa rupture — se yon ritm', pos: [440, 60, -240], size: 12,
+        body: 'Migration reframed: not rupture — a generative rhythm.' },
+
+      // sounds — a lower constellation
+      { id: 'tanbou', kind: 'son — sound', label: 'yon tanbou byen lwen', pos: [80, -380, -180], size: 14,
+        body: 'A distant drum. [Placeholder — a real recording lives here.]' },
+      { id: 'lapli', kind: 'son — sound', label: 'lapli sou tòl', pos: [-120, -320, 220], size: 13,
+        body: 'Rain on a tin roof. [Placeholder — a real recording lives here.]' },
+      { id: 'vwa', kind: 'son — sound', label: 'yon vwa k ap chante', pos: [300, -280, 60], size: 13,
+        body: 'A voice singing. [Placeholder — a real recording lives here.]' },
+    ];
+
+    const EDGES = [
+      // the inner ring holds the center
+      ['grann', 'poto'], ['manman', 'poto'], ['papa', 'poto'],
+      // kinship among works
+      ['una', 'kale'], ['kale', 'marks'], ['marks', 'katherine'],
+      ['dream', 'death'], ['una', 'dream'],
+      ['choublak', 'grann'], ['choublak', 'poto'], ['choublak', 'marks'],
+      // the proverb chains to the center
+      ['bwapiwo', 'grenn'], ['grenn', 'poto'], ['grenn', 'vibre'], ['ritm', 'dream'], ['ritm', 'grenn'],
+      // sounds bind to people and center
+      ['tanbou', 'poto'], ['lapli', 'grann'], ['vwa', 'manman'],
+    ];
+
+    // ---------------- SCENE ----------------
+    const canvas = document.getElementById('sky');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050505, 0.00055);
+    const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 6000);
+
+    // glow sprite texture
+    function glowTexture(hex) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      g.addColorStop(0, hex);
+      g.addColorStop(0.25, hex + 'cc');
+      g.addColorStop(0.6, hex + '33');
+      g.addColorStop(1, hex + '00');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+    const textures = {};
+    for (const k in COLORS) textures[k] = glowTexture(COLORS[k]);
+
+    // stars (sprites)
+    const nodeById = {};
+    const sprites = [];
+    NODES.forEach(n => {
+      const kindKey = n.id === 'poto' ? 'poto'
+        : n.kind.includes('ancestor') ? 'ancestor'
+        : n.kind.includes('film') || n.kind.includes('exhibition') ? 'film'
+        : n.kind.includes('words') ? 'text' : 'sound';
+      const mat = new THREE.SpriteMaterial({
+        map: textures[kindKey], transparent: true,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const s = new THREE.Sprite(mat);
+      s.position.set(...n.pos);
+      s.scale.setScalar(n.size);
+      s.userData = n;
+      n.baseSize = n.size;
+      n.sprite = s;
+      n.phase = Math.random() * Math.PI * 2;
+      scene.add(s);
+      sprites.push(s);
+      nodeById[n.id] = n;
+    });
+
+    // kinship lines
+    const linePositions = [];
+    EDGES.forEach(([a, b]) => {
+      linePositions.push(...nodeById[a].pos, ...nodeById[b].pos);
+    });
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+    const lines = new THREE.LineSegments(lineGeo,
+      new THREE.LineBasicMaterial({ color: 0xf0ece4, transparent: true, opacity: 0.09 }));
+    scene.add(lines);
+
+    // distant dust — depth without a "world"
+    (function dust() {
+      const N = 2600, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const r = 1200 + Math.random() * 2600;
+        const t = Math.random() * Math.PI * 2;
+        const p = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(p) * Math.cos(t);
+        pos[i * 3 + 1] = r * Math.cos(p);
+        pos[i * 3 + 2] = r * Math.sin(p) * Math.sin(t);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+        color: 0x8a8a8a, size: 1.4, transparent: true, opacity: 0.35, sizeAttenuation: true
+      })));
+    })();
+
+    // ---------------- CAMERA (orbit + fly-to) ----------------
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let theta = 0.6, phi = 1.25, radius = 950;
+    let targetTheta = theta, targetPhi = phi, targetRadius = radius;
+    const lookAt = new THREE.Vector3(0, 0, 0);
+    const targetLookAt = new THREE.Vector3(0, 0, 0);
+    let interacted = false;
+
+    function applyCamera() {
+      theta += (targetTheta - theta) * 0.06;
+      phi += (targetPhi - phi) * 0.06;
+      radius += (targetRadius - radius) * 0.06;
+      lookAt.lerp(targetLookAt, 0.06);
+      camera.position.set(
+        lookAt.x + radius * Math.sin(phi) * Math.cos(theta),
+        lookAt.y + radius * Math.cos(phi),
+        lookAt.z + radius * Math.sin(phi) * Math.sin(theta)
+      );
+      camera.lookAt(lookAt);
+    }
+
+    // pointer orbit
+    let dragging = false, moved = 0, last = null, pinchDist = null;
+    function pxy(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+
+    addEventListener('mousedown', e => { dragging = true; moved = 0; last = pxy(e); document.body.classList.add('dragging'); });
+    addEventListener('mousemove', e => {
+      if (dragging) {
+        const p = pxy(e);
+        targetTheta += (p.x - last.x) * 0.005;
+        targetPhi = Math.min(2.6, Math.max(0.5, targetPhi - (p.y - last.y) * 0.004));
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p; interacted = true; hideHint();
+      }
+      onHover(e);
+    });
+    addEventListener('mouseup', () => { dragging = false; document.body.classList.remove('dragging'); });
+    addEventListener('wheel', e => {
+      targetRadius = Math.min(2200, Math.max(160, targetRadius + e.deltaY * 0.7));
+      interacted = true; hideHint();
+    }, { passive: true });
+
+    addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      } else { dragging = true; moved = 0; last = pxy(e); }
+      interacted = true; hideHint();
+    }, { passive: true });
+    addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && pinchDist) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        targetRadius = Math.min(2200, Math.max(160, targetRadius * pinchDist / d));
+        pinchDist = d;
+      } else if (dragging) {
+        const p = pxy(e);
+        targetTheta += (p.x - last.x) * 0.006;
+        targetPhi = Math.min(2.6, Math.max(0.5, targetPhi - (p.y - last.y) * 0.005));
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p;
+      }
+    }, { passive: true });
+    addEventListener('touchend', e => {
+      if (dragging && moved < 8 && last) tryPick(last.x, last.y);
+      dragging = false; pinchDist = null;
+    });
+
+    // ---------------- PICKING ----------------
+    const ray = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const label = document.getElementById('label');
+    const labelText = document.getElementById('labelText');
+    const labelKind = document.getElementById('labelKind');
+    let hovered = null;
+
+    function pick(x, y) {
+      mouse.x = (x / innerWidth) * 2 - 1;
+      mouse.y = -(y / innerHeight) * 2 + 1;
+      ray.setFromCamera(mouse, camera);
+      const hits = ray.intersectObjects(sprites);
+      return hits.length ? hits[0].object.userData : null;
+    }
+
+    function onHover(e) {
+      const n = pick(e.clientX, e.clientY);
+      hovered = n;
+      if (n) {
+        labelText.textContent = n.label + (n.year ? ' — ' + n.year : '');
+        labelKind.textContent = n.kind;
+        label.style.left = e.clientX + 'px';
+        label.style.top = e.clientY + 'px';
+        label.classList.add('visible');
+        document.body.style.cursor = 'pointer';
+      } else {
+        label.classList.remove('visible');
+        document.body.style.cursor = dragging ? 'grabbing' : 'grab';
+      }
+    }
+
+    addEventListener('click', e => {
+      if (moved > 8) return;
+      tryPick(e.clientX, e.clientY);
+    });
+
+    function tryPick(x, y) {
+      const n = pick(x, y);
+      if (!n) return;
+      // fly toward the star, then open it
+      targetLookAt.set(...n.pos);
+      targetRadius = 220;
+      setTimeout(() => openNode(n), 700);
+    }
+
+    // ---------------- OVERLAY ----------------
+    const openNodeEl = document.getElementById('openNode');
+    const openInner = document.getElementById('openInner');
+    function openNode(n) {
+      openInner.innerHTML = `<span class="kind">${n.kind}</span><h2>${n.label}</h2><p>${n.body}</p>` +
+        `<p class="note">${n.kind.includes('film') ? 'the film (vimeo) opens here in the production build' :
+           n.kind.includes('sound') ? 'a real recording plays here in the production build' :
+           n.kind.includes('ancestor') ? 'click-through to their full branch — another tree' :
+           'placeholder'}</p>`;
+      openNodeEl.classList.add('visible');
+      document.getElementById('openClose').focus();
+    }
+    function closeNode() {
+      openNodeEl.classList.remove('visible');
+      targetLookAt.set(0, 0, 0);
+      targetRadius = 950;
+    }
+    document.getElementById('openClose').addEventListener('click', closeNode);
+    addEventListener('keydown', e => { if (e.key === 'Escape') closeNode(); });
+
+    // ---------------- HUD ----------------
+    let hintHidden = false;
+    function hideHint() {
+      if (hintHidden) return;
+      hintHidden = true;
+      setTimeout(() => document.getElementById('hint').classList.add('gone'), 3500);
+    }
+
+    // ---------------- LOOP ----------------
+    let t = 0;
+    function frame() {
+      t += 0.016;
+      if (!interacted && !reduced) targetTheta += 0.0006; // the sky turns slowly on its own
+      // stars breathe
+      NODES.forEach(n => {
+        const pulse = 1 + Math.sin(t * 1.1 + n.phase) * (n.id === 'poto' ? 0.10 : 0.07);
+        n.sprite.scale.setScalar(n.baseSize * pulse * (hovered === n ? 1.5 : 1));
+      });
+      applyCamera();
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    frame();
+
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
+</body>
+</html>
