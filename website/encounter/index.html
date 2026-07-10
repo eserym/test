@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onè — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      --warm: #d9a066;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--ink);
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    /* ================= ARRIVAL ================= */
+    .stage {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      transition: opacity 1.2s ease, visibility 1.2s ease;
+    }
+    .stage.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .knock-form {
+      display: flex; align-items: center; gap: 1rem;
+      border-bottom: 1px solid rgba(240,236,228,0.25);
+      padding-bottom: 0.6rem;
+      transition: border-color 0.5s ease;
+    }
+    .knock-form:focus-within { border-color: rgba(240,236,228,0.6); }
+
+    #knock {
+      background: none; border: none; outline: none;
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      text-align: center;
+      width: min(60vw, 420px);
+      caret-color: var(--choublak);
+    }
+    #knock::placeholder { color: rgba(240,236,228,0.18); font-style: italic; }
+
+    .mic {
+      background: none; border: 1px solid rgba(240,236,228,0.2);
+      border-radius: 50%; width: 44px; height: 44px;
+      cursor: pointer; color: var(--light-grey);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.3s ease, color 0.3s ease;
+      flex-shrink: 0;
+    }
+    .mic:hover, .mic:focus-visible { border-color: var(--choublak); color: var(--bone); }
+    .mic.listening { border-color: var(--choublak); color: var(--choublak); animation: micPulse 1.2s ease-in-out infinite; }
+    @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,64,47,0.35); } 50% { box-shadow: 0 0 0 10px rgba(196,64,47,0); } }
+    .mic svg { width: 18px; height: 18px; }
+
+    .whisper {
+      margin-top: 2.4rem; text-align: center;
+      font-style: italic; font-size: 0.95rem;
+      color: rgba(240,236,228,0.35);
+      line-height: 2;
+      opacity: 0; transition: opacity 2s ease;
+      min-height: 3em;
+    }
+    .whisper.visible { opacity: 1; }
+
+    /* ================= GRANN ================= */
+    .grann-scene {
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 1.6s ease, visibility 1.6s ease;
+      background: radial-gradient(ellipse at 50% 30%, rgba(30,20,12,0.92), rgba(10,10,10,0.97));
+    }
+    .grann-scene.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+
+    .grann {
+      position: relative; cursor: pointer; border: none; background: none;
+      margin-bottom: 2.2rem; padding: 0;
+    }
+    .grann-presence {
+      width: clamp(120px, 18vw, 180px);
+      height: clamp(150px, 23vw, 230px);
+      border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+      background:
+        radial-gradient(ellipse at 50% 32%, rgba(217,160,102,0.5), rgba(217,160,102,0.12) 55%, transparent 75%),
+        radial-gradient(ellipse at 50% 65%, rgba(196,64,47,0.18), transparent 70%);
+      filter: blur(1px);
+      animation: presence 5s ease-in-out infinite;
+      border: 1px solid rgba(217,160,102,0.25);
+    }
+    @keyframes presence {
+      0%,100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.03); opacity: 1; }
+    }
+    .grann-name {
+      position: absolute; bottom: -1.6rem; left: 50%; transform: translateX(-50%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--warm); white-space: nowrap;
+    }
+    .grann-hint {
+      position: absolute; top: -2rem; left: 50%; transform: translateX(-50%);
+      font-style: italic; font-size: 0.78rem; color: rgba(240,236,228,0.4);
+      white-space: nowrap; opacity: 0; transition: opacity 1.5s ease 4s;
+    }
+    .grann-scene.visible .grann-hint { opacity: 1; }
+    .grann:hover .grann-presence, .grann:focus-visible .grann-presence {
+      border-color: rgba(217,160,102,0.7);
+    }
+
+    .counsel {
+      max-width: 620px; text-align: center;
+    }
+    .counsel-line {
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 1.4s ease, transform 1.4s ease;
+      margin-bottom: 1.1rem;
+    }
+    .counsel-line.visible { opacity: 1; transform: translateY(0); }
+    .counsel-line.kreyol {
+      font-size: clamp(1.15rem, 2.6vw, 1.55rem); font-style: italic;
+      color: var(--bone); line-height: 1.6;
+    }
+    .counsel-line.echo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem; color: var(--light-grey);
+      line-height: 1.8; letter-spacing: 0.03em;
+    }
+
+    .try-again {
+      margin-top: 2rem; opacity: 0; transition: opacity 1.5s ease;
+    }
+    .try-again.visible { opacity: 1; }
+
+    /* ================= BIO PANEL ================= */
+    .bio {
+      position: fixed; inset: 0; z-index: 40;
+      background: rgba(8,7,6,0.97);
+      overflow-y: auto;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+    .bio.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    .bio-inner { max-width: 640px; margin: 0 auto; padding: 12vh 2rem 14vh; }
+    .bio-kicker {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+      margin-bottom: 1.2rem;
+    }
+    .bio h2 {
+      font-weight: 400; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05;
+      margin-bottom: 2rem;
+    }
+    .bio p { font-size: 1.05rem; line-height: 1.85; color: rgba(240,236,228,0.8); margin-bottom: 1.4rem; }
+    .bio .note {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem;
+      color: var(--grey); line-height: 1.9; letter-spacing: 0.04em;
+      border-left: 2px solid rgba(217,160,102,0.35); padding-left: 1rem;
+      margin-top: 3rem;
+    }
+    .bio-close {
+      position: fixed; top: 1.6rem; right: 2rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease;
+    }
+    .bio-close:hover, .bio-close:focus-visible { color: var(--bone); }
+
+    /* ================= RESPÈ ================= */
+    .respe {
+      position: fixed; inset: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 1.4s ease, visibility 1.4s ease;
+      background: radial-gradient(ellipse at center, rgba(38,16,12,0.9), var(--ink) 75%);
+    }
+    .respe.visible { opacity: 1; visibility: visible; }
+    .respe-word {
+      font-size: clamp(3.5rem, 14vw, 11rem); font-weight: 400;
+      letter-spacing: 0.04em; color: var(--bone);
+      animation: none; transform: scale(0.96); opacity: 0;
+      transition: transform 2.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 2.4s ease;
+    }
+    .respe.visible .respe-word { transform: scale(1); opacity: 1; }
+
+    /* ================= THE FIELD (placeholder) ================= */
+    .field {
+      position: fixed; inset: 0; z-index: 25;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 2s ease, visibility 2s ease;
+    }
+    .field.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    #embers { position: absolute; inset: 0; }
+    .field-note {
+      position: absolute; bottom: 8vh; left: 0; right: 0;
+      text-align: center; pointer-events: none;
+    }
+    .field-note .big {
+      font-style: italic; font-size: clamp(1.2rem, 3vw, 1.8rem);
+      color: var(--bone); margin-bottom: 0.8rem;
+    }
+    .field-note .small {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--grey);
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grain, .grann-presence, .mic.listening { animation: none !important; }
+      .counsel-line, .stage, .grann-scene, .respe, .field { transition-duration: 0.2s; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <!-- ============ ARRIVAL: only an input ============ -->
+  <section class="stage" id="arrival" aria-label="Threshold">
+    <form class="knock-form" id="knockForm">
+      <label for="knock" class="sr-only">You are at a threshold. Speak or type your greeting.</label>
+      <input id="knock" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="whisper">
+      <button type="button" class="mic" id="mic" aria-label="Speak instead of typing" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="9" y="3" width="6" height="11" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+        </svg>
+      </button>
+    </form>
+    <p class="whisper" id="whisper" aria-live="polite"></p>
+  </section>
+
+  <!-- ============ GRANN ============ -->
+  <section class="grann-scene" id="grannScene" aria-live="polite">
+    <button class="grann" id="grannBtn" aria-label="Grann — click to know her story">
+      <span class="grann-hint" data-hint>klike sou Grann pou konnen istwa li · click her to know her story</span>
+      <div class="grann-presence" aria-hidden="true"></div>
+      <span class="grann-name">Grann</span>
+    </button>
+    <div class="counsel" id="counsel"></div>
+    <div class="try-again" id="tryAgain">
+      <form class="knock-form" id="knockForm2">
+        <label for="knock2" class="sr-only">Try your greeting again</label>
+        <input id="knock2" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ BIO (a whole other tree) ============ -->
+  <section class="bio" id="bio" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
+    <button class="bio-close" id="bioClose">Tounen — return</button>
+    <div class="bio-inner">
+      <p class="bio-kicker">Yon lòt pyebwa — another tree</p>
+      <h2 id="bioTitle">Grann</h2>
+      <p><em>[Her name, her dates, her places — this is where her story begins.]</em></p>
+      <p>She was the one who taught that a door is never just a door. That you announce yourself. That honor is asked and respect is granted, and only then do you cross. What you know of hospitality, you learned in her lakou.</p>
+      <p>[Placeholder — this branch will grow into its own tree: her photographs, her voice if recordings exist, the recipes, the proverbs she used, the towns she lived in, the people she raised. Each ancestor-guide on the site opens a branch like this one — a genealogy that runs parallel to the artist's own story and intertwines with it.]</p>
+      <p class="note">DESIGN NOTE — the ancestors (Grann, Manman, Papa…) are the site's guides. They appear when the visitor hesitates, errs, or reaches a threshold. Each is clickable, each opens their own branch of the family tree. The bio branches are a second architecture living behind the main journey.</p>
+    </div>
+  </section>
+
+  <!-- ============ RESPÈ ============ -->
+  <section class="respe" id="respe" aria-live="assertive">
+    <div class="respe-word">RESPÈ</div>
+  </section>
+
+  <!-- ============ THE FIELD (placeholder for the borderless space) ============ -->
+  <section class="field" id="field">
+    <canvas id="embers"></canvas>
+    <div class="field-note">
+      <p class="big" id="enterWord">Ou antre.</p>
+      <p class="small">the borderless space begins here — next phase</p>
+    </div>
+  </section>
+
+  <script>
+    // ---------------------------------------------------------------
+    // STATE
+    // ---------------------------------------------------------------
+    let grannShown = false;
+    let entered = false;
+    let whisperTimer, grannTimer;
+
+    const arrival = document.getElementById('arrival');
+    const whisper = document.getElementById('whisper');
+    const grannScene = document.getElementById('grannScene');
+    const counsel = document.getElementById('counsel');
+    const tryAgain = document.getElementById('tryAgain');
+    const respe = document.getElementById('respe');
+    const field = document.getElementById('field');
+    const bio = document.getElementById('bio');
+
+    // ---------------------------------------------------------------
+    // THE WORD — generous normalization.
+    // Accents, case, punctuation forgiven; the word itself is what matters.
+    // ---------------------------------------------------------------
+    const ACCEPT = new Set(['one', 'hone', 'onne', 'onneu', 'oneh', 'onè', 'honè']);
+    function normalize(s) {
+      return s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+              .toLowerCase().replace(/[^a-z]/g, '');
+    }
+    function isOne(s) {
+      const n = normalize(s);
+      return ACCEPT.has(n) || n === 'one' || /^h?on+e+$/.test(n);
+    }
+
+    // ---------------------------------------------------------------
+    // WHISPER — after a quiet moment, a multilingual hint (not the answer)
+    // ---------------------------------------------------------------
+    const WHISPER_LINES = 'ou rive devan yon kay… &middot; you have arrived at a door… &middot; te voil&agrave; devant une porte…';
+    whisperTimer = setTimeout(() => {
+      whisper.innerHTML = WHISPER_LINES;
+      whisper.classList.add('visible');
+    }, 7000);
+
+    // If they stay silent too long, Grann comes to the door.
+    grannTimer = setTimeout(() => { if (!grannShown && !entered) showGrann('silence'); }, 20000);
+
+    // ---------------------------------------------------------------
+    // GRANN — counsel, trilingual. She is the teaching; no "aside".
+    // ---------------------------------------------------------------
+    const COUNSEL = {
+      silence: [
+        { cls: 'kreyol', text: 'Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa.' },
+        { cls: 'echo',   text: 'My child… you have arrived at someone’s door — you cannot stand there in silence.' },
+        { cls: 'kreyol', text: 'Isit la, lè ou rive, ou mande: <strong>&laquo;&nbsp;Onè&nbsp;&raquo;</strong>. Epi kay la va reponn ou: &laquo;&nbsp;Respè&nbsp;&raquo;. Se konsa nou antre lakay moun.' },
+        { cls: 'echo',   text: 'Here, when you arrive, you ask for honor — &laquo;&nbsp;On&egrave;&nbsp;&raquo; — and the house grants you respect — &laquo;&nbsp;Resp&egrave;&nbsp;&raquo;. That is how one enters a home. &middot; Ici, on demande &laquo;&nbsp;l’honneur&nbsp;&raquo; et la maison r&eacute;pond &laquo;&nbsp;le respect&nbsp;&raquo;. C’est ainsi qu’on entre chez les gens.' },
+        { cls: 'kreyol', text: 'Al&egrave;, es&egrave;ye ank&ograve;.' },
+        { cls: 'echo',   text: 'Go on — try again. &middot; Vas-y, essaie encore.' }
+      ],
+      wrong: [
+        { cls: 'kreyol', text: 'Tande, pitit… se pa konsa nou f&egrave; l isit la.' },
+        { cls: 'echo',   text: 'Listen, child… that is not how we do it here. &middot; &Eacute;coute, petit… ce n’est pas comme &ccedil;a qu’on fait ici.' },
+        { cls: 'kreyol', text: 'Lè ou rive devan yon kay, ou mande: <strong>&laquo;&nbsp;Onè&nbsp;&raquo;</strong>. Kay la va reponn ou: &laquo;&nbsp;Respè&nbsp;&raquo;. Apre sa, ou antre.' },
+        { cls: 'echo',   text: 'When you arrive at a door, you ask: &laquo;&nbsp;On&egrave;&nbsp;&raquo; — honor. The house answers: &laquo;&nbsp;Resp&egrave;&nbsp;&raquo; — respect. Then, you enter.' },
+        { cls: 'kreyol', text: 'Es&egrave;ye ank&ograve;, wi.' },
+        { cls: 'echo',   text: 'Try again. &middot; Essaie encore.' }
+      ]
+    };
+
+    function showGrann(mode) {
+      grannShown = true;
+      clearTimeout(whisperTimer); clearTimeout(grannTimer);
+      arrival.classList.add('hidden');
+      grannScene.classList.add('visible');
+
+      counsel.innerHTML = '';
+      const lines = COUNSEL[mode] || COUNSEL.silence;
+      lines.forEach((l, i) => {
+        const p = document.createElement('p');
+        p.className = 'counsel-line ' + l.cls;
+        p.innerHTML = l.text;
+        counsel.appendChild(p);
+        setTimeout(() => p.classList.add('visible'), 900 + i * 1600);
+      });
+      setTimeout(() => {
+        tryAgain.classList.add('visible');
+        document.getElementById('knock2').focus();
+      }, 900 + lines.length * 1600);
+    }
+
+    // ---------------------------------------------------------------
+    // ENTRY — the house answers
+    // ---------------------------------------------------------------
+    function enter() {
+      if (entered) return;
+      entered = true;
+      clearTimeout(whisperTimer); clearTimeout(grannTimer);
+      arrival.classList.add('hidden');
+      grannScene.classList.remove('visible');
+
+      setTimeout(() => respe.classList.add('visible'), 500);
+      setTimeout(() => {
+        respe.classList.remove('visible');
+        field.classList.add('visible');
+        startEmbers();
+      }, 4200);
+    }
+
+    function attempt(value) {
+      if (!value.trim()) return;
+      if (isOne(value)) enter();
+      else if (!grannShown) showGrann('wrong');
+      else {
+        // she is already here; gently re-highlight her key line
+        const key = counsel.querySelectorAll('.counsel-line')[2];
+        if (key) { key.style.color = '#f0ece4'; key.style.textShadow = '0 0 24px rgba(217,160,102,0.35)'; }
+        document.getElementById('knock2').value = '';
+      }
+    }
+
+    document.getElementById('knockForm').addEventListener('submit', e => {
+      e.preventDefault(); attempt(document.getElementById('knock').value);
+    });
+    document.getElementById('knockForm2').addEventListener('submit', e => {
+      e.preventDefault(); attempt(document.getElementById('knock2').value);
+    });
+
+    document.getElementById('knock').focus();
+
+    // ---------------------------------------------------------------
+    // VOICE — Web Speech API where available
+    // ---------------------------------------------------------------
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = document.getElementById('mic');
+    if (SR) {
+      micBtn.hidden = false;
+      const rec = new SR();
+      rec.lang = 'fr-FR'; // closest widely-supported match for Kreyòl phonetics
+      rec.interimResults = false;
+      rec.maxAlternatives = 5;
+      let listening = false;
+
+      micBtn.addEventListener('click', () => {
+        if (listening) { rec.stop(); return; }
+        try { rec.start(); listening = true; micBtn.classList.add('listening'); } catch (e) {}
+      });
+      rec.onend = () => { listening = false; micBtn.classList.remove('listening'); };
+      rec.onresult = e => {
+        const alts = Array.from(e.results[0]).map(r => r.transcript);
+        const hit = alts.find(t => isOne(t) || /\bon[eè]\b|honn?[eè]/i.test(normalize(t)));
+        const input = document.getElementById('knock');
+        input.value = alts[0] || '';
+        if (hit) enter(); else attempt(alts[0] || '');
+      };
+    }
+
+    // ---------------------------------------------------------------
+    // GRANN's BIO — a whole other tree
+    // ---------------------------------------------------------------
+    document.getElementById('grannBtn').addEventListener('click', () => {
+      bio.classList.add('visible');
+      document.getElementById('bioClose').focus();
+    });
+    document.getElementById('bioClose').addEventListener('click', () => {
+      bio.classList.remove('visible');
+      document.getElementById('grannBtn').focus();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && bio.classList.contains('visible')) {
+        bio.classList.remove('visible');
+        document.getElementById('grannBtn').focus();
+      }
+    });
+
+    // ---------------------------------------------------------------
+    // THE FIELD — placeholder embers drifting in the dark
+    // ---------------------------------------------------------------
+    function startEmbers() {
+      const canvas = document.getElementById('embers');
+      const ctx = canvas.getContext('2d');
+      let W = canvas.width = innerWidth, H = canvas.height = innerHeight;
+      addEventListener('resize', () => { W = canvas.width = innerWidth; H = canvas.height = innerHeight; });
+
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const embers = Array.from({ length: 26 }, () => ({
+        x: Math.random() * 1, y: Math.random() * 1,
+        r: 1 + Math.random() * 2.2,
+        dx: (Math.random() - 0.5) * 0.0006,
+        dy: (Math.random() - 0.5) * 0.0006,
+        tw: Math.random() * Math.PI * 2,
+        warm: Math.random() > 0.4
+      }));
+
+      (function frame() {
+        ctx.clearRect(0, 0, W, H);
+        embers.forEach(m => {
+          if (!reduced) {
+            m.x = (m.x + m.dx + 1) % 1; m.y = (m.y + m.dy + 1) % 1;
+            m.tw += 0.02;
+          }
+          const a = 0.25 + Math.abs(Math.sin(m.tw)) * 0.5;
+          ctx.beginPath();
+          ctx.arc(m.x * W, m.y * H, m.r, 0, Math.PI * 2);
+          ctx.fillStyle = m.warm ? `rgba(217,160,102,${a})` : `rgba(196,64,47,${a * 0.8})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(frame);
+      })();
+    }
+  </script>
+</body>
+</html>
