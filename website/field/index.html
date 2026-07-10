@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ht">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espas la — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+    :root {
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
+      --grey: #4a4a4a;
+      --light-grey: #8a8a8a;
+      --warm: #d9a066;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      background: var(--ink);
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body.dragging { cursor: grabbing; }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    /* ============ WORLD ============ */
+    #deep, #world {
+      position: fixed; top: 0; left: 0;
+      will-change: transform;
+    }
+    #deep { z-index: 1; pointer-events: none; }
+    #world { z-index: 10; }
+
+    .glow {
+      position: absolute; border-radius: 50%;
+      pointer-events: none;
+      filter: blur(2px);
+    }
+
+    /* ============ FRAGMENTS ============ */
+    .fragment {
+      position: absolute;
+      opacity: 0.06;
+      transition: opacity 0.6s ease;
+      will-change: opacity, transform;
+    }
+    .fragment .inner { transition: transform 0.6s ease; transform: scale(0.96); }
+    .fragment.awake { opacity: 1; }
+    .fragment.awake .inner { transform: scale(1); }
+    .fragment.near { opacity: 0.45; }
+
+    /* film fragment */
+    .frag-film { cursor: pointer; }
+    .frag-film .inner {
+      width: 240px; height: 150px;
+      border: 1px solid rgba(240,236,228,0.18);
+      position: relative; overflow: hidden;
+      background:
+        repeating-linear-gradient(90deg, rgba(240,236,228,0.025) 0 2px, transparent 2px 7px),
+        linear-gradient(160deg, rgba(196,64,47,0.14), rgba(20,14,10,0.9) 60%);
+    }
+    .frag-film .inner::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: 8px;
+      width: 1px; background: rgba(240,236,228,0.22);
+    }
+    .frag-film .inner::after {
+      content: ''; position: absolute; top: 0; bottom: 0; right: 8px;
+      width: 1px; background: rgba(240,236,228,0.22);
+    }
+    .frag-film .title {
+      position: absolute; bottom: 0.8rem; left: 1.2rem; right: 1.2rem;
+      font-style: italic; font-size: 1.05rem; line-height: 1.25;
+    }
+    .frag-film .year {
+      position: absolute; top: 0.7rem; right: 1.2rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      letter-spacing: 0.25em; color: var(--light-grey);
+    }
+    .frag-film:hover .inner { border-color: rgba(217,160,102,0.6); }
+
+    /* text fragment */
+    .frag-text { max-width: 300px; cursor: default; }
+    .frag-text .inner {
+      font-style: italic;
+      font-size: 1.12rem; line-height: 1.7;
+      color: rgba(240,236,228,0.85);
+    }
+    .frag-text .echo {
+      display: block; margin-top: 0.7rem;
+      font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.65rem; letter-spacing: 0.06em; line-height: 1.8;
+      color: var(--light-grey);
+    }
+
+    /* sound fragment */
+    .frag-sound { cursor: pointer; }
+    .frag-sound .inner {
+      display: flex; align-items: center; gap: 0.9rem;
+    }
+    .frag-sound .rings {
+      position: relative; width: 46px; height: 46px; flex-shrink: 0;
+    }
+    .frag-sound .rings span {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid rgba(217,160,102,0.5);
+      animation: ring 3.2s ease-out infinite;
+    }
+    .frag-sound .rings span:nth-child(2) { animation-delay: 1.1s; }
+    .frag-sound .rings span:nth-child(3) { animation-delay: 2.2s; }
+    @keyframes ring {
+      0% { transform: scale(0.25); opacity: 0.9; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+    .frag-sound .label {
+      font-style: italic; font-size: 0.95rem; color: rgba(240,236,228,0.75);
+    }
+
+    /* ancestor presence */
+    .frag-ancestor { cursor: pointer; }
+    .frag-ancestor .inner { text-align: center; }
+    .presence {
+      width: 96px; height: 122px; margin: 0 auto;
+      border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+      background:
+        radial-gradient(ellipse at 50% 32%, rgba(217,160,102,0.5), rgba(217,160,102,0.1) 55%, transparent 75%),
+        radial-gradient(ellipse at 50% 65%, rgba(196,64,47,0.16), transparent 70%);
+      border: 1px solid rgba(217,160,102,0.3);
+      filter: blur(0.8px);
+      animation: presence 5s ease-in-out infinite;
+    }
+    @keyframes presence {
+      0%,100% { transform: scale(1); } 50% { transform: scale(1.04); }
+    }
+    .frag-ancestor .name {
+      margin-top: 1.5rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+    }
+
+    /* ============ HUD ============ */
+    .hint {
+      position: fixed; bottom: 3rem; left: 0; right: 0; z-index: 60;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 0.95rem;
+      color: rgba(240,236,228,0.4); line-height: 2;
+      transition: opacity 1.5s ease;
+    }
+    .hint.gone { opacity: 0; }
+
+    .arrival-word {
+      position: fixed; inset: 0; z-index: 70;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      font-style: italic; font-size: clamp(1.6rem, 4vw, 2.6rem);
+      color: var(--bone);
+      transition: opacity 2.5s ease;
+    }
+    .arrival-word.gone { opacity: 0; }
+
+    /* ============ FRAGMENT OVERLAY ============ */
+    .open-frag {
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(8,7,6,0.96);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+    .open-frag.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    .open-frag-inner { max-width: 560px; padding: 2rem; text-align: center; }
+    .open-frag-inner h2 { font-weight: 400; font-style: italic; font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 1.4rem; }
+    .open-frag-inner p { color: rgba(240,236,228,0.7); line-height: 1.8; margin-bottom: 1rem; }
+    .open-frag-inner .note {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem;
+      letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
+    }
+    .open-close {
+      position: fixed; top: 1.6rem; right: 2rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease;
+    }
+    .open-close:hover { color: var(--bone); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .grain, .presence, .frag-sound .rings span { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <div id="deep" aria-hidden="true"></div>
+  <div id="world"></div>
+
+  <div class="arrival-word" id="arrivalWord">Ou antre.</div>
+
+  <p class="hint" id="hint">
+    trennen pou w mache &middot; drag to wander &middot; laisse-toi porter<br>
+    <span style="font-size:0.75rem; opacity:0.7">suiv limy&egrave; yo ak son yo &middot; follow the lights and the sounds</span>
+  </p>
+
+  <div class="open-frag" id="openFrag" role="dialog" aria-modal="true">
+    <button class="open-close" id="openClose">Tounen — return</button>
+    <div class="open-frag-inner" id="openInner"></div>
+  </div>
+
+  <script>
+    // ================================================================
+    // THE FIELD — proof that the borderless space works in a browser.
+    // DOM world + camera transform, proximity awakening, spatial sound.
+    // ================================================================
+
+    const world = document.getElementById('world');
+    const deep = document.getElementById('deep');
+
+    // ------------------------- CONTENT -------------------------
+    // Clusters of fragments in world coordinates. Origin = arrival point.
+    const FILMS = [
+      { x: 1500,  y: -900,  title: 'Una Sola Sangre', year: '2022', body: 'Haitians in Cuba, familial memory, political displacement across generations.' },
+      { x: 1950,  y: -650,  title: 'What Happens to a Dream Deferred', year: '2022', body: 'Asylum seekers in Mexico — glitch, cellphone footage, WhatsApp voice notes.' },
+      { x: 1700,  y: -1250, title: 'Kale Kann Kale', year: '2023', body: 'Hand-processed 16mm, flicker, the violent history of sugarcane.' },
+      { x: 2300,  y: -1000, title: 'The Marks Remember', year: '2023', body: '16mm and plant-based dyes — colonial labor, transnational memory.' },
+      { x: 2100,  y: -400,  title: 'Of What Death We Die', year: '2022', body: 'The AIDS crisis in Haiti — mourning reclaimed through fragmentation.' },
+      { x: 2600,  y: -700,  title: 'Katherine', year: '2020', body: 'Katherine Dunham re-filmed, processed in coffee — Black feminist presence.' },
+      { x: 1300,  y: -500,  title: 'Choublak', year: '2024–25', body: 'Solo exhibition, Leonard & Bina Ellen Gallery — intergenerational storytelling.' },
+    ];
+    const TEXTS = [
+      { x: -1600, y: 900,  kreyol: 'Bwa pi wo di li wè lwen…', echo: 'The tallest tree claims to see far… · L’arbre le plus haut dit qu’il voit loin…' },
+      { x: -2100, y: 1250, kreyol: '…men grenn pwomennen di li wè pi lwen.', echo: '…but the wandering seed asserts it sees farther. · …mais la graine qui voyage dit qu’elle voit plus loin.' },
+      { x: -1200, y: 1400, kreyol: 'Espas nan mitan an pa vid — li vibre.', echo: 'The in-between is not empty — it vibrates.' },
+      { x: -1800, y: 500,  kreyol: 'Se pa rupture — se yon ritm.', echo: 'Not rupture — a rhythm. · Pas une rupture — un rythme.' },
+    ];
+    const SOUNDS = [
+      { x: -900,  y: -1400, label: 'yon vwa k ap chante — a voice singing', freq: 174 },
+      { x: -1500, y: -1100, label: 'lapli sou tòl — rain on a tin roof', freq: 220 },
+      { x: -600,  y: -1900, label: 'yon tanbou byen lwen — a distant drum', freq: 130 },
+    ];
+    const ANCESTORS = [
+      { x: 500, y: 1600, name: 'Grann', body: 'She was the one who taught that a door is never just a door. Click-through to her whole branch — the other tree.' },
+    ];
+
+    // ------------------------- BUILD WORLD -------------------------
+    const fragments = [];
+
+    function addFragment(el, x, y, radius) {
+      el.classList.add('fragment');
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      world.appendChild(el);
+      fragments.push({ el, x, y, radius: radius || 500 });
+      return el;
+    }
+
+    FILMS.forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'frag-film';
+      el.innerHTML = `<div class="inner"><span class="year">${f.year}</span><span class="title">${f.title}</span></div>`;
+      el.addEventListener('click', () => openFragment(`<h2>${f.title}</h2><p>${f.body}</p><p class="note">placeholder — the film itself (Vimeo) opens here in the production build</p>`));
+      addFragment(el, f.x, f.y, 550);
+    });
+
+    TEXTS.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'frag-text';
+      el.innerHTML = `<div class="inner">${t.kreyol}<span class="echo">${t.echo}</span></div>`;
+      addFragment(el, t.x, t.y, 480);
+    });
+
+    SOUNDS.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'frag-sound';
+      el.innerHTML = `<div class="inner"><div class="rings"><span></span><span></span><span></span></div><span class="label">${s.label}</span></div>`;
+      el.addEventListener('click', () => openFragment(`<h2>${s.label}</h2><p class="note">placeholder — a real recording (voice memo, ambient sound, archival audio) lives here</p>`));
+      s.node = addFragment(el, s.x, s.y, 700);
+    });
+
+    ANCESTORS.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'frag-ancestor';
+      el.innerHTML = `<div class="inner"><div class="presence"></div><div class="name">${a.name}</div></div>`;
+      el.addEventListener('click', () => openFragment(`<h2>${a.name}</h2><p>${a.body}</p><p class="note">her bio — a whole other tree</p>`));
+      addFragment(el, a.x, a.y, 600);
+    });
+
+    // Cluster glows — the far-off lights you steer toward
+    const GLOWS = [
+      { x: 1900,  y: -800,  r: 900,  c: 'rgba(196,64,47,0.10)' },   // films
+      { x: -1650, y: 1000,  r: 800,  c: 'rgba(240,236,228,0.05)' }, // texts
+      { x: -1000, y: -1450, r: 850,  c: 'rgba(217,160,102,0.09)' }, // sounds
+      { x: 500,   y: 1600,  r: 700,  c: 'rgba(217,160,102,0.08)' }, // grann
+    ];
+    GLOWS.forEach(g => {
+      const el = document.createElement('div');
+      el.className = 'glow';
+      el.style.left = (g.x - g.r) + 'px';
+      el.style.top = (g.y - g.r) + 'px';
+      el.style.width = el.style.height = g.r * 2 + 'px';
+      el.style.background = `radial-gradient(circle, ${g.c}, transparent 70%)`;
+      world.insertBefore(el, world.firstChild);
+    });
+
+    // Deep layer — sparse embers with parallax so emptiness still breathes
+    for (let i = 0; i < 90; i++) {
+      const d = document.createElement('div');
+      const warm = Math.random() > 0.5;
+      const size = 1 + Math.random() * 2.5;
+      d.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;` +
+        `left:${(Math.random() - 0.5) * 9000}px;top:${(Math.random() - 0.5) * 9000}px;` +
+        `background:${warm ? 'rgba(217,160,102,0.4)' : 'rgba(240,236,228,0.25)'};`;
+      deep.appendChild(d);
+    }
+
+    // ------------------------- CAMERA -------------------------
+    let cam = { x: 0, y: 0 };
+    let vel = { x: 0, y: 0 };
+    let dragging = false;
+    let last = null;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function pointerXY(e) {
+      return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    }
+
+    function down(e) {
+      if (e.target.closest('.open-frag')) return;
+      dragging = true; last = pointerXY(e);
+      document.body.classList.add('dragging');
+      initAudio();
+      hideHint();
+    }
+    function move(e) {
+      if (!dragging) return;
+      const p = pointerXY(e);
+      const dx = p.x - last.x, dy = p.y - last.y;
+      cam.x -= dx; cam.y -= dy;
+      vel.x = -dx; vel.y = -dy;
+      last = p;
+    }
+    function up() { dragging = false; document.body.classList.remove('dragging'); }
+
+    addEventListener('mousedown', down);
+    addEventListener('mousemove', move);
+    addEventListener('mouseup', up);
+    addEventListener('touchstart', down, { passive: true });
+    addEventListener('touchmove', move, { passive: true });
+    addEventListener('touchend', up);
+
+    // keyboard wandering — accessibility
+    const keys = {};
+    addEventListener('keydown', e => { keys[e.key] = true; if (e.key.startsWith('Arrow')) { initAudio(); hideHint(); } });
+    addEventListener('keyup', e => { keys[e.key] = false; });
+
+    // ------------------------- AUDIO -------------------------
+    // Spatial proof: sound fragments hum louder as you approach.
+    let actx = null;
+    const voices = [];
+    function initAudio() {
+      if (actx || reduced) return;
+      try {
+        actx = new (window.AudioContext || window.webkitAudioContext)();
+        SOUNDS.forEach(s => {
+          const osc = actx.createOscillator();
+          const osc2 = actx.createOscillator();
+          const gain = actx.createGain();
+          osc.frequency.value = s.freq;
+          osc2.frequency.value = s.freq * 1.5 + 2;
+          osc.type = 'sine'; osc2.type = 'sine';
+          gain.gain.value = 0;
+          osc.connect(gain); osc2.connect(gain);
+          gain.connect(actx.destination);
+          osc.start(); osc2.start();
+          voices.push({ s, gain });
+        });
+      } catch (e) {}
+    }
+
+    // ------------------------- LOOP -------------------------
+    function frame() {
+      // inertia
+      if (!dragging) {
+        cam.x += vel.x; cam.y += vel.y;
+        vel.x *= 0.94; vel.y *= 0.94;
+      }
+      if (keys.ArrowLeft) cam.x -= 9; if (keys.ArrowRight) cam.x += 9;
+      if (keys.ArrowUp) cam.y -= 9; if (keys.ArrowDown) cam.y += 9;
+
+      const cx = cam.x, cy = cam.y;
+      const vw = innerWidth, vh = innerHeight;
+
+      world.style.transform = `translate3d(${vw / 2 - cx}px, ${vh / 2 - cy}px, 0)`;
+      deep.style.transform = `translate3d(${vw / 2 - cx * 0.35}px, ${vh / 2 - cy * 0.35}px, 0)`;
+
+      // proximity awakening + culling
+      fragments.forEach(f => {
+        const d = Math.hypot(f.x - cx, f.y - cy);
+        if (d > 2600) { // far outside view: cull
+          if (f.el.style.display !== 'none') f.el.style.display = 'none';
+          return;
+        }
+        if (f.el.style.display === 'none') f.el.style.display = '';
+        f.el.classList.toggle('awake', d < f.radius);
+        f.el.classList.toggle('near', d >= f.radius && d < f.radius * 2.2);
+      });
+
+      // spatial audio gains
+      if (actx) {
+        voices.forEach(v => {
+          const d = Math.hypot(v.s.x - cx, v.s.y - cy);
+          const g = Math.max(0, 1 - d / 1300) * 0.045;
+          v.gain.gain.setTargetAtTime(g, actx.currentTime, 0.2);
+        });
+      }
+
+      requestAnimationFrame(frame);
+    }
+    frame();
+
+    // ------------------------- HUD -------------------------
+    let hintHidden = false;
+    function hideHint() {
+      if (hintHidden) return;
+      hintHidden = true;
+      setTimeout(() => document.getElementById('hint').classList.add('gone'), 4000);
+    }
+    setTimeout(() => document.getElementById('arrivalWord').classList.add('gone'), 3000);
+
+    // ------------------------- FRAGMENT OVERLAY -------------------------
+    const openFrag = document.getElementById('openFrag');
+    const openInner = document.getElementById('openInner');
+    function openFragment(html) {
+      openInner.innerHTML = html;
+      openFrag.classList.add('visible');
+      document.getElementById('openClose').focus();
+    }
+    document.getElementById('openClose').addEventListener('click', () => openFrag.classList.remove('visible'));
+    addEventListener('keydown', e => { if (e.key === 'Escape') openFrag.classList.remove('visible'); });
+  </script>
+</body>
+</html>
