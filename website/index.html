@@ -1,1014 +1,1023 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ht">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Esery Mondesir</title>
-
+  <title>Grenn Pwomennen — Ésery Mondésir</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 
     :root {
-      --black: #0a0a0a;
-      --white: #f0ece4;
-      --accent: #c4402f;
+      --ink: #0a0a0a;
+      --bone: #f0ece4;
+      --choublak: #c4402f;
       --grey: #4a4a4a;
       --light-grey: #8a8a8a;
-      --grain-opacity: 0.04;
+      --warm: #d9a066;
+      --sous: #b9c4d6;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html {
-      scroll-behavior: auto;
-      overflow-x: hidden;
-    }
+    html { scroll-behavior: smooth; }
 
     body {
-      background: var(--black);
-      color: var(--white);
-      font-family: 'Space Grotesk', sans-serif;
-      cursor: crosshair;
+      background: var(--ink);
+      color: var(--bone);
+      font-family: 'EB Garamond', serif;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
     }
+    body.locked { overflow: hidden; height: 100vh; }
 
-    /* ===== GRAIN OVERLAY ===== */
     .grain {
-      position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: var(--grain-opacity);
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-      animation: grainShift 0.5s steps(6) infinite;
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 95; opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
     }
 
-    @keyframes grainShift {
-      0%, 100% { transform: translate(0, 0); }
-      10% { transform: translate(-5%, -10%); }
-      30% { transform: translate(3%, -15%); }
-      50% { transform: translate(12%, 9%); }
-      70% { transform: translate(9%, 4%); }
-      90% { transform: translate(-1%, 7%); }
+    /* =================== RITUAL OVERLAY =================== */
+    .ritual {
+      position: fixed; inset: 0; z-index: 100;
+      background: var(--ink);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      transition: opacity 1.6s ease, visibility 1.6s ease;
+    }
+    .ritual.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .knock-form {
+      display: flex; align-items: center; gap: 1rem;
+      border-bottom: 1px solid rgba(240,236,228,0.25);
+      padding-bottom: 0.6rem;
+      transition: border-color 0.5s ease;
+    }
+    .knock-form:focus-within { border-color: rgba(240,236,228,0.6); }
+    .knock-input {
+      background: none; border: none; outline: none;
+      color: var(--bone); font-family: 'EB Garamond', serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem); text-align: center;
+      width: min(60vw, 420px); caret-color: var(--choublak);
+    }
+    .mic {
+      background: none; border: 1px solid rgba(240,236,228,0.2);
+      border-radius: 50%; width: 44px; height: 44px;
+      cursor: pointer; color: var(--light-grey);
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.3s ease, color 0.3s ease; flex-shrink: 0;
+    }
+    .mic:hover { border-color: var(--choublak); color: var(--bone); }
+    .mic.listening { border-color: var(--choublak); color: var(--choublak); animation: micPulse 1.2s ease-in-out infinite; }
+    @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,64,47,0.35); } 50% { box-shadow: 0 0 0 10px rgba(196,64,47,0); } }
+    .mic svg { width: 18px; height: 18px; }
+
+    .whisper {
+      margin-top: 2.4rem; text-align: center;
+      font-style: italic; font-size: 0.95rem;
+      color: rgba(240,236,228,0.35); line-height: 2;
+      opacity: 0; transition: opacity 2s ease; min-height: 3em;
+    }
+    .whisper.visible { opacity: 1; }
+
+    .grann-zone {
+      display: none; flex-direction: column; align-items: center;
+      max-width: 640px; text-align: center;
+    }
+    .grann-zone.visible { display: flex; }
+    .grann-btn { background: none; border: none; cursor: pointer; margin-bottom: 1.8rem; position: relative; }
+    .grann-presence {
+      width: clamp(100px, 15vw, 150px); height: clamp(126px, 19vw, 190px);
+      border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+      background:
+        radial-gradient(ellipse at 50% 32%, rgba(217,160,102,0.5), rgba(217,160,102,0.12) 55%, transparent 75%),
+        radial-gradient(ellipse at 50% 65%, rgba(196,64,47,0.18), transparent 70%);
+      filter: blur(1px);
+      border: 1px solid rgba(217,160,102,0.25);
+      animation: presence 5s ease-in-out infinite;
+      margin: 0 auto;
+    }
+    @keyframes presence { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+    .grann-name {
+      display: block; margin-top: 0.8rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+    }
+    .counsel-line {
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      margin-bottom: 1rem;
+    }
+    .counsel-line.visible { opacity: 1; transform: translateY(0); }
+    .counsel-line.kreyol { font-size: clamp(1.1rem, 2.4vw, 1.45rem); font-style: italic; line-height: 1.6; }
+    .counsel-line.echo {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
+      color: var(--light-grey); line-height: 1.8;
     }
 
-    /* ===== CUSTOM CURSOR ===== */
-    .cursor-dot {
-      position: fixed;
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      mix-blend-mode: difference;
-      transition: transform 0.1s ease;
+    .respe-flash {
+      position: fixed; inset: 0; z-index: 99;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(38,16,12,0.9), var(--ink) 75%);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 1.2s ease, visibility 1.2s ease;
+    }
+    .respe-flash.visible { opacity: 1; visibility: visible; }
+    .respe-word {
+      font-size: clamp(3.5rem, 14vw, 11rem); letter-spacing: 0.04em;
+      transform: scale(0.96); opacity: 0;
+      transition: transform 2.2s cubic-bezier(0.16,1,0.3,1), opacity 2.2s ease;
+    }
+    .respe-flash.visible .respe-word { transform: scale(1); opacity: 1; }
+
+    /* =================== SCROLL SECTIONS =================== */
+    section { position: relative; }
+
+    .reveal {
+      opacity: 0; transform: translateY(60px);
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .kicker {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--choublak);
+      display: block; margin-bottom: 1.2rem;
     }
 
-    .cursor-ring {
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--white);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      mix-blend-mode: difference;
-      transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
-    }
-
-    /* ===== WEBGL CANVAS ===== */
-    #webgl-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* ===== LOADING SCREEN ===== */
-    .loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--black);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      transition: opacity 0.8s ease, visibility 0.8s ease;
-    }
-
-    .loader.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .loader-text {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(1.2rem, 3vw, 2rem);
-      font-style: italic;
-      color: var(--light-grey);
-      letter-spacing: 0.05em;
-      overflow: hidden;
-    }
-
-    .loader-text span {
-      display: inline-block;
-      transform: translateY(100%);
-      animation: slideUp 0.6s ease forwards;
-    }
-
-    .loader-bar {
-      width: 120px;
-      height: 1px;
-      background: var(--grey);
-      margin-top: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .loader-bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0%;
-      height: 100%;
-      background: var(--white);
-      animation: loadProgress 2.5s ease forwards;
-    }
-
-    @keyframes slideUp {
-      to { transform: translateY(0); }
-    }
-
-    @keyframes loadProgress {
-      to { width: 100%; }
-    }
-
-    /* ===== HERO / ENTRY ===== */
+    /* hero */
     .hero {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .hero-content {
-      text-align: center;
-      position: relative;
-    }
-
-    .hero-name {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(3rem, 12vw, 10rem);
-      font-weight: 400;
-      line-height: 0.9;
-      letter-spacing: -0.03em;
-      opacity: 0;
-      transform: translateY(60px);
-    }
-
-    .hero-name .char {
-      display: inline-block;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hero-name .char:hover {
-      transform: translateY(-10px) rotate(-5deg) scale(1.1);
-      color: var(--accent);
-    }
-
-    .hero-subtitle {
-      font-size: clamp(0.7rem, 1.2vw, 0.9rem);
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      color: var(--light-grey);
-      margin-top: 2rem;
-      opacity: 0;
-      transform: translateY(30px);
-    }
-
-    .hero-scroll-hint {
-      position: absolute;
-      bottom: 3rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--grey);
-      opacity: 0;
-      animation: pulse 2s ease infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 0.7; }
-    }
-
-    /* ===== FRAGMENTED SECTIONS ===== */
-    .fragment-section {
-      position: relative;
       min-height: 100vh;
-      z-index: 1;
-      padding: 10vh 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+    }
+    .hero h1 {
+      font-weight: 400; font-size: clamp(3rem, 11vw, 8.5rem);
+      line-height: 0.95; letter-spacing: -0.02em;
+    }
+    .hero h1 .accent { color: var(--choublak); font-style: italic; }
+    .hero .sub {
+      margin-top: 1.6rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem;
+      letter-spacing: 0.4em; text-transform: uppercase; color: var(--light-grey);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 2.6rem; left: 50%; transform: translateX(-50%);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--grey);
+      animation: hintPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes hintPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+
+    /* proverb — two voices */
+    .proverb {
+      min-height: 110vh; padding: 18vh 8vw;
+      display: flex; flex-direction: column; justify-content: center; gap: 10vh;
+    }
+    .voice { max-width: 560px; }
+    .voice.right { align-self: flex-end; text-align: right; }
+    .voice .who {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 1rem; display: block;
+    }
+    .voice.left .who { color: var(--sous); }
+    .voice.right .who { color: var(--warm); }
+    .voice .kreyol { font-size: clamp(1.5rem, 3.4vw, 2.6rem); font-style: italic; line-height: 1.35; }
+    .voice .trans {
+      margin-top: 0.9rem; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem; color: var(--light-grey); letter-spacing: 0.04em;
     }
 
-    .fragment {
-      opacity: 0;
-      transform: translateY(80px);
-      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    /* manifesto — words light on scroll */
+    .manifesto { padding: 20vh 8vw; max-width: 1000px; margin: 0 auto; }
+    .manifesto p { font-size: clamp(1.6rem, 3.6vw, 3rem); line-height: 1.45; }
+    .manifesto .word { opacity: 0.12; transition: opacity 0.4s ease; }
+    .manifesto .word.lit { opacity: 1; }
 
-    .fragment.visible {
-      opacity: 1;
-      transform: translateY(0);
+    /* map section */
+    .map-section { height: 100vh; position: relative; overflow: hidden; background: #040404; }
+    #sky { position: absolute; inset: 0; display: block; touch-action: pan-y; cursor: grab; }
+    #sky.dragging { cursor: grabbing; }
+    .map-title {
+      position: absolute; top: 2.2rem; left: 0; right: 0; z-index: 5;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 1rem; color: rgba(240,236,228,0.45);
     }
-
-    /* ===== ENTRY POINTS GRID ===== */
-    .entry-points {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 40vh);
-      gap: 2px;
-      padding: 0 2px;
-      min-height: 80vh;
+    .map-title .sub {
+      display: block; margin-top: 0.4rem;
+      font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.56rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--grey);
     }
+    .map-hint {
+      position: absolute; bottom: 2rem; left: 0; right: 0; z-index: 5;
+      text-align: center; pointer-events: none;
+      font-style: italic; font-size: 0.85rem; color: rgba(240,236,228,0.35);
+    }
+    #label {
+      position: absolute; z-index: 6; pointer-events: none;
+      font-style: italic; font-size: 1rem; color: var(--bone);
+      text-shadow: 0 0 14px rgba(0,0,0,0.95);
+      opacity: 0; transition: opacity 0.25s ease;
+      transform: translate(-50%, -200%); white-space: nowrap; text-align: center;
+    }
+    #label .kind {
+      display: block; font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--warm); margin-top: 0.3rem;
+    }
+    #label.visible { opacity: 1; }
 
-    .entry-point {
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      background: var(--black);
-      border: 1px solid rgba(240, 236, 228, 0.05);
+    /* works strip */
+    .works { padding: 18vh 0; overflow: hidden; }
+    .works .head { padding: 0 8vw; margin-bottom: 6vh; }
+    .strip {
+      display: flex; gap: 1rem; padding: 0 8vw;
+      cursor: grab; user-select: none;
+      will-change: transform;
+    }
+    .strip.dragging { cursor: grabbing; }
+    .work {
+      flex-shrink: 0; width: 300px; height: 400px;
+      border: 1px solid rgba(240,236,228,0.12);
+      position: relative; overflow: hidden;
+      background:
+        repeating-linear-gradient(90deg, rgba(240,236,228,0.02) 0 2px, transparent 2px 7px),
+        linear-gradient(165deg, rgba(196,64,47,0.12), rgba(18,12,9,0.92) 65%);
       transition: border-color 0.4s ease;
     }
-
-    .entry-point:hover {
-      border-color: rgba(240, 236, 228, 0.2);
+    .work:hover { border-color: rgba(217,160,102,0.5); }
+    .work .year {
+      position: absolute; top: 1.2rem; right: 1.4rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.25em; color: var(--light-grey);
+    }
+    .work .name {
+      position: absolute; bottom: 1.6rem; left: 1.6rem; right: 1.6rem;
+      font-style: italic; font-size: 1.35rem; line-height: 1.3;
+    }
+    .work .film-edge {
+      position: absolute; top: 0; bottom: 0; width: 1px;
+      background: rgba(240,236,228,0.2);
     }
 
-    .entry-point:nth-child(1) { grid-column: 1 / 2; grid-row: 1 / 3; }
-    .entry-point:nth-child(2) { grid-column: 2 / 3; grid-row: 1 / 2; }
-    .entry-point:nth-child(3) { grid-column: 3 / 4; grid-row: 1 / 2; }
-    .entry-point:nth-child(4) { grid-column: 2 / 4; grid-row: 2 / 3; }
-
-    .entry-point-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 2rem;
-      background: linear-gradient(transparent 40%, rgba(10, 10, 10, 0.9));
-      transition: background 0.4s ease;
+    /* ancestors */
+    .ancestors { padding: 18vh 8vw; text-align: center; }
+    .ancestors .row {
+      display: flex; justify-content: center; gap: clamp(2rem, 8vw, 7rem);
+      flex-wrap: wrap; margin-top: 8vh;
     }
+    .ancestor { background: none; border: none; cursor: pointer; }
+    .ancestor .grann-presence { animation-delay: calc(var(--i) * -1.7s); }
+    .ancestor:hover .grann-presence { border-color: rgba(217,160,102,0.7); }
 
-    .entry-point:hover .entry-point-inner {
-      background: linear-gradient(transparent 20%, rgba(10, 10, 10, 0.95));
+    /* contribute */
+    .contribute {
+      min-height: 80vh; padding: 18vh 8vw;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
     }
-
-    .entry-point-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
+    .contribute .big { font-size: clamp(1.6rem, 3.6vw, 2.8rem); font-style: italic; max-width: 24ch; line-height: 1.4; }
+    .contribute .expl {
+      margin-top: 2rem; max-width: 52ch; color: var(--light-grey); line-height: 1.8;
     }
-
-    .entry-point-title {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      font-weight: 400;
-      line-height: 1.1;
-      transform: translateY(10px);
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    .leave-btn {
+      background: none; border: 1px solid rgba(217,160,102,0.4);
+      color: var(--warm); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.9rem 1.6rem; cursor: pointer; margin-top: 3rem;
+      transition: border-color 0.3s ease, color 0.3s ease;
     }
+    .leave-btn:hover { border-color: var(--warm); color: var(--bone); }
 
-    .entry-point:hover .entry-point-title {
-      transform: translateY(0);
-    }
-
-    .entry-point-number {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      font-size: 0.7rem;
-      color: var(--grey);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .entry-point-media {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity 0.6s ease;
-      background-size: cover;
-      background-position: center;
-      filter: grayscale(0.6) contrast(1.1);
-    }
-
-    .entry-point:hover .entry-point-media {
-      opacity: 0.3;
-    }
-
-    /* ===== MANIFESTO / STATEMENT SECTION ===== */
-    .manifesto {
-      padding: 15vh 8vw;
-      max-width: 900px;
-    }
-
-    .manifesto-text {
-      font-family: 'EB Garamond', serif;
-      font-size: clamp(1.8rem, 4vw, 3.5rem);
-      line-height: 1.3;
-      font-weight: 400;
-    }
-
-    .manifesto-text .word {
-      display: inline-block;
-      opacity: 0.15;
-      transition: opacity 0.5s ease;
-      margin-right: 0.2em;
-    }
-
-    .manifesto-text .word.lit {
-      opacity: 1;
-    }
-
-    /* ===== HORIZONTAL SCROLL STRIP ===== */
-    .strip-container {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .strip {
-      display: flex;
-      gap: 4px;
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      white-space: nowrap;
-    }
-
-    .strip-item {
-      flex-shrink: 0;
-      width: 300px;
-      height: 400px;
-      background: rgba(240, 236, 228, 0.03);
-      border: 1px solid rgba(240, 236, 228, 0.06);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s ease;
-    }
-
-    .strip-item:hover {
-      border-color: rgba(240, 236, 228, 0.15);
-    }
-
-    .strip-item-placeholder {
-      font-family: 'EB Garamond', serif;
-      font-size: 1.2rem;
-      font-style: italic;
-      color: var(--grey);
-      text-align: center;
-      padding: 2rem;
-      white-space: normal;
-    }
-
-    .strip-label {
-      position: absolute;
-      bottom: 1rem;
-      left: 1.5rem;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: var(--light-grey);
-    }
-
-    /* ===== FLOATING FRAGMENTS ===== */
-    .float-section {
-      position: relative;
-      min-height: 150vh;
-      padding: 10vh 0;
-    }
-
-    .floating-block {
-      position: absolute;
-      opacity: 0;
-      transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .floating-block.visible {
-      opacity: 1;
-    }
-
-    .floating-block--text {
-      max-width: 350px;
-      padding: 2rem;
-    }
-
-    .floating-block--text p {
-      font-family: 'EB Garamond', serif;
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--light-grey);
-    }
-
-    .floating-block--visual {
-      width: 250px;
-      height: 350px;
-      background: rgba(240, 236, 228, 0.02);
-      border: 1px solid rgba(240, 236, 228, 0.05);
-    }
-
-    .floating-block--tag {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--grey);
-      writing-mode: vertical-rl;
-      padding: 1rem;
-    }
-
-    /* ===== BOTTOM NAV / COLOPHON ===== */
+    /* colophon */
     .colophon {
-      padding: 8vh 4vw;
-      border-top: 1px solid rgba(240, 236, 228, 0.06);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      z-index: 1;
-      position: relative;
+      padding: 10vh 8vw 8vh;
+      border-top: 1px solid rgba(240,236,228,0.07);
+      display: flex; justify-content: space-between; align-items: flex-end;
+      flex-wrap: wrap; gap: 2rem;
     }
-
-    .colophon-left {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--grey);
-      line-height: 2;
+    .colophon .left {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.64rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--grey); line-height: 2.1;
     }
-
-    .colophon-right {
-      text-align: right;
-    }
-
-    .colophon-right a {
-      display: block;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--light-grey);
-      text-decoration: none;
-      padding: 0.3rem 0;
+    .colophon .right a {
+      display: block; text-align: right; text-decoration: none;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--light-grey); padding: 0.3rem 0;
       transition: color 0.3s ease;
     }
+    .colophon .right a:hover { color: var(--bone); }
 
-    .colophon-right a:hover {
-      color: var(--white);
+    /* star / ancestor overlay */
+    .open-frag {
+      position: fixed; inset: 0; z-index: 96;
+      background: rgba(5,5,5,0.95);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.7s ease, visibility 0.7s ease;
     }
-
-    /* ===== SIDE MARKERS ===== */
-    .side-marker {
-      position: fixed;
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--grey);
-      z-index: 100;
-      mix-blend-mode: difference;
+    .open-frag.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+    .open-inner { max-width: 560px; padding: 2rem; text-align: center; max-height: 85vh; overflow-y: auto; }
+    .open-inner .kind {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
+      display: block; margin-bottom: 1.2rem;
     }
-
-    .side-marker--left {
-      left: 1.5rem;
-      top: 50%;
-      transform: rotate(-90deg) translateX(-50%);
-      transform-origin: left center;
+    .open-inner h2 { font-weight: 400; font-style: italic; font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
+    .open-inner .dist {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
+      letter-spacing: 0.25em; color: var(--grey); margin-bottom: 1.2rem;
     }
-
-    .side-marker--right {
-      right: 1.5rem;
-      top: 50%;
-      transform: rotate(90deg) translateX(50%);
-      transform-origin: right center;
+    .open-inner p { color: rgba(240,236,228,0.75); line-height: 1.8; margin-bottom: 1rem; }
+    .open-inner .memory {
+      font-style: italic; color: var(--warm);
+      border-left: 2px solid rgba(217,160,102,0.4);
+      padding-left: 1rem; text-align: left;
+      margin: 1.4rem auto; max-width: 42ch;
     }
-
-    /* ===== SECTION DIVIDER ===== */
-    .divider {
-      width: 100%;
-      padding: 4vh 4vw;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      z-index: 1;
-      position: relative;
+    .open-inner .note {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
+      letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
     }
-
-    .divider-line {
-      flex: 1;
-      height: 1px;
-      background: rgba(240, 236, 228, 0.08);
+    .open-close {
+      position: fixed; top: 1.6rem; right: 2rem;
+      background: none; border: none; cursor: pointer;
+      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease;
     }
+    .open-close:hover { color: var(--bone); }
 
-    .divider-label {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: var(--grey);
-    }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      .entry-points {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-      }
-      .entry-point { grid-column: auto !important; grid-row: auto !important; min-height: 40vh; }
-      .manifesto { padding: 10vh 6vw; }
-      .floating-block { position: relative !important; top: auto !important; left: auto !important; right: auto !important; margin: 4vh 4vw; }
-      .colophon { flex-direction: column; gap: 2rem; align-items: flex-start; }
-      .side-marker { display: none; }
+      .voice.right { align-self: flex-start; text-align: left; }
+      .work { width: 240px; height: 330px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .grain, .grann-presence, .scroll-hint, .mic.listening { animation: none !important; }
+      .reveal, .counsel-line { transition-duration: 0.2s; }
     }
   </style>
 </head>
-<body>
-
-  <!-- GRAIN -->
+<body class="locked">
   <div class="grain"></div>
 
-  <!-- CUSTOM CURSOR -->
-  <div class="cursor-dot" id="cursorDot"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
-
-  <!-- WEBGL BACKGROUND -->
-  <canvas id="webgl-canvas"></canvas>
-
-  <!-- LOADER -->
-  <div class="loader" id="loader">
-    <div class="loader-text">
-      <span>entering the space</span>
+  <!-- ============ THE RITUAL (door) ============ -->
+  <div class="ritual" id="ritual">
+    <div id="knockZone">
+      <form class="knock-form" id="knockForm">
+        <label for="knock" class="sr-only">You are at a threshold. Speak or type your greeting.</label>
+        <input class="knock-input" id="knock" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="mic" id="mic" aria-label="Speak instead of typing" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+          </svg>
+        </button>
+      </form>
+      <p class="whisper" id="whisper" aria-live="polite"></p>
     </div>
-    <div class="loader-bar"></div>
+
+    <div class="grann-zone" id="grannZone" aria-live="polite">
+      <button class="grann-btn" id="grannBtn" aria-label="Grann — click to know her story">
+        <div class="grann-presence"></div>
+        <span class="grann-name">Grann</span>
+      </button>
+      <div id="counsel"></div>
+      <form class="knock-form" id="knockForm2" style="margin-top:1.6rem; display:none;">
+        <label for="knock2" class="sr-only">Try your greeting again</label>
+        <input class="knock-input" id="knock2" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </form>
+    </div>
   </div>
 
-  <!-- SIDE MARKERS -->
-  <div class="side-marker side-marker--left">Artist / Filmmaker / Writer</div>
-  <div class="side-marker side-marker--right">Montreal, QC</div>
+  <div class="respe-flash" id="respeFlash" aria-live="assertive"><div class="respe-word">RESPÈ</div></div>
 
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-content">
-      <h1 class="hero-name" id="heroName"></h1>
-      <p class="hero-subtitle" id="heroSubtitle">Artist-Filmmaker &middot; Writer &middot; Educator</p>
+  <!-- ============ THE JOURNEY (scroll) ============ -->
+  <section class="hero">
+    <div class="reveal">
+      <h1>Grenn<br><span class="accent">Pwomennen</span></h1>
+      <p class="sub">yon vwayaj &middot; yon konvèsasyon &middot; yon kominyon</p>
     </div>
-    <div class="hero-scroll-hint">Scroll to enter</div>
+    <span class="scroll-hint">desann — scroll</span>
   </section>
 
-  <!-- ENTRY POINTS -->
-  <section class="fragment-section">
-    <div class="divider fragment">
-      <div class="divider-line"></div>
-      <span class="divider-label">Enter anywhere</span>
-      <div class="divider-line"></div>
+  <section class="proverb">
+    <div class="voice left reveal">
+      <span class="who">Bwa Pi Wo — the tallest tree</span>
+      <p class="kreyol">«&nbsp;Mwen wè lwen.&nbsp;»</p>
+      <p class="trans">I see far. &middot; Je vois loin.</p>
     </div>
-
-    <div class="entry-points fragment">
-      <div class="entry-point" data-entry="work">
-        <div class="entry-point-media" style="background-color: #1a1a2e;"></div>
-        <div class="entry-point-inner">
-          <span class="entry-point-label">Film / Video</span>
-          <h2 class="entry-point-title">The Work</h2>
-        </div>
-        <span class="entry-point-number">001</span>
-      </div>
-
-      <div class="entry-point" data-entry="process">
-        <div class="entry-point-media" style="background-color: #1a0f0a;"></div>
-        <div class="entry-point-inner">
-          <span class="entry-point-label">Research / Process</span>
-          <h2 class="entry-point-title">Behind the<br>Surface</h2>
-        </div>
-        <span class="entry-point-number">002</span>
-      </div>
-
-      <div class="entry-point" data-entry="story">
-        <div class="entry-point-media" style="background-color: #0a1a1a;"></div>
-        <div class="entry-point-inner">
-          <span class="entry-point-label">Personal / Narrative</span>
-          <h2 class="entry-point-title">Origin<br>Story</h2>
-        </div>
-        <span class="entry-point-number">003</span>
-      </div>
-
-      <div class="entry-point" data-entry="connect">
-        <div class="entry-point-media" style="background-color: #1a0a1a;"></div>
-        <div class="entry-point-inner">
-          <span class="entry-point-label">Collaborate / Co-create</span>
-          <h2 class="entry-point-title">Enter the Conversation</h2>
-        </div>
-        <span class="entry-point-number">004</span>
-      </div>
+    <div class="voice right reveal">
+      <span class="who">Grenn Pwomennen — the wandering seed</span>
+      <p class="kreyol">«&nbsp;Men mwen wè pi lwen.&nbsp;»</p>
+      <p class="trans">But I see farther. &middot; Mais je vois plus loin.</p>
     </div>
   </section>
 
-  <!-- MANIFESTO -->
-  <section class="fragment-section">
-    <div class="manifesto fragment">
-      <p class="manifesto-text" id="manifesto">
-        I make films that fracture time. I write to remember what the body already knows. I teach because art is not a solo act. The work lives between languages, between geographies, between what is said and what remains unspoken. This is not a portfolio. This is a window left open.
-      </p>
-    </div>
+  <section class="manifesto">
+    <span class="kicker reveal">kimoun mwen ye — who i am</span>
+    <p id="manifesto">I am the seed that walked. From Pòtoprens outward, across waters and borders and languages, I scattered and I took root. I carry films the way others carry photographs. I carry voices — my grandmother's, my mother's, my father's — and they walk with me, appearing when the road forks. This is not a website about a life. It is a place where you meet someone. And like any true encounter, it will ask something of you before it gives.</p>
   </section>
 
-  <!-- HORIZONTAL STRIP (WORK PREVIEW) -->
-  <section class="strip-container fragment-section">
-    <div class="divider fragment" style="position: relative; z-index: 2;">
-      <div class="divider-line"></div>
-      <span class="divider-label">Selected work</span>
-      <div class="divider-line"></div>
+  <section class="map-section" id="mapSection">
+    <canvas id="sky"></canvas>
+    <p class="map-title">Kat Grenn Pwomennen
+      <span class="sub">the world, with Ayiti at its center</span>
+    </p>
+    <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
+    <p class="map-hint" id="mapHint">trennen pou w vire &middot; drag to turn &middot; klike sou yon zetwal &middot; click a star</p>
+  </section>
+
+  <section class="works">
+    <div class="head reveal">
+      <span class="kicker">sa grenn nan te wè — what the seed has seen</span>
+      <p style="font-style:italic; font-size:clamp(1.4rem,3vw,2.2rem); max-width:30ch;">Films gathered along the way — drag through them.</p>
     </div>
     <div class="strip" id="strip">
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Choublak<br><small>Exhibition, Leonard & Bina Ellen</small></span>
-        <span class="strip-label">2024</span>
-      </div>
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Film Project II<br><small>Your next work here</small></span>
-        <span class="strip-label">2023</span>
-      </div>
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Film Project III<br><small>Description</small></span>
-        <span class="strip-label">2022</span>
-      </div>
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Writing / Text<br><small>Published works</small></span>
-        <span class="strip-label">Ongoing</span>
-      </div>
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Teaching<br><small>Workshops & lectures</small></span>
-        <span class="strip-label">Ongoing</span>
-      </div>
-      <div class="strip-item">
-        <span class="strip-item-placeholder">Collaborative Work<br><small>Community projects</small></span>
-        <span class="strip-label">Ongoing</span>
-      </div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2024–25</span><span class="name">Choublak</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2023</span><span class="name">Kale Kann Kale</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2023</span><span class="name">The Marks Remember</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">Una Sola Sangre</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">What Happens to a Dream Deferred</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">Of What Death We Die</span></div>
+      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2020</span><span class="name">Katherine</span></div>
     </div>
   </section>
 
-  <!-- FLOATING FRAGMENTS -->
-  <section class="float-section fragment-section">
-    <div class="floating-block floating-block--tag" style="top: 5vh; left: 8vw;">
-      Research
-    </div>
-    <div class="floating-block floating-block--text" style="top: 15vh; left: 15vw;">
-      <p>The creative process is not linear. It spirals. It returns to the same wound with new eyes. Each project is a fragment of something larger that refuses to be named.</p>
-    </div>
-    <div class="floating-block floating-block--visual" style="top: 10vh; right: 10vw;">
-    </div>
-    <div class="floating-block floating-block--text" style="top: 65vh; right: 12vw;">
-      <p>Between Port-au-Prince and Montreal, between Kreyol and French, between film and text -- the work exists in the gaps. The in-between is not empty. It vibrates.</p>
-    </div>
-    <div class="floating-block floating-block--tag" style="top: 80vh; left: 5vw;">
-      Memory
-    </div>
-    <div class="floating-block floating-block--visual" style="top: 70vh; left: 25vw; width: 200px; height: 280px;">
+  <section class="ancestors">
+    <span class="kicker reveal">zansèt yo — the guides</span>
+    <p class="reveal" style="font-style:italic; font-size:clamp(1.4rem,3vw,2.2rem);">They walk with the seed. Click them to enter their branches.</p>
+    <div class="row reveal">
+      <button class="ancestor" data-ancestor="grann" style="--i:0"><div class="grann-presence"></div><span class="grann-name">Grann</span></button>
+      <button class="ancestor" data-ancestor="manman" style="--i:1"><div class="grann-presence"></div><span class="grann-name">Manman</span></button>
+      <button class="ancestor" data-ancestor="papa" style="--i:2"><div class="grann-presence"></div><span class="grann-name">Papa</span></button>
     </div>
   </section>
 
-  <!-- COLOPHON -->
-  <footer class="colophon fragment">
-    <div class="colophon-left">
-      Esery Mondesir<br>
-      Artist-Filmmaker, Writer, Educator<br>
-      Montreal, QC<br>
-      <br>
-      &copy; 2024 -- ongoing
+  <section class="contribute">
+    <span class="kicker reveal">kite yon souvni — leave a memory</span>
+    <p class="big reveal">To go further, you must leave something behind.</p>
+    <p class="expl reveal">A word, a sound, a memory of your own — pinned to your city on the map. The site exchanges it for a fragment left by another traveller. Every visit alters the space for the next arrival: the stars grow brighter with what they hold.</p>
+    <button class="leave-btn reveal" onclick="this.textContent='— the reciprocal ritual opens here in the production build —'">Kite yon souvni</button>
+  </section>
+
+  <footer class="colophon">
+    <div class="left">
+      Ésery Mondésir — Grenn Pwomennen<br>
+      artist-filmmaker &middot; writer &middot; educator<br>
+      pòtoprens &middot; monreyal &middot; tow­onto<br><br>
+      onè &middot; respè &middot; &copy; ongoing
     </div>
-    <div class="colophon-right">
-      <a href="#">Vimeo</a>
-      <a href="#">Instagram</a>
-      <a href="#">Contact</a>
+    <div class="right">
+      <a href="#" onclick="return false">Vimeo</a>
+      <a href="#" onclick="return false">Instagram</a>
+      <a href="#" onclick="return false">Kontak</a>
     </div>
   </footer>
 
-  <!-- ===== SCRIPTS ===== -->
-
-  <!-- Three.js for WebGL -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- overlay for stars & ancestors -->
+  <div class="open-frag" id="openFrag" role="dialog" aria-modal="true">
+    <button class="open-close" id="openClose">Tounen — return</button>
+    <div class="open-inner" id="openInner"></div>
+  </div>
 
   <script>
-    // =============================================
-    // CUSTOM CURSOR
-    // =============================================
-    const cursorDot = document.getElementById('cursorDot');
-    const cursorRing = document.getElementById('cursorRing');
-    let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
+  // =================================================================
+  // GRENN PWOMENNEN — one interactive site: ritual → scroll journey.
+  // =================================================================
 
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursorDot.style.left = mouseX - 4 + 'px';
-      cursorDot.style.top = mouseY - 4 + 'px';
+  // ---------------- RITUAL ----------------
+  const ACCEPT_RE = /^h?on+e+$/;
+  function normalize(s) {
+    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '');
+  }
+  function isOne(s) { const n = normalize(s); return n === 'one' || ACCEPT_RE.test(n); }
+
+  const ritual = document.getElementById('ritual');
+  const knockZone = document.getElementById('knockZone');
+  const grannZone = document.getElementById('grannZone');
+  const counsel = document.getElementById('counsel');
+  const whisper = document.getElementById('whisper');
+  const respeFlash = document.getElementById('respeFlash');
+  let entered = false, grannShown = false;
+
+  const whisperTimer = setTimeout(() => {
+    whisper.innerHTML = 'ou rive devan yon kay… &middot; you have arrived at a door… &middot; te voil&agrave; devant une porte…';
+    whisper.classList.add('visible');
+  }, 7000);
+  const grannTimer = setTimeout(() => { if (!grannShown && !entered) showGrann('silence'); }, 20000);
+
+  const COUNSEL = {
+    silence: [
+      { cls: 'kreyol', text: 'Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa.' },
+      { cls: 'echo', text: 'My child… you cannot stand at a door in silence. &middot; Mon enfant… on ne reste pas muet devant une porte.' },
+      { cls: 'kreyol', text: 'Isit la, ou mande: <strong>«&nbsp;Onè&nbsp;»</strong>. Epi kay la va reponn ou: «&nbsp;Respè&nbsp;».' },
+      { cls: 'echo', text: 'Here, you ask for honor — «&nbsp;Onè&nbsp;» — and the house grants respect — «&nbsp;Respè&nbsp;». Then you enter.' },
+    ],
+    wrong: [
+      { cls: 'kreyol', text: 'Tande, pitit… se pa konsa nou fè l isit la.' },
+      { cls: 'echo', text: 'Listen, child… that is not how we do it here. &middot; Ce n’est pas comme ça qu’on fait ici.' },
+      { cls: 'kreyol', text: 'Lè ou rive devan yon kay, ou mande: <strong>«&nbsp;Onè&nbsp;»</strong>. Kay la va reponn: «&nbsp;Respè&nbsp;». Apre sa, ou antre.' },
+      { cls: 'echo', text: 'You ask: «&nbsp;Onè&nbsp;» — honor. The house answers: «&nbsp;Respè&nbsp;». Then, you enter. Esèye ankò.' },
+    ]
+  };
+
+  function showGrann(mode) {
+    grannShown = true;
+    clearTimeout(whisperTimer); clearTimeout(grannTimer);
+    knockZone.style.display = 'none';
+    grannZone.classList.add('visible');
+    counsel.innerHTML = '';
+    const lines = COUNSEL[mode];
+    lines.forEach((l, i) => {
+      const p = document.createElement('p');
+      p.className = 'counsel-line ' + l.cls;
+      p.innerHTML = l.text;
+      counsel.appendChild(p);
+      setTimeout(() => p.classList.add('visible'), 700 + i * 1400);
     });
+    setTimeout(() => {
+      document.getElementById('knockForm2').style.display = 'flex';
+      document.getElementById('knock2').focus();
+    }, 700 + lines.length * 1400);
+  }
 
-    function animateCursor() {
-      ringX += (mouseX - ringX) * 0.08;
-      ringY += (mouseY - ringY) * 0.08;
-      cursorRing.style.left = ringX - 20 + 'px';
-      cursorRing.style.top = ringY - 20 + 'px';
-      requestAnimationFrame(animateCursor);
+  function enter() {
+    if (entered) return;
+    entered = true;
+    clearTimeout(whisperTimer); clearTimeout(grannTimer);
+    ritual.classList.add('gone');
+    respeFlash.classList.add('visible');
+    setTimeout(() => {
+      respeFlash.classList.remove('visible');
+      document.body.classList.remove('locked');
+      initScroll();
+    }, 3200);
+  }
+
+  function attempt(v) {
+    if (!v.trim()) return;
+    if (isOne(v)) enter();
+    else if (!grannShown) showGrann('wrong');
+    else document.getElementById('knock2').value = '';
+  }
+
+  document.getElementById('knockForm').addEventListener('submit', e => { e.preventDefault(); attempt(document.getElementById('knock').value); });
+  document.getElementById('knockForm2').addEventListener('submit', e => { e.preventDefault(); attempt(document.getElementById('knock2').value); });
+  document.getElementById('knock').focus();
+
+  // voice input
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR) {
+    const micBtn = document.getElementById('mic');
+    micBtn.hidden = false;
+    const rec = new SR();
+    rec.lang = 'fr-FR'; rec.interimResults = false; rec.maxAlternatives = 5;
+    let listening = false;
+    micBtn.addEventListener('click', () => {
+      if (listening) { rec.stop(); return; }
+      try { rec.start(); listening = true; micBtn.classList.add('listening'); } catch (e) {}
+    });
+    rec.onend = () => { listening = false; micBtn.classList.remove('listening'); };
+    rec.onresult = e => {
+      const alts = Array.from(e.results[0]).map(r => r.transcript);
+      const hit = alts.find(t => isOne(t));
+      document.getElementById('knock').value = alts[0] || '';
+      if (hit) enter(); else attempt(alts[0] || '');
+    };
+  }
+
+  // Grann bio from the ritual
+  document.getElementById('grannBtn').addEventListener('click', () => openAncestor('grann'));
+
+  // ---------------- ANCESTOR BRANCHES ----------------
+  const ANCESTORS = {
+    grann: { name: 'Grann', body: 'She was the one who taught that a door is never just a door. You announce yourself; honor is asked; respect is granted; only then do you cross. [Her photographs, her voice, her proverbs — her whole branch grows here.]' },
+    manman: { name: 'Manman', body: '[Placeholder — her story, her voice, her branch of the tree.]' },
+    papa: { name: 'Papa', body: '[Placeholder — his story, his voice, his branch of the tree.]' },
+  };
+  document.querySelectorAll('.ancestor').forEach(b =>
+    b.addEventListener('click', () => openAncestor(b.dataset.ancestor)));
+
+  function openAncestor(id) {
+    const a = ANCESTORS[id];
+    openOverlay(`<span class="kind">zansèt — yon lòt pyebwa, another tree</span><h2>${a.name}</h2><p>${a.body}</p><p class="note">each guide opens their own branch of the family tree</p>`);
+  }
+
+  // ---------------- OVERLAY ----------------
+  const openFrag = document.getElementById('openFrag');
+  const openInner = document.getElementById('openInner');
+  function openOverlay(html) {
+    openInner.innerHTML = html;
+    openFrag.classList.add('visible');
+    document.getElementById('openClose').focus();
+  }
+  function closeOverlay() {
+    openFrag.classList.remove('visible');
+    if (window.mapZoomOut) window.mapZoomOut();
+  }
+  document.getElementById('openClose').addEventListener('click', closeOverlay);
+  addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+  // ---------------- SCROLL LAYER ----------------
+  function initScroll() {
+    // reveals
+    const io = new IntersectionObserver(es => {
+      es.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // manifesto word lighting
+    const man = document.getElementById('manifesto');
+    man.innerHTML = man.textContent.trim().split(/\s+/).map(w => `<span class="word">${w}</span>`).join(' ');
+    const words = man.querySelectorAll('.word');
+    function lightWords() {
+      const r = man.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, 1 - (r.top - innerHeight * 0.15) / (innerHeight * 0.6)));
+      const n = Math.floor(p * words.length);
+      words.forEach((w, i) => w.classList.toggle('lit', i < n));
     }
-    animateCursor();
+    addEventListener('scroll', lightWords, { passive: true });
+    lightWords();
 
-    // Expand cursor on interactive elements
-    document.querySelectorAll('.entry-point, a, .strip-item').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursorRing.style.width = '70px';
-        cursorRing.style.height = '70px';
-        cursorRing.style.left = ringX - 35 + 'px';
-        cursorRing.style.top = ringY - 35 + 'px';
+    // works strip drag
+    const strip = document.getElementById('strip');
+    let sDrag = false, sX = 0, sPos = 0, sStart = 0;
+    const maxDrag = () => Math.max(0, strip.scrollWidth - innerWidth + innerWidth * 0.16);
+    function sDown(e) { sDrag = true; sX = (e.touches ? e.touches[0].clientX : e.clientX); sStart = sPos; strip.classList.add('dragging'); }
+    function sMove(e) {
+      if (!sDrag) return;
+      const x = (e.touches ? e.touches[0].clientX : e.clientX);
+      sPos = Math.max(-maxDrag(), Math.min(0, sStart + x - sX));
+      strip.style.transform = `translateX(${sPos}px)`;
+    }
+    function sUp() { sDrag = false; strip.classList.remove('dragging'); }
+    strip.addEventListener('mousedown', sDown);
+    addEventListener('mousemove', sMove);
+    addEventListener('mouseup', sUp);
+    strip.addEventListener('touchstart', sDown, { passive: true });
+    strip.addEventListener('touchmove', sMove, { passive: true });
+    strip.addEventListener('touchend', sUp);
+
+    // lazy-boot the map when its section approaches
+    const mapIO = new IntersectionObserver(es => {
+      es.forEach(en => {
+        if (en.isIntersecting) { loadThree(0); mapIO.disconnect(); }
       });
-      el.addEventListener('mouseleave', () => {
-        cursorRing.style.width = '40px';
-        cursorRing.style.height = '40px';
-      });
+    }, { rootMargin: '400px' });
+    mapIO.observe(document.getElementById('mapSection'));
+  }
+
+  // ---------------- THE MAP (galaxy) ----------------
+  let threeLoading = false;
+  function loadThree(i) {
+    if (threeLoading && i === 0) return;
+    threeLoading = true;
+    const urls = [
+      'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+      'https://unpkg.com/three@0.128.0/build/three.min.js',
+      'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+    ];
+    if (i >= urls.length) {
+      document.getElementById('mapHint').textContent = 'unable to load the 3D engine — check connection and reload';
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = urls[i];
+    s.onload = () => bootMap();
+    s.onerror = () => loadThree(i + 1);
+    document.head.appendChild(s);
+  }
+
+  function bootMap() {
+    const PAP = { lat: 18.5944, lon: -72.3074 };
+    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184', sous: '#b9c4d6' };
+
+    const SOUS = [
+      { name: 'Kafou (Carrefour)', lat: 18.5344, lon: -72.4094, size: 13, stories: 8, body: 'The city beside the city — millions passed through Kafou on their way to everywhere.' },
+      { name: 'Baconnois (Ansavo, Nip)', lat: 18.4700, lon: -73.3500, size: 12, stories: 4, body: 'Plaine de Baconnois, commune of Anse-à-Veau, Nippes — the kind of place the maps forget and the diaspora never does.' },
+      { name: 'Lagonav (Ansagalè)', lat: 18.8342, lon: -72.8662, size: 12, stories: 3, body: 'The island beside the island — La Gonâve, whose children know the water first.' },
+      { name: 'Jakmèl', lat: 18.2341, lon: -72.5345, size: 12, stories: 5, body: 'Jacmel — the painters’ port, the first goodbye of the South-East.' },
+      { name: 'Okap (Cap-Haïtien)', lat: 19.7580, lon: -72.2042, size: 13, stories: 6, body: 'The old capital of the North — Vertières is here.' },
+      { name: 'Gonayiv', lat: 19.4456, lon: -72.6884, size: 12, stories: 4, body: 'Gonaïves — where independence was declared in 1804, and where the kanntè boats later sailed.' },
+      { name: 'Senmak (Saint-Marc)', lat: 19.1080, lon: -72.6939, size: 12, stories: 3, body: 'Saint-Marc — birthplace of Jean Baptiste Point du Sable, who wandered north and founded Chicago.' },
+      { name: 'Jeremi', lat: 18.6500, lon: -74.1167, size: 12, stories: 4, body: 'Jérémie — the city of poets, the beginning of many departures.' },
+      { name: 'Okay (Les Cayes)', lat: 18.1933, lon: -73.7460, size: 12, stories: 3, body: 'Les Cayes — the great South, sender of generations.' },
+      { name: 'Miragwàn', lat: 18.4411, lon: -73.0883, size: 12, stories: 4, body: 'Miragoâne — for decades the boats to Nassau and Florida left from this bay.' },
+      { name: 'Wanament', lat: 19.5497, lon: -71.7264, size: 12, stories: 3, body: 'Ouanaminthe — the river crossing, the eastward road into the Dominican Republic.' },
+    ];
+
+    const CITIES = [
+      { name: 'Flatbush, Brooklyn', lat: 40.6526, lon: -73.9590, type: 'kominote', size: 24, stories: 23, body: 'Flatbush and East Flatbush — the beating heart of Haitian New York, the largest community in the U.S.', sample: '“Sou Church Avenue, sant lakay mwen pa t janm lwen.” — a memory left by a visitor' },
+      { name: 'Springfield Gardens, Queens', lat: 40.6642, lon: -73.7590, type: 'kominote', size: 14, stories: 6, body: 'Queens’ Haitian corridor — Springfield Gardens, Cambria Heights, Queens Village.' },
+      { name: 'Elmont, NY', lat: 40.7009, lon: -73.7126, type: 'kominote', size: 14, stories: 4, body: 'Nassau County, Long Island — where Brooklyn’s children bought houses and stayed.' },
+      { name: 'Spring Valley, NY', lat: 41.1132, lon: -74.0438, type: 'kominote', size: 14, stories: 5, body: 'Rockland County — one of the densest Haitian communities in America.' },
+      { name: 'Miami — Little Haiti', lat: 25.7617, lon: -80.1918, type: 'toude', size: 22, stories: 18, body: 'Little Haiti, Krome, Third Horizon, PAMM. A community and a stage — and a wound (WelKrome).', sample: '“Krome se te premye adrès anpil moun nan Miami.” — a memory left by a visitor' },
+      { name: 'North Miami', lat: 25.8901, lon: -80.1867, type: 'kominote', size: 15, stories: 7, body: 'North Miami and Golden Glades — Little Haiti extended northward.' },
+      { name: 'New Orleans', lat: 29.9511, lon: -90.0715, type: 'kominote', size: 17, stories: 9, body: '1809: ten thousand Saint-Domingue refugees doubled the city. The seed is two centuries deep in this soil.', sample: '“My family has been here since the boats from Cuba. We never called it immigration.” — a memory left by a visitor' },
+      { name: 'Chicago', lat: 41.8781, lon: -87.6298, type: 'kominote', size: 14, stories: 3, body: 'Founded by a Haitian — Jean Baptiste Point du Sable, born in Saint-Marc.' },
+      { name: 'Boston — Mattapan', lat: 42.2771, lon: -71.0914, type: 'kominote', size: 16, stories: 8, body: 'Mattapan, Hyde Park, Brockton — New England’s lakou.' },
+      { name: 'Montréal — Montréal-Nord', lat: 45.5017, lon: -73.5673, type: 'toude', size: 20, stories: 12, body: 'Montréal-Nord, Saint-Michel — and the practice: Choublak at Leonard & Bina Ellen (2024–25).' },
+      { name: 'Toronto', lat: 43.6532, lon: -79.3832, type: 'toude', size: 18, stories: 6, body: 'Where the artist teaches and works — and where this website is being dreamed.' },
+      { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312, type: 'kominote', size: 16, stories: 10, body: 'The nearest elsewhere — the island shared and divided.' },
+      { name: 'La Havane', lat: 23.1136, lon: -82.3666, type: 'travay', size: 16, stories: 5, body: 'Una Sola Sangre — Haitians in Cuba, familial memory across generations.' },
+      { name: 'Santiago de Cuba', lat: 20.0247, lon: -75.8219, type: 'kominote', size: 13, stories: 4, body: 'Descendants of cane-cutters — one blood.' },
+      { name: 'Nassau', lat: 25.0443, lon: -77.3504, type: 'kominote', size: 14, stories: 7, body: 'The Bahamas — the closest crossing, the oldest boats.', sample: '“Papa m te janbe an 1979 sou yon vwalye.” — a memory left by a visitor' },
+      { name: 'Marsh Harbour, Abaco', lat: 26.5412, lon: -77.0636, type: 'kominote', size: 11, stories: 3, body: 'The Mudd and Pigeon Peas — erased by Hurricane Dorian in 2019. The stars remember what the storm took.' },
+      { name: 'Providenciales', lat: 21.7738, lon: -72.2719, type: 'kominote', size: 11, stories: 2, body: 'Turks and Caicos — the islands’ largest minority, mostly unseen.' },
+      { name: 'Pointe-à-Pitre', lat: 16.2415, lon: -61.5328, type: 'kominote', size: 11, stories: 2, body: 'Guadeloupe — kin across the arc of islands.' },
+      { name: 'Cayenne', lat: 4.9224, lon: -52.3134, type: 'kominote', size: 12, stories: 3, body: 'Guyane — a newer route of the seed.' },
+      { name: 'Santiago (Chile)', lat: -33.4489, lon: -70.6693, type: 'kominote', size: 13, stories: 5, body: 'Quilicura — “Petite Haïti” of the southern cone.' },
+      { name: 'São Paulo', lat: -23.5505, lon: -46.6333, type: 'kominote', size: 13, stories: 4, body: 'Brazil — a waystation that became a home, then a departure again.' },
+      { name: 'Tijuana', lat: 32.5149, lon: -117.0382, type: 'travay', size: 16, stories: 6, body: 'What Happens to a Dream Deferred — asylum seekers at the border.' },
+      { name: 'Tapachula', lat: 14.9059, lon: -92.2577, type: 'kominote', size: 12, stories: 3, body: 'Mexico’s southern border — the waiting room of the northward road.' },
+      { name: 'Paris', lat: 48.8566, lon: 2.3522, type: 'kominote', size: 15, stories: 6, body: 'Paris and Saint-Denis — the community across the water.' },
+    ];
+
+    const R_EARTH = 6371;
+    const toRad = d => d * Math.PI / 180;
+    function distBearing(lat1, lon1, lat2, lon2) {
+      const p1 = toRad(lat1), p2 = toRad(lat2), dl = toRad(lon2 - lon1);
+      const d = Math.acos(Math.min(1, Math.sin(p1) * Math.sin(p2) + Math.cos(p1) * Math.cos(p2) * Math.cos(dl))) * R_EARTH;
+      const y = Math.sin(dl) * Math.cos(p2);
+      const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+      return { d, brg: Math.atan2(y, x) };
+    }
+    const INNER_KM = 300, INNER_R = 165, OUTER_R = 700, MAX_KM = 8200;
+    function projR(dKm) {
+      if (dKm <= INNER_KM) return dKm * (INNER_R / INNER_KM);
+      return INNER_R + (dKm - INNER_KM) * ((OUTER_R - INNER_R) / (MAX_KM - INNER_KM));
+    }
+
+    const canvas = document.getElementById('sky');
+    const section = document.getElementById('mapSection');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    function sizeRenderer() {
+      renderer.setSize(section.clientWidth, section.clientHeight);
+      camera.aspect = section.clientWidth / section.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x040404, 0.00045);
+    const camera = new THREE.PerspectiveCamera(58, 1, 1, 8000);
+    sizeRenderer();
+    addEventListener('resize', sizeRenderer);
+
+    function glowTexture(hex, soft) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      if (soft) { g.addColorStop(0, hex + '55'); g.addColorStop(0.5, hex + '22'); g.addColorStop(1, hex + '00'); }
+      else { g.addColorStop(0, hex); g.addColorStop(0.25, hex + 'cc'); g.addColorStop(0.6, hex + '33'); g.addColorStop(1, hex + '00'); }
+      ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+      return new THREE.CanvasTexture(c);
+    }
+
+    // nebula
+    const nebTex = [glowTexture('#d9a066', true), glowTexture('#c4402f', true), glowTexture('#6a6f8a', true)];
+    const nebulae = [];
+    for (let i = 0; i < 14; i++) {
+      const m = new THREE.SpriteMaterial({ map: nebTex[i % 3], transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 });
+      const s = new THREE.Sprite(m);
+      const a = Math.random() * Math.PI * 2, r = 120 + Math.random() * 620;
+      s.position.set(Math.cos(a) * r, (Math.random() - 0.5) * 120 - 60, Math.sin(a) * r);
+      s.scale.setScalar(360 + Math.random() * 520);
+      s.userData.rot = (Math.random() - 0.5) * 0.0004;
+      scene.add(s); nebulae.push(s);
+    }
+
+    // rings
+    [150, 300, 1000, 2500, 5000, 7500].forEach(km => {
+      const r = projR(km), pts = [];
+      for (let i = 0; i <= 128; i++) {
+        const a = (i / 128) * Math.PI * 2;
+        pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+      }
+      const g = new THREE.BufferGeometry().setFromPoints(pts);
+      scene.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xf0ece4, transparent: true, opacity: 0.05 })));
     });
 
-    // =============================================
-    // WEBGL BACKGROUND (DISTORTION MESH)
-    // =============================================
-    (function initWebGL() {
-      const canvas = document.getElementById('webgl-canvas');
-      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // nodes
+    const nodes = [];
+    function addNode(data, pos, colorKey, size) {
+      const mat = new THREE.SpriteMaterial({ map: glowTexture(COLORS[colorKey]), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+      const s = new THREE.Sprite(mat);
+      s.position.copy(pos); s.scale.setScalar(size); s.userData = data;
+      data.sprite = s; data.baseSize = size; data.phase = Math.random() * Math.PI * 2;
+      scene.add(s); nodes.push(data);
+    }
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-      camera.position.z = 2.5;
+    const core = { name: 'Pòtoprens', kind: 'kè a — the core', type: 'core', stories: 31,
+      body: 'Where every line begins. Every distance and direction on this map is true — measured from here.',
+      sample: '“Mwen pa janm pati. Se mwen ki veye limyè yo.” — a memory left by a visitor', dist: 0 };
+    addNode(core, new THREE.Vector3(0, 0, 0), 'core', 34);
 
-      // Create a distortion plane with custom shader
-      const geometry = new THREE.PlaneGeometry(6, 6, 128, 128);
+    SOUS.forEach(c => {
+      c.type = 'sous'; c.kind = 'sous — the wellspring';
+      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
+      c.dist = Math.round(d);
+      const r = projR(d);
+      addNode(c, new THREE.Vector3(Math.sin(brg) * r, (Math.random() - 0.5) * 10, -Math.cos(brg) * r), 'sous', c.size);
+    });
+    CITIES.forEach(c => {
+      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
+      c.dist = Math.round(d);
+      c.kind = c.type === 'kominote' ? 'kominote — community' : c.type === 'travay' ? 'travay — the work' : 'kominote + travay';
+      const r = projR(d);
+      addNode(c, new THREE.Vector3(Math.sin(brg) * r, (Math.random() - 0.5) * 26, -Math.cos(brg) * r), c.type, c.size);
+    });
 
-      const vertexShader = `
-        uniform float uTime;
-        uniform float uScrollProgress;
-        uniform vec2 uMouse;
-        varying vec2 vUv;
-        varying float vElevation;
-
-        void main() {
-          vUv = uv;
-
-          vec3 pos = position;
-
-          // Organic wave distortion
-          float wave1 = sin(pos.x * 2.0 + uTime * 0.3) * cos(pos.y * 1.5 + uTime * 0.2) * 0.15;
-          float wave2 = sin(pos.x * 3.0 - uTime * 0.4 + uScrollProgress * 2.0) * 0.08;
-          float wave3 = cos(pos.y * 2.5 + uTime * 0.25) * sin(pos.x * 1.8 + uScrollProgress) * 0.1;
-
-          // Mouse influence
-          float dist = distance(uv, uMouse);
-          float mouseEffect = smoothstep(0.5, 0.0, dist) * 0.2;
-
-          pos.z += wave1 + wave2 + wave3 + mouseEffect;
-          vElevation = pos.z;
-
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    // filaments
+    const filaments = [];
+    nodes.forEach(n => {
+      if (n.type === 'core') return;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(new Array(25 * 3).fill(0), 3));
+      const line = new THREE.Line(g, new THREE.LineBasicMaterial({
+        color: new THREE.Color(COLORS[n.type]), transparent: true,
+        opacity: n.type === 'kominote' ? 0.22 : n.type === 'sous' ? 0.16 : 0.34,
+        blending: THREE.AdditiveBlending,
+      }));
+      scene.add(line);
+      filaments.push({ node: n, line });
+    });
+    function updateFilaments() {
+      const a = new THREE.Vector3(0, 0, 0);
+      filaments.forEach(f => {
+        const b = f.node.sprite.position;
+        const mid = a.clone().add(b).multiplyScalar(0.5);
+        mid.y += b.distanceTo(a) * 0.16;
+        const attr = f.line.geometry.attributes.position;
+        for (let i = 0; i <= 24; i++) {
+          const t = i / 24;
+          const p = new THREE.Vector3()
+            .addScaledVector(a, (1 - t) * (1 - t))
+            .addScaledVector(mid, 2 * (1 - t) * t)
+            .addScaledVector(b, t * t);
+          attr.setXYZ(i, p.x, p.y, p.z);
         }
-      `;
-
-      const fragmentShader = `
-        uniform float uTime;
-        uniform float uScrollProgress;
-        varying vec2 vUv;
-        varying float vElevation;
-
-        void main() {
-          // Dynamic color based on scroll and elevation
-          vec3 colorA = vec3(0.04, 0.04, 0.06);  // near-black blue
-          vec3 colorB = vec3(0.08, 0.03, 0.02);   // dark warm
-          vec3 colorC = vec3(0.77, 0.25, 0.18);   // accent red
-
-          float mixFactor = smoothstep(-0.2, 0.3, vElevation);
-          vec3 color = mix(colorA, colorB, uScrollProgress);
-          color = mix(color, colorC, mixFactor * 0.15);
-
-          // Subtle grid lines
-          float gridX = smoothstep(0.98, 1.0, abs(sin(vUv.x * 40.0)));
-          float gridY = smoothstep(0.98, 1.0, abs(sin(vUv.y * 40.0)));
-          color += (gridX + gridY) * 0.015;
-
-          gl_FragColor = vec4(color, 0.6);
-        }
-      `;
-
-      const material = new THREE.ShaderMaterial({
-        vertexShader,
-        fragmentShader,
-        uniforms: {
-          uTime: { value: 0 },
-          uScrollProgress: { value: 0 },
-          uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-        },
-        transparent: true,
-        wireframe: false,
+        attr.needsUpdate = true;
       });
+    }
 
-      const plane = new THREE.Mesh(geometry, material);
-      scene.add(plane);
-
-      // Normalized mouse for shader
-      let shaderMouseX = 0.5, shaderMouseY = 0.5;
-      document.addEventListener('mousemove', (e) => {
-        shaderMouseX = e.clientX / window.innerWidth;
-        shaderMouseY = 1.0 - (e.clientY / window.innerHeight);
-      });
-
-      // Scroll progress
-      function getScrollProgress() {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        return docHeight > 0 ? scrollTop / docHeight : 0;
+    // dust
+    (function () {
+      const N = 3000, pos = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const r = 900 + Math.random() * 3000, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
+        pos[i * 3] = r * Math.sin(p) * Math.cos(t);
+        pos[i * 3 + 1] = r * Math.cos(p);
+        pos[i * 3 + 2] = r * Math.sin(p) * Math.sin(t);
       }
-
-      // Animation loop
-      function animate() {
-        requestAnimationFrame(animate);
-        material.uniforms.uTime.value += 0.01;
-        material.uniforms.uScrollProgress.value += (getScrollProgress() - material.uniforms.uScrollProgress.value) * 0.05;
-        material.uniforms.uMouse.value.x += (shaderMouseX - material.uniforms.uMouse.value.x) * 0.03;
-        material.uniforms.uMouse.value.y += (shaderMouseY - material.uniforms.uMouse.value.y) * 0.03;
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8a8a8a, size: 1.3, transparent: true, opacity: 0.3 })));
     })();
 
-    // =============================================
-    // HERO TEXT ANIMATION (character split)
-    // =============================================
-    (function initHeroText() {
-      const name = "Esery Mondesir";
-      const heroEl = document.getElementById('heroName');
-      const chars = name.split('');
+    // camera
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let theta = -0.4, phi = 0.95, radius = 1150;
+    let tTheta = theta, tPhi = phi, tRadius = radius;
+    const lookAt = new THREE.Vector3(0, 0, 0), tLookAt = new THREE.Vector3(0, 0, 0);
+    let interacted = false;
 
-      heroEl.innerHTML = chars.map((char, i) => {
-        if (char === ' ') return '<span class="char">&nbsp;</span>';
-        return `<span class="char" style="animation-delay: ${i * 0.04}s">${char}</span>`;
-      }).join('');
-    })();
+    window.mapZoomOut = function () { tLookAt.set(0, 0, 0); tRadius = 1150; };
 
-    // =============================================
-    // LOADER
-    // =============================================
-    window.addEventListener('load', () => {
+    let dragging = false, moved = 0, last = null, pinchDist = null;
+    const pxy = e => e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+
+    canvas.addEventListener('mousedown', e => { dragging = true; moved = 0; last = pxy(e); canvas.classList.add('dragging'); });
+    addEventListener('mousemove', e => {
+      if (dragging) {
+        const p = pxy(e);
+        tTheta += (p.x - last.x) * 0.005;
+        tPhi = Math.min(1.45, Math.max(0.25, tPhi - (p.y - last.y) * 0.004));
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p; interacted = true;
+      } else if (isOverMap(e)) onHover(e);
+    });
+    addEventListener('mouseup', () => { dragging = false; canvas.classList.remove('dragging'); });
+    canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      tRadius = Math.min(2600, Math.max(180, tRadius + e.deltaY * 0.8));
+      interacted = true;
+    }, { passive: false });
+    canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      } else { dragging = true; moved = 0; last = pxy(e); }
+      interacted = true;
+    }, { passive: true });
+    canvas.addEventListener('touchmove', e => {
+      if (e.touches.length === 2 && pinchDist) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        tRadius = Math.min(2600, Math.max(180, tRadius * pinchDist / d));
+        pinchDist = d;
+      } else if (dragging) {
+        const p = pxy(e);
+        tTheta += (p.x - last.x) * 0.006;
+        moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
+        last = p;
+      }
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => {
+      if (dragging && moved < 8 && last) tryPick(last.x, last.y);
+      dragging = false; pinchDist = null;
+    });
+    canvas.addEventListener('click', e => { if (moved <= 8) tryPick(e.clientX, e.clientY); });
+
+    function isOverMap(e) {
+      const r = canvas.getBoundingClientRect();
+      return e.clientY >= r.top && e.clientY <= r.bottom;
+    }
+
+    // picking
+    const ray = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const label = document.getElementById('label');
+    const labelText = document.getElementById('labelText');
+    const labelKind = document.getElementById('labelKind');
+    let hovered = null;
+
+    function pick(x, y) {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = ((x - r.left) / r.width) * 2 - 1;
+      mouse.y = -((y - r.top) / r.height) * 2 + 1;
+      ray.setFromCamera(mouse, camera);
+      const hits = ray.intersectObjects(nodes.map(n => n.sprite));
+      return hits.length ? hits[0].object.userData : null;
+    }
+    function onHover(e) {
+      const n = pick(e.clientX, e.clientY);
+      hovered = n;
+      if (n) {
+        const r = canvas.getBoundingClientRect();
+        labelText.textContent = n.name;
+        labelKind.textContent = (n.kind || '') + (n.dist ? ' · ' + n.dist.toLocaleString() + ' km' : '');
+        label.style.left = (e.clientX - r.left) + 'px';
+        label.style.top = (e.clientY - r.top) + 'px';
+        label.classList.add('visible');
+        canvas.style.cursor = 'pointer';
+      } else {
+        label.classList.remove('visible');
+        canvas.style.cursor = dragging ? 'grabbing' : 'grab';
+      }
+    }
+    function tryPick(x, y) {
+      const n = pick(x, y);
+      if (!n) return;
+      tLookAt.copy(n.sprite.position);
+      tRadius = 260;
       setTimeout(() => {
-        document.getElementById('loader').classList.add('hidden');
+        const stories = n.stories || 0;
+        openOverlay(
+          `<span class="kind">${n.kind}</span><h2>${n.name}</h2>` +
+          (n.dist ? `<p class="dist">${n.dist.toLocaleString()} km soti Pòtoprens</p>` : '') +
+          `<p>${n.body}</p>` +
+          (n.sample ? `<p class="memory">${n.sample}</p>` : '') +
+          `<p class="dist">✶ ${stories} istwa kite isit — memories left here</p>` +
+          `<button class="leave-btn" onclick="this.textContent='— the reciprocal ritual opens here in the production build —'">Kite yon souvni — leave a memory</button>`
+        );
+      }, 700);
+    }
 
-        // Animate hero in
-        setTimeout(() => {
-          const heroName = document.getElementById('heroName');
-          const heroSub = document.getElementById('heroSubtitle');
-          heroName.style.opacity = '1';
-          heroName.style.transform = 'translateY(0)';
-          heroName.style.transition = 'opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
-
-          setTimeout(() => {
-            heroSub.style.opacity = '1';
-            heroSub.style.transform = 'translateY(0)';
-            heroSub.style.transition = 'opacity 1s ease 0.3s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s';
-          }, 300);
-        }, 400);
-      }, 2800);
-    });
-
-    // =============================================
-    // SCROLL REVEAL (fragments)
-    // =============================================
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+    // loop
+    let t = 0;
+    (function frame() {
+      t += 0.016;
+      if (!interacted && !reduced) tTheta += 0.0005;
+      theta += (tTheta - theta) * 0.06;
+      phi += (tPhi - phi) * 0.06;
+      radius += (tRadius - radius) * 0.06;
+      lookAt.lerp(tLookAt, 0.06);
+      camera.position.set(
+        lookAt.x + radius * Math.sin(phi) * Math.cos(theta),
+        lookAt.y + radius * Math.cos(phi),
+        lookAt.z + radius * Math.sin(phi) * Math.sin(theta)
+      );
+      camera.lookAt(lookAt);
+      nodes.forEach(n => {
+        const pulse = 1 + Math.sin(t * 1.1 + n.phase) * (n.type === 'core' ? 0.1 : 0.07);
+        n.sprite.scale.setScalar(n.baseSize * pulse * (hovered === n ? 1.5 : 1));
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-
-    document.querySelectorAll('.fragment, .floating-block').forEach(el => observer.observe(el));
-
-    // =============================================
-    // MANIFESTO WORD REVEAL ON SCROLL
-    // =============================================
-    (function initManifesto() {
-      const manifestoEl = document.getElementById('manifesto');
-      const text = manifestoEl.textContent.trim();
-      const words = text.split(/\s+/);
-
-      manifestoEl.innerHTML = words.map(w => `<span class="word">${w}</span>`).join(' ');
-
-      const wordEls = manifestoEl.querySelectorAll('.word');
-
-      function updateManifesto() {
-        const rect = manifestoEl.getBoundingClientRect();
-        const windowH = window.innerHeight;
-        const progress = Math.max(0, Math.min(1, 1 - (rect.top / (windowH * 0.7))));
-        const wordsToLight = Math.floor(progress * wordEls.length);
-
-        wordEls.forEach((word, i) => {
-          word.classList.toggle('lit', i < wordsToLight);
-        });
-      }
-
-      window.addEventListener('scroll', updateManifesto, { passive: true });
-      updateManifesto();
+      updateFilaments();
+      nebulae.forEach(s => { s.material.rotation += s.userData.rot; });
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
     })();
-
-    // =============================================
-    // HORIZONTAL STRIP (drag + scroll)
-    // =============================================
-    (function initStrip() {
-      const strip = document.getElementById('strip');
-      let isDragging = false;
-      let startX = 0;
-      let scrollLeft = 0;
-      let currentX = 0;
-
-      strip.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.pageX;
-        scrollLeft = currentX;
-        strip.style.cursor = 'grabbing';
-      });
-
-      document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        const dx = e.pageX - startX;
-        currentX = scrollLeft + dx;
-        strip.style.transform = `translateY(-50%) translateX(${currentX}px)`;
-      });
-
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        strip.style.cursor = 'grab';
-      });
-
-      strip.style.cursor = 'grab';
-    })();
-
-    // =============================================
-    // ENTRY POINT CLICK FEEDBACK
-    // =============================================
-    document.querySelectorAll('.entry-point').forEach(ep => {
-      ep.addEventListener('click', () => {
-        const entry = ep.dataset.entry;
-        // Flash effect
-        ep.style.background = 'rgba(196, 64, 47, 0.1)';
-        setTimeout(() => { ep.style.background = ''; }, 400);
-        console.log(`Navigating to: ${entry}`);
-        // Future: route to section/page
-      });
-    });
-
-    // =============================================
-    // PARALLAX on floating blocks
-    // =============================================
-    (function initParallax() {
-      const blocks = document.querySelectorAll('.floating-block');
-      window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
-        blocks.forEach((block, i) => {
-          const speed = 0.02 + (i % 3) * 0.015;
-          const offset = scrollY * speed;
-          block.style.transform = `translateY(${-offset}px)`;
-        });
-      }, { passive: true });
-    })();
+  }
   </script>
-
 </body>
 </html>
