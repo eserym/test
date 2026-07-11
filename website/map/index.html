@@ -183,8 +183,27 @@
     <div class="open-inner" id="openInner"></div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // Load Three.js robustly (several CDNs, boot only once it exists) —
+    // preview proxies load external <script> tags out of order.
+    (function loadThree(i) {
+      const urls = [
+        'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+        'https://unpkg.com/three@0.128.0/build/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+      ];
+      if (i >= urls.length) {
+        document.getElementById('hint').textContent = 'unable to load the 3D engine — check connection and reload';
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = urls[i];
+      s.onload = () => boot();
+      s.onerror = () => loadThree(i + 1);
+      document.head.appendChild(s);
+    })(0);
+
+    function boot() {
     // ================================================================
     // KAT GRENN PWOMENNEN — the diaspora as a galaxy.
     // Azimuthal-equidistant world: every position is its TRUE distance
@@ -657,6 +676,7 @@
       camera.updateProjectionMatrix();
       renderer.setSize(innerWidth, innerHeight);
     });
+    } // boot
   </script>
 </body>
 </html>
