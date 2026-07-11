@@ -126,6 +126,20 @@
       font-family: 'Space Grotesk', sans-serif; font-size: 0.64rem;
       letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
     }
+    .open-inner .memory {
+      font-style: italic; color: var(--warm);
+      border-left: 2px solid rgba(217,160,102,0.4);
+      padding-left: 1rem; text-align: left;
+      margin: 1.4rem auto; max-width: 42ch;
+    }
+    .leave-btn {
+      background: none; border: 1px solid rgba(217,160,102,0.4);
+      color: var(--warm); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.8rem 1.4rem; cursor: pointer; margin-top: 0.6rem;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .leave-btn:hover { border-color: var(--warm); color: var(--bone); }
     .open-close {
       position: fixed; top: 1.6rem; right: 2rem;
       background: none; border: none; cursor: pointer;
@@ -153,7 +167,8 @@
   <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
 
   <div class="legend">
-    <span class="dot" style="background:#f0ece4"></span>Ayiti — kè a, the core<br>
+    <span class="dot" style="background:#f0ece4"></span>Pòtoprens — kè a, the core<br>
+    <span class="dot" style="background:#b9c4d6"></span>sous — the regions that send, Ayiti's own constellation<br>
     <span class="dot" style="background:#d9a066"></span>kominote — where Haiti's children settled<br>
     <span class="dot" style="background:#c4402f"></span>travay — where the work was made or shown<br>
     <span class="dot" style="background:linear-gradient(90deg,#d9a066,#c4402f)"></span>tou de — both
@@ -180,40 +195,110 @@
     const PAP = { lat: 18.5944, lon: -72.3074 };
 
     // type: kominote (community) | travay (work) | toude (both)
+    // stories: memories left here by visitors (placeholder counts —
+    // in production these come from the contribution backend, and
+    // a city's glow grows with what it holds)
     const CITIES = [
-      { name: 'Miami — Little Haiti', lat: 25.7617, lon: -80.1918, type: 'toude', size: 22,
-        body: 'Little Haiti, Krome, Third Horizon, PAMM. A community and a stage — and a wound (WelKrome).' },
-      { name: 'New York — Brooklyn', lat: 40.6782, lon: -73.9442, type: 'kominote', size: 22,
-        body: 'Flatbush, the largest Haitian community outside the island.' },
-      { name: 'Boston', lat: 42.3601, lon: -71.0589, type: 'kominote', size: 15,
-        body: 'Mattapan, Hyde Park — dekabès New England.' },
-      { name: 'Montréal', lat: 45.5017, lon: -73.5673, type: 'toude', size: 20,
-        body: 'Community and practice: Choublak at Leonard & Bina Ellen (2024–25).' },
-      { name: 'Toronto', lat: 43.6532, lon: -79.3832, type: 'toude', size: 18,
-        body: 'Where the artist teaches and works.' },
-      { name: 'La Havane', lat: 23.1136, lon: -82.3666, type: 'travay', size: 16,
+      // --- New York metro — the largest concentration outside the island ---
+      { name: 'Flatbush, Brooklyn', lat: 40.6526, lon: -73.9590, type: 'kominote', size: 24, stories: 23,
+        body: 'Flatbush and East Flatbush — the beating heart of Haitian New York, the largest community in the U.S. Church Avenue, the botanikas, the radio stations.',
+        sample: '“Sou Church Avenue, sant lakay mwen pa t janm lwen.” — a memory left by a visitor' },
+      { name: 'Springfield Gardens, Queens', lat: 40.6642, lon: -73.7590, type: 'kominote', size: 14, stories: 6,
+        body: 'Queens’ Haitian corridor — Springfield Gardens, Cambria Heights, Queens Village.' },
+      { name: 'Elmont, NY', lat: 40.7009, lon: -73.7126, type: 'kominote', size: 14, stories: 4,
+        body: 'Nassau County, Long Island — where Brooklyn’s children bought houses and stayed.' },
+      { name: 'Spring Valley, NY', lat: 41.1132, lon: -74.0438, type: 'kominote', size: 14, stories: 5,
+        body: 'Rockland County — one of the densest Haitian communities in America, a lakou north of the city.' },
+
+      // --- Florida ---
+      { name: 'Miami — Little Haiti', lat: 25.7617, lon: -80.1918, type: 'toude', size: 22, stories: 18,
+        body: 'Little Haiti, Krome, Third Horizon, PAMM. A community and a stage — and a wound (WelKrome).',
+        sample: '“Krome se te premye adrès anpil moun nan Miami.” — a memory left by a visitor' },
+      { name: 'North Miami', lat: 25.8901, lon: -80.1867, type: 'kominote', size: 15, stories: 7,
+        body: 'North Miami and Golden Glades — where Little Haiti extended itself northward.' },
+
+      // --- historic anchors ---
+      { name: 'New Orleans', lat: 29.9511, lon: -90.0715, type: 'kominote', size: 17, stories: 9,
+        body: '1809: ten thousand Saint-Domingue refugees arrived by boat and doubled the city. The music, the food, the speech, the Vieux Carré — the seed is in the soil here, two centuries deep.',
+        sample: '“My family has been here since the boats from Cuba. We never called it immigration.” — a memory left by a visitor' },
+      { name: 'Chicago', lat: 41.8781, lon: -87.6298, type: 'kominote', size: 14, stories: 3,
+        body: 'The city itself was founded by a Haitian — Jean Baptiste Point du Sable, born in Saint-Marc. The wandering seed planted a metropolis.' },
+
+      // --- New England ---
+      { name: 'Boston — Mattapan', lat: 42.2771, lon: -71.0914, type: 'kominote', size: 16, stories: 8,
+        body: 'Mattapan, Hyde Park, Brockton — New England’s lakou.' },
+
+      // --- Canada ---
+      { name: 'Montréal — Montréal-Nord', lat: 45.5017, lon: -73.5673, type: 'toude', size: 20, stories: 12,
+        body: 'Montréal-Nord, Saint-Michel — the francophone north of the diaspora. And the practice: Choublak at Leonard & Bina Ellen (2024–25).' },
+      { name: 'Toronto', lat: 43.6532, lon: -79.3832, type: 'toude', size: 18, stories: 6,
+        body: 'Where the artist teaches and works — and where this website is being dreamed.' },
+
+      // --- the island’s neighbors ---
+      { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312, type: 'kominote', size: 16, stories: 10,
+        body: 'The nearest elsewhere — the island shared and divided. The bateyes hold the oldest stories.' },
+      { name: 'La Havane', lat: 23.1136, lon: -82.3666, type: 'travay', size: 16, stories: 5,
         body: 'Una Sola Sangre — Haitians in Cuba, familial memory across generations.' },
-      { name: 'Santiago de Cuba', lat: 20.0247, lon: -75.8219, type: 'kominote', size: 13,
-        body: 'Descendants of cane-cutters — one blood.' },
-      { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312, type: 'kominote', size: 16,
-        body: 'The nearest elsewhere — the island shared and divided.' },
-      { name: 'Tijuana', lat: 32.5149, lon: -117.0382, type: 'travay', size: 16,
-        body: 'What Happens to a Dream Deferred — asylum seekers at the border.' },
-      { name: 'Paris', lat: 48.8566, lon: 2.3522, type: 'kominote', size: 15,
-        body: 'The old metropole; the community across the water.' },
-      { name: 'Cayenne', lat: 4.9224, lon: -52.3134, type: 'kominote', size: 12,
-        body: 'Guyane — a newer route of the seed.' },
-      { name: 'Nassau', lat: 25.0443, lon: -77.3504, type: 'kominote', size: 12,
-        body: 'The Bahamas — closest crossing, oldest boats.' },
-      { name: 'Santiago (Chile)', lat: -33.4489, lon: -70.6693, type: 'kominote', size: 13,
-        body: 'The long southern road after 2010.' },
-      { name: 'São Paulo', lat: -23.5505, lon: -46.6333, type: 'kominote', size: 13,
-        body: 'Brazil — a waystation that became a home, then a departure again.' },
-      { name: 'Pointe-à-Pitre', lat: 16.2415, lon: -61.5328, type: 'kominote', size: 11,
+      { name: 'Santiago de Cuba', lat: 20.0247, lon: -75.8219, type: 'kominote', size: 13, stories: 4,
+        body: 'Descendants of cane-cutters — one blood. Tumba francesa still drums here.' },
+      { name: 'Nassau', lat: 25.0443, lon: -77.3504, type: 'kominote', size: 14, stories: 7,
+        body: 'The Bahamas — the closest crossing, the oldest boats. One in ten residents has Haitian roots.',
+        sample: '“Papa m te janbe an 1979 sou yon vwalye.” — a memory left by a visitor' },
+      { name: 'Marsh Harbour, Abaco', lat: 26.5412, lon: -77.0636, type: 'kominote', size: 11, stories: 3,
+        body: 'The Mudd and Pigeon Peas — shantytowns built by Haitian hands, erased by Hurricane Dorian in 2019. The stars remember what the storm took.' },
+      { name: 'Providenciales', lat: 21.7738, lon: -72.2719, type: 'kominote', size: 11, stories: 2,
+        body: 'Turks and Caicos — Haitians are the islands’ largest minority, mostly unseen, holding up the whole economy.' },
+      { name: 'Pointe-à-Pitre', lat: 16.2415, lon: -61.5328, type: 'kominote', size: 11, stories: 2,
         body: 'Guadeloupe — kin across the arc of islands.' },
+      { name: 'Cayenne', lat: 4.9224, lon: -52.3134, type: 'kominote', size: 12, stories: 3,
+        body: 'Guyane — a newer route of the seed, through the forest’s edge.' },
+
+      // --- the long southern roads ---
+      { name: 'Santiago (Chile)', lat: -33.4489, lon: -70.6693, type: 'kominote', size: 13, stories: 5,
+        body: 'Quilicura — “Petite Haïti” of the southern cone. The long road after 2010.' },
+      { name: 'São Paulo', lat: -23.5505, lon: -46.6333, type: 'kominote', size: 13, stories: 4,
+        body: 'Brazil — a waystation that became a home, then a departure again, northward through the Darién.' },
+
+      // --- the border ---
+      { name: 'Tijuana', lat: 32.5149, lon: -117.0382, type: 'travay', size: 16, stories: 6,
+        body: 'What Happens to a Dream Deferred — asylum seekers at the border, WhatsApp voice notes across a wall.' },
+      { name: 'Tapachula', lat: 14.9059, lon: -92.2577, type: 'kominote', size: 12, stories: 3,
+        body: 'Mexico’s southern border — the waiting room of the northward road.' },
+
+      // --- across the water ---
+      { name: 'Paris', lat: 48.8566, lon: 2.3522, type: 'kominote', size: 15, stories: 6,
+        body: 'Paris and Saint-Denis — the old metropole, the community across the water.' },
     ];
 
-    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184' };
+    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184', sous: '#b9c4d6' };
+
+    // ---- AYITI ANDEDAN — the sending regions, the wellsprings ----
+    // The map magnifies the first 300 km so the homeland is not a dot:
+    // Ayiti is a constellation of its own, not a single star.
+    const SOUS = [
+      { name: 'Kafou (Carrefour)', lat: 18.5344, lon: -72.4094, size: 13, stories: 8,
+        body: 'The city beside the city — millions passed through Kafou on their way to everywhere.' },
+      { name: 'Baconnois (Ansavo, Nip)', lat: 18.4700, lon: -73.3500, size: 12, stories: 4,
+        body: 'Plaine de Baconnois, commune of Anse-à-Veau, Nippes — the kind of place the maps forget and the diaspora never does.' },
+      { name: 'Lagonav (Ansagalè)', lat: 18.8342, lon: -72.8662, size: 12, stories: 3,
+        body: 'The island beside the island — La Gonâve, whose children know the water first.' },
+      { name: 'Jakmèl', lat: 18.2341, lon: -72.5345, size: 12, stories: 5,
+        body: 'Jacmel — the painters’ port, the carnival of papier-mâché, the first goodbye of the South-East.' },
+      { name: 'Okap (Cap-Haïtien)', lat: 19.7580, lon: -72.2042, size: 13, stories: 6,
+        body: 'The old capital of the North — Vertières is here. Many boats to Miami left from these shores.' },
+      { name: 'Gonayiv', lat: 19.4456, lon: -72.6884, size: 12, stories: 4,
+        body: 'Gonaïves — where independence was declared in 1804, and where the kanntè boats later sailed.' },
+      { name: 'Senmak (Saint-Marc)', lat: 19.1080, lon: -72.6939, size: 12, stories: 3,
+        body: 'Saint-Marc — birthplace of Jean Baptiste Point du Sable, who wandered north and founded Chicago.' },
+      { name: 'Jeremi', lat: 18.6500, lon: -74.1167, size: 12, stories: 4,
+        body: 'Jérémie — the city of poets, at the end of the road, the beginning of many departures.' },
+      { name: 'Okay (Les Cayes)', lat: 18.1933, lon: -73.7460, size: 12, stories: 3,
+        body: 'Les Cayes — the great South, sender of generations.' },
+      { name: 'Miragwàn', lat: 18.4411, lon: -73.0883, size: 12, stories: 4,
+        body: 'Miragoâne — Nippes’ port; for decades the boats to Nassau and Florida left from this bay.' },
+      { name: 'Wanament', lat: 19.5497, lon: -71.7264, size: 12, stories: 3,
+        body: 'Ouanaminthe — the river crossing, the border market, the eastward road into the Dominican Republic.' },
+    ];
 
     // ---------- azimuthal equidistant from Port-au-Prince ----------
     const R_EARTH = 6371;
@@ -225,7 +310,14 @@
       const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
       return { d, brg: Math.atan2(y, x) };
     }
-    const SCALE = 700 / 8200; // fit ~8200km (Paris) within radius 700
+    // Piecewise radial scale: the first 300 km (Ayiti + its waters) get a
+    // quarter of the sky, so the homeland reads as a constellation, not a dot.
+    // Continuous at the seam; true bearings everywhere.
+    const INNER_KM = 300, INNER_R = 165, OUTER_R = 700, MAX_KM = 8200;
+    function projR(dKm) {
+      if (dKm <= INNER_KM) return dKm * (INNER_R / INNER_KM);
+      return INNER_R + (dKm - INNER_KM) * ((OUTER_R - INNER_R) / (MAX_KM - INNER_KM));
+    }
 
     // ---------- scene ----------
     const canvas = document.getElementById('sky');
@@ -266,9 +358,9 @@
       scene.add(s); nebulae.push(s);
     }
 
-    // ---------- distance rings (1000 / 2500 / 5000 / 7500 km) ----------
-    [1000, 2500, 5000, 7500].forEach(km => {
-      const r = km * SCALE, pts = [];
+    // ---------- distance rings ----------
+    [150, 300, 1000, 2500, 5000, 7500].forEach(km => {
+      const r = projR(km), pts = [];
       for (let i = 0; i <= 128; i++) {
         const a = (i / 128) * Math.PI * 2;
         pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
@@ -296,20 +388,34 @@
       nodes.push(data);
     }
 
-    // core: Ayiti
-    const core = { name: 'Ayiti — Pòtoprens', kind: 'kè a — the core', type: 'core',
-      body: 'Where every line begins. The tree the seeds fell from. In this projection, every distance and every direction is true — measured from here.' , dist: 0 };
+    // core: Pòtoprens — itself a place that holds stories, not just a symbol
+    const core = { name: 'Pòtoprens', kind: 'kè a — the core', type: 'core', stories: 31,
+      body: 'Where every line begins. The tree the seeds fell from. Every distance and every direction on this map is true — measured from here. And the city is not only an origin: it holds its own memories, like every other star.',
+      sample: '“Mwen pa janm pati. Se mwen ki veye limyè yo.” — a memory left by a visitor', dist: 0 };
     addNode(core, new THREE.Vector3(0, 0, 0), 'core', 34);
 
-    // cities
+    // the sending regions — Ayiti's own constellation
+    SOUS.forEach(c => {
+      c.type = 'sous';
+      c.kind = 'sous — the wellspring';
+      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
+      c.dist = Math.round(d);
+      const r = projR(d);
+      const x = Math.sin(brg) * r;
+      const z = -Math.cos(brg) * r;
+      addNode(c, new THREE.Vector3(x, (Math.random() - 0.5) * 10, z), 'sous', c.size);
+    });
+
+    // cities of the diaspora
     CITIES.forEach(c => {
       const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
       c.dist = Math.round(d);
       c.kind = c.type === 'kominote' ? 'kominote — community'
              : c.type === 'travay' ? 'travay — the work'
              : 'kominote + travay';
-      const x = Math.sin(brg) * d * SCALE;
-      const z = -Math.cos(brg) * d * SCALE;
+      const r = projR(d);
+      const x = Math.sin(brg) * r;
+      const z = -Math.cos(brg) * r;
       const y = (Math.random() - 0.5) * 26; // slight galactic thickness
       addNode(c, new THREE.Vector3(x, y, z), c.type, c.size);
     });
@@ -317,7 +423,7 @@
     // ---------- alternative layout: FANMI (kinship rings, not geography) ----------
     // toude = inner ring, travay = middle, kominote = outer — golden-angle spread
     (function fanmiLayout() {
-      const rings = { toude: 170, travay: 320, kominote: 480 };
+      const rings = { sous: 95, toude: 190, travay: 330, kominote: 490 };
       const GA = Math.PI * (3 - Math.sqrt(5));
       const counts = {};
       nodes.forEach((n, i) => {
@@ -342,7 +448,7 @@
       g.setAttribute('position', new THREE.Float32BufferAttribute(new Array(25 * 3).fill(0), 3));
       const line = new THREE.Line(g, new THREE.LineBasicMaterial({
         color: new THREE.Color(COLORS[node.type]), transparent: true,
-        opacity: node.type === 'kominote' ? 0.22 : 0.34,
+        opacity: node.type === 'kominote' ? 0.22 : node.type === 'sous' ? 0.16 : 0.34,
         blending: THREE.AdditiveBlending,
       }));
       scene.add(line);
@@ -494,12 +600,17 @@
     const openNodeEl = document.getElementById('openNode');
     const openInner = document.getElementById('openInner');
     function openNode(n) {
+      const stories = n.stories || 0;
       openInner.innerHTML =
         `<span class="kind">${n.kind}</span><h2>${n.name}</h2>` +
         (n.dist ? `<p class="dist">${n.dist.toLocaleString()} km soti Pòtoprens — from Port-au-Prince</p>` : '') +
         `<p>${n.body}</p>` +
-        `<p class="note">${n.type === 'core' ? 'the journey begins and returns here' :
-          'films, sounds, memories and community stories gathered in this city open here'}</p>`;
+        (n.sample ? `<p class="memory">${n.sample}</p>` : '') +
+        `<p class="dist">✶ ${stories} istwa kite isit — memories left here</p>` +
+        `<button class="leave-btn" onclick="this.textContent='— the reciprocal ritual opens here in the production build —'">Kite yon souvni — leave a memory</button>` +
+        `<p class="note" style="margin-top:1.2rem">${n.type === 'travay' || n.type === 'toude' ?
+          'films and works made here also open from this star' :
+          'every memory left makes this star burn brighter'}</p>`;
       openNodeEl.classList.add('visible');
       document.getElementById('openClose').focus();
     }
