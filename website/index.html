@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grenn Pwomennen — Ésery Mondésir</title>
+  <title>Grenn Pwomennen</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 
     :root {
-      --ink: #0a0a0a;
+      --ink: #060505;
       --bone: #f0ece4;
       --choublak: #c4402f;
       --grey: #4a4a4a;
@@ -18,21 +18,25 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
+    html, body { height: 100%; }
 
     body {
       background: var(--ink);
       color: var(--bone);
       font-family: 'EB Garamond', serif;
-      overflow-x: hidden;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
-    body.locked { overflow: hidden; height: 100vh; }
 
+    /* ---------- material grain: real 16mm scan when present, procedural until ---------- */
+    #grainVid {
+      position: fixed; inset: 0; width: 100vw; height: 100vh;
+      object-fit: cover; pointer-events: none; z-index: 94;
+      mix-blend-mode: screen; opacity: 0.12; display: none;
+    }
     .grain {
       position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
-      pointer-events: none; z-index: 95; opacity: 0.05;
+      pointer-events: none; z-index: 94; opacity: 0.05;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       animation: grain 0.5s steps(6) infinite;
     }
@@ -41,22 +45,20 @@
       40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
     }
 
-    /* =================== RITUAL OVERLAY =================== */
-    .ritual {
-      position: fixed; inset: 0; z-index: 100;
+    /* =================== PÒTAY — the portal =================== */
+    .portal {
+      position: fixed; inset: 0; z-index: 80;
       background: var(--ink);
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 2rem;
-      transition: opacity 1.6s ease, visibility 1.6s ease;
+      align-items: center; justify-content: center; padding: 2rem;
+      transition: opacity 2s ease, visibility 2s ease;
     }
-    .ritual.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+    .portal.gone { opacity: 0; visibility: hidden; pointer-events: none; }
 
     .knock-form {
       display: flex; align-items: center; gap: 1rem;
       border-bottom: 1px solid rgba(240,236,228,0.25);
-      padding-bottom: 0.6rem;
-      transition: border-color 0.5s ease;
+      padding-bottom: 0.6rem; transition: border-color 0.5s ease;
     }
     .knock-form:focus-within { border-color: rgba(240,236,228,0.6); }
     .knock-input {
@@ -67,9 +69,8 @@
     }
     .mic {
       background: none; border: 1px solid rgba(240,236,228,0.2);
-      border-radius: 50%; width: 44px; height: 44px;
-      cursor: pointer; color: var(--light-grey);
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; width: 44px; height: 44px; cursor: pointer;
+      color: var(--light-grey); display: flex; align-items: center; justify-content: center;
       transition: border-color 0.3s ease, color 0.3s ease; flex-shrink: 0;
     }
     .mic:hover { border-color: var(--choublak); color: var(--bone); }
@@ -78,31 +79,30 @@
     .mic svg { width: 18px; height: 18px; }
 
     .whisper {
-      margin-top: 2.4rem; text-align: center;
-      font-style: italic; font-size: 0.95rem;
-      color: rgba(240,236,228,0.35); line-height: 2;
+      margin-top: 2.4rem; text-align: center; font-style: italic;
+      font-size: 0.95rem; color: rgba(240,236,228,0.35); line-height: 2;
       opacity: 0; transition: opacity 2s ease; min-height: 3em;
     }
     .whisper.visible { opacity: 1; }
 
-    .grann-zone {
-      display: none; flex-direction: column; align-items: center;
-      max-width: 640px; text-align: center;
-    }
+    .grann-zone { display: none; flex-direction: column; align-items: center; max-width: 640px; text-align: center; }
     .grann-zone.visible { display: flex; }
-    .grann-btn { background: none; border: none; cursor: pointer; margin-bottom: 1.8rem; position: relative; }
+    .grann-btn { background: none; border: none; cursor: pointer; margin-bottom: 1.8rem; }
     .grann-presence {
-      width: clamp(100px, 15vw, 150px); height: clamp(126px, 19vw, 190px);
+      width: clamp(110px, 16vw, 160px); height: clamp(140px, 20vw, 200px);
       border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
       background:
         radial-gradient(ellipse at 50% 32%, rgba(217,160,102,0.5), rgba(217,160,102,0.12) 55%, transparent 75%),
         radial-gradient(ellipse at 50% 65%, rgba(196,64,47,0.18), transparent 70%);
-      filter: blur(1px);
-      border: 1px solid rgba(217,160,102,0.25);
-      animation: presence 5s ease-in-out infinite;
-      margin: 0 auto;
+      filter: blur(1px); border: 1px solid rgba(217,160,102,0.25);
+      animation: presence 5s ease-in-out infinite; margin: 0 auto;
+      background-size: cover; background-position: center;
     }
-    @keyframes presence { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+    .grann-presence.photo {
+      filter: grayscale(0.4) sepia(0.25) contrast(1.05);
+      border-radius: 2px; border: 1px solid rgba(217,160,102,0.4);
+    }
+    @keyframes presence { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
     .grann-name {
       display: block; margin-top: 0.8rem;
       font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
@@ -110,18 +110,14 @@
     }
     .counsel-line {
       opacity: 0; transform: translateY(12px);
-      transition: opacity 1.2s ease, transform 1.2s ease;
-      margin-bottom: 1rem;
+      transition: opacity 1.2s ease, transform 1.2s ease; margin-bottom: 1rem;
     }
     .counsel-line.visible { opacity: 1; transform: translateY(0); }
     .counsel-line.kreyol { font-size: clamp(1.1rem, 2.4vw, 1.45rem); font-style: italic; line-height: 1.6; }
-    .counsel-line.echo {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem;
-      color: var(--light-grey); line-height: 1.8;
-    }
+    .counsel-line.echo { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--light-grey); line-height: 1.8; }
 
     .respe-flash {
-      position: fixed; inset: 0; z-index: 99;
+      position: fixed; inset: 0; z-index: 85;
       display: flex; align-items: center; justify-content: center;
       background: radial-gradient(ellipse at center, rgba(38,16,12,0.9), var(--ink) 75%);
       opacity: 0; visibility: hidden; pointer-events: none;
@@ -135,92 +131,16 @@
     }
     .respe-flash.visible .respe-word { transform: scale(1); opacity: 1; }
 
-    /* =================== SCROLL SECTIONS =================== */
-    section { position: relative; }
-
-    .reveal {
-      opacity: 0; transform: translateY(60px);
-      transition: opacity 1s ease, transform 1s cubic-bezier(0.16,1,0.3,1);
+    /* =================== SYÈL LA — the sky =================== */
+    #sky {
+      position: fixed; inset: 0; display: block; cursor: grab;
+      opacity: 0; transition: opacity 2.5s ease;
     }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    .kicker {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
-      letter-spacing: 0.35em; text-transform: uppercase; color: var(--choublak);
-      display: block; margin-bottom: 1.2rem;
-    }
-
-    /* hero */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 2rem;
-    }
-    .hero h1 {
-      font-weight: 400; font-size: clamp(3rem, 11vw, 8.5rem);
-      line-height: 0.95; letter-spacing: -0.02em;
-    }
-    .hero h1 .accent { color: var(--choublak); font-style: italic; }
-    .hero .sub {
-      margin-top: 1.6rem;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem;
-      letter-spacing: 0.4em; text-transform: uppercase; color: var(--light-grey);
-    }
-    .scroll-hint {
-      position: absolute; bottom: 2.6rem; left: 50%; transform: translateX(-50%);
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
-      letter-spacing: 0.3em; text-transform: uppercase; color: var(--grey);
-      animation: hintPulse 2.2s ease-in-out infinite;
-    }
-    @keyframes hintPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.8; } }
-
-    /* proverb — two voices */
-    .proverb {
-      min-height: 110vh; padding: 18vh 8vw;
-      display: flex; flex-direction: column; justify-content: center; gap: 10vh;
-    }
-    .voice { max-width: 560px; }
-    .voice.right { align-self: flex-end; text-align: right; }
-    .voice .who {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
-      letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 1rem; display: block;
-    }
-    .voice.left .who { color: var(--sous); }
-    .voice.right .who { color: var(--warm); }
-    .voice .kreyol { font-size: clamp(1.5rem, 3.4vw, 2.6rem); font-style: italic; line-height: 1.35; }
-    .voice .trans {
-      margin-top: 0.9rem; font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.78rem; color: var(--light-grey); letter-spacing: 0.04em;
-    }
-
-    /* manifesto — words light on scroll */
-    .manifesto { padding: 20vh 8vw; max-width: 1000px; margin: 0 auto; }
-    .manifesto p { font-size: clamp(1.6rem, 3.6vw, 3rem); line-height: 1.45; }
-    .manifesto .word { opacity: 0.12; transition: opacity 0.4s ease; }
-    .manifesto .word.lit { opacity: 1; }
-
-    /* map section */
-    .map-section { height: 100vh; position: relative; overflow: hidden; background: #040404; }
-    #sky { position: absolute; inset: 0; display: block; touch-action: pan-y; cursor: grab; }
+    #sky.on { opacity: 1; }
     #sky.dragging { cursor: grabbing; }
-    .map-title {
-      position: absolute; top: 2.2rem; left: 0; right: 0; z-index: 5;
-      text-align: center; pointer-events: none;
-      font-style: italic; font-size: 1rem; color: rgba(240,236,228,0.45);
-    }
-    .map-title .sub {
-      display: block; margin-top: 0.4rem;
-      font-family: 'Space Grotesk', sans-serif; font-style: normal;
-      font-size: 0.56rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--grey);
-    }
-    .map-hint {
-      position: absolute; bottom: 2rem; left: 0; right: 0; z-index: 5;
-      text-align: center; pointer-events: none;
-      font-style: italic; font-size: 0.85rem; color: rgba(240,236,228,0.35);
-    }
+
     #label {
-      position: absolute; z-index: 6; pointer-events: none;
+      position: fixed; z-index: 60; pointer-events: none;
       font-style: italic; font-size: 1rem; color: var(--bone);
       text-shadow: 0 0 14px rgba(0,0,0,0.95);
       opacity: 0; transition: opacity 0.25s ease;
@@ -233,147 +153,144 @@
     }
     #label.visible { opacity: 1; }
 
-    /* works strip */
-    .works { padding: 18vh 0; overflow: hidden; }
-    .works .head { padding: 0 8vw; margin-bottom: 6vh; }
-    .strip {
-      display: flex; gap: 1rem; padding: 0 8vw;
-      cursor: grab; user-select: none;
-      will-change: transform;
+    .sky-hint {
+      position: fixed; bottom: 2.2rem; left: 0; right: 0; z-index: 60;
+      text-align: center; pointer-events: none; font-style: italic;
+      font-size: 0.85rem; color: rgba(240,236,228,0.3);
+      opacity: 0; transition: opacity 2s ease;
     }
-    .strip.dragging { cursor: grabbing; }
-    .work {
-      flex-shrink: 0; width: 300px; height: 400px;
-      border: 1px solid rgba(240,236,228,0.12);
-      position: relative; overflow: hidden;
-      background:
-        repeating-linear-gradient(90deg, rgba(240,236,228,0.02) 0 2px, transparent 2px 7px),
-        linear-gradient(165deg, rgba(196,64,47,0.12), rgba(18,12,9,0.92) 65%);
-      transition: border-color 0.4s ease;
+    .sky-hint.visible { opacity: 1; }
+    .sky-hint.gone { opacity: 0; }
+
+    .mute {
+      position: fixed; bottom: 1.6rem; right: 1.8rem; z-index: 92;
+      background: none; border: none; cursor: pointer;
+      color: var(--grey); font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+      padding: 0.5rem; transition: color 0.3s ease; display: none;
     }
-    .work:hover { border-color: rgba(217,160,102,0.5); }
-    .work .year {
-      position: absolute; top: 1.2rem; right: 1.4rem;
+    .mute:hover { color: var(--bone); }
+    .mute.on { display: block; }
+
+    /* =================== VEIL (threshold tear) =================== */
+    #veil {
+      position: fixed; inset: 0; z-index: 88;
+      pointer-events: none; display: none;
+    }
+
+    /* =================== CHANM — the chamber =================== */
+    .chanm {
+      position: fixed; inset: 0; z-index: 86;
+      background: rgba(4,3,3,0.88);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+      cursor: pointer;
+    }
+    .chanm.visible { opacity: 1; visibility: visible; pointer-events: auto; }
+
+    .chanm-stage { position: absolute; inset: 0; overflow: hidden; }
+    .chanm-stage video, .chanm-stage iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain; border: none; background: #000;
+    }
+    .chanm-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .chanm-stage img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; filter: grayscale(0.3) sepia(0.15) contrast(1.05);
+      animation: kenburns 24s ease-in-out infinite alternate;
+    }
+    @keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08) translate(1.5%, -1%); } }
+
+    .chanm-place {
+      position: absolute; top: 2rem; left: 2.2rem; z-index: 3; pointer-events: none;
       font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
-      letter-spacing: 0.25em; color: var(--light-grey);
+      letter-spacing: 0.35em; text-transform: uppercase; color: rgba(240,236,228,0.5);
     }
-    .work .name {
-      position: absolute; bottom: 1.6rem; left: 1.6rem; right: 1.6rem;
-      font-style: italic; font-size: 1.35rem; line-height: 1.3;
+    .chanm-title {
+      position: absolute; bottom: 2.4rem; left: 2.2rem; right: 2.2rem; z-index: 3; pointer-events: none;
     }
-    .work .film-edge {
-      position: absolute; top: 0; bottom: 0; width: 1px;
-      background: rgba(240,236,228,0.2);
+    .chanm-title .t { font-style: italic; font-size: clamp(1.3rem, 3vw, 2rem); text-shadow: 0 0 18px rgba(0,0,0,0.9); }
+    .chanm-title .y {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      letter-spacing: 0.3em; color: var(--light-grey); margin-top: 0.4rem;
     }
 
-    /* ancestors */
-    .ancestors { padding: 18vh 8vw; text-align: center; }
-    .ancestors .row {
-      display: flex; justify-content: center; gap: clamp(2rem, 8vw, 7rem);
-      flex-wrap: wrap; margin-top: 8vh;
+    .chanm-teks {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; padding: 8vw;
     }
-    .ancestor { background: none; border: none; cursor: pointer; }
-    .ancestor .grann-presence { animation-delay: calc(var(--i) * -1.7s); }
-    .ancestor:hover .grann-presence { border-color: rgba(217,160,102,0.7); }
+    .chanm-teks .kreyol {
+      font-style: italic; font-size: clamp(1.6rem, 4vw, 3rem); line-height: 1.4; max-width: 24ch;
+    }
+    .chanm-teks .kreyol .w { display: inline-block; opacity: 0; transform: translateY(0.3em); }
+    .chanm-teks .kreyol .w.in { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+    .chanm-teks .echo {
+      margin-top: 2rem; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem; color: var(--light-grey); line-height: 1.9; max-width: 60ch;
+      opacity: 0; transition: opacity 1.4s ease 0.8s;
+    }
+    .chanm-teks .echo.in { opacity: 1; }
 
-    /* contribute */
-    .contribute {
-      min-height: 80vh; padding: 18vh 8vw;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; text-align: center;
+    .chanm-souvni {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; padding: 8vw;
     }
-    .contribute .big { font-size: clamp(1.6rem, 3.6vw, 2.8rem); font-style: italic; max-width: 24ch; line-height: 1.4; }
-    .contribute .expl {
-      margin-top: 2rem; max-width: 52ch; color: var(--light-grey); line-height: 1.8;
+    .chanm-souvni .memory {
+      font-style: italic; font-size: clamp(1.2rem, 2.6vw, 1.8rem); color: var(--warm);
+      max-width: 40ch; line-height: 1.6;
+      border-left: 2px solid rgba(217,160,102,0.4); padding-left: 1.4rem; text-align: left;
+    }
+    .chanm-souvni .count {
+      margin-top: 2.2rem; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.66rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--grey);
     }
     .leave-btn {
       background: none; border: 1px solid rgba(217,160,102,0.4);
       color: var(--warm); font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
-      padding: 0.9rem 1.6rem; cursor: pointer; margin-top: 3rem;
+      font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.85rem 1.5rem; cursor: pointer; margin-top: 2rem;
       transition: border-color 0.3s ease, color 0.3s ease;
     }
     .leave-btn:hover { border-color: var(--warm); color: var(--bone); }
 
-    /* colophon */
-    .colophon {
-      padding: 10vh 8vw 8vh;
-      border-top: 1px solid rgba(240,236,228,0.07);
-      display: flex; justify-content: space-between; align-items: flex-end;
-      flex-wrap: wrap; gap: 2rem;
+    .chanm-next {
+      position: absolute; bottom: 2.4rem; right: 2.2rem; z-index: 3; pointer-events: none;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: rgba(240,236,228,0.35);
     }
-    .colophon .left {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.64rem;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--grey); line-height: 2.1;
-    }
-    .colophon .right a {
-      display: block; text-align: right; text-decoration: none;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--light-grey); padding: 0.3rem 0;
-      transition: color 0.3s ease;
-    }
-    .colophon .right a:hover { color: var(--bone); }
-
-    /* star / ancestor overlay */
-    .open-frag {
-      position: fixed; inset: 0; z-index: 96;
-      background: rgba(5,5,5,0.95);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity 0.7s ease, visibility 0.7s ease;
-    }
-    .open-frag.visible { opacity: 1; visibility: visible; pointer-events: auto; }
-    .open-inner { max-width: 560px; padding: 2rem; text-align: center; max-height: 85vh; overflow-y: auto; }
-    .open-inner .kind {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
-      letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
-      display: block; margin-bottom: 1.2rem;
-    }
-    .open-inner h2 { font-weight: 400; font-style: italic; font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
-    .open-inner .dist {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
-      letter-spacing: 0.25em; color: var(--grey); margin-bottom: 1.2rem;
-    }
-    .open-inner p { color: rgba(240,236,228,0.75); line-height: 1.8; margin-bottom: 1rem; }
-    .open-inner .memory {
-      font-style: italic; color: var(--warm);
-      border-left: 2px solid rgba(217,160,102,0.4);
-      padding-left: 1rem; text-align: left;
-      margin: 1.4rem auto; max-width: 42ch;
-    }
-    .open-inner .note {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.62rem;
-      letter-spacing: 0.15em; color: var(--grey); text-transform: uppercase;
-    }
-    .open-close {
-      position: fixed; top: 1.6rem; right: 2rem;
+    .chanm-close {
+      position: absolute; top: 1.8rem; right: 2rem; z-index: 4;
       background: none; border: none; cursor: pointer;
       color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+      font-size: 0.66rem; letter-spacing: 0.25em; text-transform: uppercase;
       padding: 0.5rem; transition: color 0.3s ease;
     }
-    .open-close:hover { color: var(--bone); }
+    .chanm-close:hover { color: var(--bone); }
+
+    #burn {
+      position: fixed; inset: 0; z-index: 89; pointer-events: none;
+      opacity: 0; background: radial-gradient(circle at 50% 50%, rgba(240,220,180,0.95), rgba(196,64,47,0.6) 30%, transparent 65%);
+    }
 
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    @media (max-width: 768px) {
-      .voice.right { align-self: flex-start; text-align: left; }
-      .work { width: 240px; height: 330px; }
-    }
     @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      .grain, .grann-presence, .scroll-hint, .mic.listening { animation: none !important; }
-      .reveal, .counsel-line { transition-duration: 0.2s; }
+      .grain, .grann-presence, .mic.listening, .chanm-stage img { animation: none !important; }
     }
   </style>
 </head>
-<body class="locked">
+<body>
+  <video id="grainVid" muted loop playsinline></video>
   <div class="grain"></div>
 
-  <!-- ============ THE RITUAL (door) ============ -->
-  <div class="ritual" id="ritual">
+  <!-- SYÈL LA (always underneath) -->
+  <canvas id="sky"></canvas>
+  <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
+  <p class="sky-hint" id="skyHint">trennen pou w vire syèl la &middot; klike sou yon zetwal &middot; pwoche — tande</p>
+  <button class="mute" id="muteBtn" aria-label="Sound on/off">son: on</button>
+
+  <!-- PÒTAY -->
+  <div class="portal" id="portal">
     <div id="knockZone">
       <form class="knock-form" id="knockForm">
         <label for="knock" class="sr-only">You are at a threshold. Speak or type your greeting.</label>
@@ -386,10 +303,9 @@
       </form>
       <p class="whisper" id="whisper" aria-live="polite"></p>
     </div>
-
     <div class="grann-zone" id="grannZone" aria-live="polite">
-      <button class="grann-btn" id="grannBtn" aria-label="Grann — click to know her story">
-        <div class="grann-presence"></div>
+      <button class="grann-btn" id="grannBtn" aria-label="Grann">
+        <div class="grann-presence" id="grannFace"></div>
         <span class="grann-name">Grann</span>
       </button>
       <div id="counsel"></div>
@@ -402,142 +318,218 @@
 
   <div class="respe-flash" id="respeFlash" aria-live="assertive"><div class="respe-word">RESPÈ</div></div>
 
-  <!-- ============ THE JOURNEY (scroll) ============ -->
-  <section class="hero">
-    <div class="reveal">
-      <h1>Grenn<br><span class="accent">Pwomennen</span></h1>
-      <p class="sub">yon vwayaj &middot; yon konvèsasyon &middot; yon kominyon</p>
-    </div>
-    <span class="scroll-hint">desann — scroll</span>
-  </section>
-
-  <section class="proverb">
-    <div class="voice left reveal">
-      <span class="who">Bwa Pi Wo — the tallest tree</span>
-      <p class="kreyol">«&nbsp;Mwen wè lwen.&nbsp;»</p>
-      <p class="trans">I see far. &middot; Je vois loin.</p>
-    </div>
-    <div class="voice right reveal">
-      <span class="who">Grenn Pwomennen — the wandering seed</span>
-      <p class="kreyol">«&nbsp;Men mwen wè pi lwen.&nbsp;»</p>
-      <p class="trans">But I see farther. &middot; Mais je vois plus loin.</p>
-    </div>
-  </section>
-
-  <section class="manifesto">
-    <span class="kicker reveal">kimoun mwen ye — who i am</span>
-    <p id="manifesto">I am the seed that walked. From Pòtoprens outward, across waters and borders and languages, I scattered and I took root. I carry films the way others carry photographs. I carry voices — my grandmother's, my mother's, my father's — and they walk with me, appearing when the road forks. This is not a website about a life. It is a place where you meet someone. And like any true encounter, it will ask something of you before it gives.</p>
-  </section>
-
-  <section class="map-section" id="mapSection">
-    <canvas id="sky"></canvas>
-    <p class="map-title">Kat Grenn Pwomennen
-      <span class="sub">the world, with Ayiti at its center</span>
-    </p>
-    <div id="label"><span id="labelText"></span><span class="kind" id="labelKind"></span></div>
-    <p class="map-hint" id="mapHint">trennen pou w vire &middot; drag to turn &middot; klike sou yon zetwal &middot; click a star</p>
-  </section>
-
-  <section class="works">
-    <div class="head reveal">
-      <span class="kicker">sa grenn nan te wè — what the seed has seen</span>
-      <p style="font-style:italic; font-size:clamp(1.4rem,3vw,2.2rem); max-width:30ch;">Films gathered along the way — drag through them.</p>
-    </div>
-    <div class="strip" id="strip">
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2024–25</span><span class="name">Choublak</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2023</span><span class="name">Kale Kann Kale</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2023</span><span class="name">The Marks Remember</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">Una Sola Sangre</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">What Happens to a Dream Deferred</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2022</span><span class="name">Of What Death We Die</span></div>
-      <div class="work"><span class="film-edge" style="left:10px"></span><span class="film-edge" style="right:10px"></span><span class="year">2020</span><span class="name">Katherine</span></div>
-    </div>
-  </section>
-
-  <section class="ancestors">
-    <span class="kicker reveal">zansèt yo — the guides</span>
-    <p class="reveal" style="font-style:italic; font-size:clamp(1.4rem,3vw,2.2rem);">They walk with the seed. Click them to enter their branches.</p>
-    <div class="row reveal">
-      <button class="ancestor" data-ancestor="grann" style="--i:0"><div class="grann-presence"></div><span class="grann-name">Grann</span></button>
-      <button class="ancestor" data-ancestor="manman" style="--i:1"><div class="grann-presence"></div><span class="grann-name">Manman</span></button>
-      <button class="ancestor" data-ancestor="papa" style="--i:2"><div class="grann-presence"></div><span class="grann-name">Papa</span></button>
-    </div>
-  </section>
-
-  <section class="contribute">
-    <span class="kicker reveal">kite yon souvni — leave a memory</span>
-    <p class="big reveal">To go further, you must leave something behind.</p>
-    <p class="expl reveal">A word, a sound, a memory of your own — pinned to your city on the map. The site exchanges it for a fragment left by another traveller. Every visit alters the space for the next arrival: the stars grow brighter with what they hold.</p>
-    <button class="leave-btn reveal" onclick="this.textContent='— the reciprocal ritual opens here in the production build —'">Kite yon souvni</button>
-  </section>
-
-  <footer class="colophon">
-    <div class="left">
-      Ésery Mondésir — Grenn Pwomennen<br>
-      artist-filmmaker &middot; writer &middot; educator<br>
-      pòtoprens &middot; monreyal &middot; tow­onto<br><br>
-      onè &middot; respè &middot; &copy; ongoing
-    </div>
-    <div class="right">
-      <a href="#" onclick="return false">Vimeo</a>
-      <a href="#" onclick="return false">Instagram</a>
-      <a href="#" onclick="return false">Kontak</a>
-    </div>
-  </footer>
-
-  <!-- overlay for stars & ancestors -->
-  <div class="open-frag" id="openFrag" role="dialog" aria-modal="true">
-    <button class="open-close" id="openClose">Tounen — return</button>
-    <div class="open-inner" id="openInner"></div>
+  <!-- VEIL + CHANM + BURN -->
+  <canvas id="veil"></canvas>
+  <div class="chanm" id="chanm" role="dialog" aria-modal="true">
+    <div class="chanm-stage" id="chanmStage"></div>
+    <span class="chanm-place" id="chanmPlace"></span>
+    <button class="chanm-close" id="chanmClose">tounen</button>
+    <span class="chanm-next" id="chanmNext">klike — next</span>
   </div>
+  <div id="burn"></div>
 
+  <script src="data/places.js"></script>
   <script>
-  // =================================================================
-  // GRENN PWOMENNEN — one interactive site: ritual → scroll journey.
-  // =================================================================
+  // ===================================================================
+  // GRENN PWOMENNEN — one portal, one sky. Everything emanates from it.
+  // ===================================================================
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---------------- RITUAL ----------------
-  const ACCEPT_RE = /^h?on+e+$/;
-  function normalize(s) {
-    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '');
-  }
-  function isOne(s) { const n = normalize(s); return n === 'one' || ACCEPT_RE.test(n); }
+  // ----------------------------------------------------------------
+  // SOUND ENGINE — one AudioContext; « Onè » is the unlocking gesture
+  // ----------------------------------------------------------------
+  const Snd = {
+    ctx: null, master: null, duck: null, muted: false,
+    bed: null, hums: [], projector: null,
 
-  const ritual = document.getElementById('ritual');
-  const knockZone = document.getElementById('knockZone');
-  const grannZone = document.getElementById('grannZone');
-  const counsel = document.getElementById('counsel');
-  const whisper = document.getElementById('whisper');
-  const respeFlash = document.getElementById('respeFlash');
+    init() {
+      if (this.ctx) return;
+      try {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.master = this.ctx.createGain();
+        this.duck = this.ctx.createGain();
+        this.duck.connect(this.master);
+        this.master.connect(this.ctx.destination);
+        this.master.gain.value = 0.9;
+        document.getElementById('muteBtn').classList.add('on');
+        this.startBed();
+      } catch (e) {}
+    },
+
+    toggleMute() {
+      if (!this.ctx) return;
+      this.muted = !this.muted;
+      this.master.gain.setTargetAtTime(this.muted ? 0 : 0.9, this.ctx.currentTime, 0.1);
+      document.getElementById('muteBtn').textContent = 'son: ' + (this.muted ? 'off' : 'on');
+    },
+
+    // night bed: real recording if provided, synthesized lakou-night until then
+    startBed() {
+      const el = new Audio('assets/portal/ambians.mp3');
+      el.loop = true;
+      el.addEventListener('canplaythrough', () => {
+        const src = this.ctx.createMediaElementSource(el);
+        const g = this.ctx.createGain(); g.gain.value = 0.5;
+        src.connect(g); g.connect(this.duck);
+        el.play().catch(() => {});
+        this.bed = { gain: g };
+      }, { once: true });
+      el.addEventListener('error', () => this.synthBed(), { once: true });
+      el.load();
+    },
+    synthBed() {
+      const c = this.ctx;
+      const g = this.ctx.createGain(); g.gain.value = 0.16; g.connect(this.duck);
+      // low earth drone
+      [55, 82.5].forEach(f => {
+        const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+        const og = c.createGain(); og.gain.value = f === 55 ? 0.5 : 0.18;
+        o.connect(og); og.connect(g); o.start();
+      });
+      // night air: filtered noise, slow breathing
+      const noise = this.noiseSource();
+      const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3800; bp.Q.value = 2.2;
+      const ng = c.createGain(); ng.gain.value = 0.05;
+      const lfo = c.createOscillator(); lfo.frequency.value = 0.11;
+      const lg = c.createGain(); lg.gain.value = 0.03;
+      lfo.connect(lg); lg.connect(ng.gain); lfo.start();
+      noise.connect(bp); bp.connect(ng); ng.connect(g);
+      this.bed = { gain: g };
+    },
+    noiseSource() {
+      const c = this.ctx, len = c.sampleRate * 2;
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+      const src = c.createBufferSource(); src.buffer = buf; src.loop = true; src.start();
+      return src;
+    },
+
+    // the drum that answers RESPÈ — real tanbou if provided
+    drum() {
+      if (!this.ctx) return;
+      const el = new Audio('assets/portal/tanbou.mp3');
+      el.addEventListener('canplaythrough', () => {
+        const src = this.ctx.createMediaElementSource(el);
+        src.connect(this.duck); el.play().catch(() => {});
+      }, { once: true });
+      el.addEventListener('error', () => {
+        [0, 0.5].forEach(dt => this.drumHit(this.ctx.currentTime + dt));
+      }, { once: true });
+      el.load();
+    },
+    drumHit(t) {
+      const c = this.ctx;
+      const o = c.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(120, t);
+      o.frequency.exponentialRampToValueAtTime(48, t + 0.25);
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.9, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+      o.connect(g); g.connect(this.duck);
+      o.start(t); o.stop(t + 0.7);
+    },
+
+    // star whisper hums, distance-driven
+    addHum(freq) {
+      if (!this.ctx) return null;
+      const c = this.ctx;
+      const g = c.createGain(); g.gain.value = 0; g.connect(this.duck);
+      [freq, freq * 1.5 + 1.7].forEach((f, i) => {
+        const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+        const og = c.createGain(); og.gain.value = i ? 0.35 : 1;
+        o.connect(og); og.connect(g); o.start();
+      });
+      this.hums.push(g);
+      return g;
+    },
+    setDuck(v) {
+      if (this.ctx) this.duck.gain.setTargetAtTime(v, this.ctx.currentTime, 0.4);
+    },
+
+    // 16mm projector hum for leader placeholders
+    startProjector() {
+      if (!this.ctx || this.projector) return;
+      const c = this.ctx;
+      const g = c.createGain(); g.gain.value = 0.12; g.connect(this.master);
+      const noise = this.noiseSource();
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+      const flutter = c.createGain(); flutter.gain.value = 1;
+      const lfo = c.createOscillator(); lfo.frequency.value = 24;
+      const lg = c.createGain(); lg.gain.value = 0.35;
+      lfo.connect(lg); lg.connect(flutter.gain); lfo.start();
+      noise.connect(lp); lp.connect(flutter); flutter.connect(g);
+      this.projector = g;
+    },
+    stopProjector() {
+      if (this.projector) {
+        this.projector.gain.setTargetAtTime(0, this.ctx.currentTime, 0.15);
+        const p = this.projector; this.projector = null;
+        setTimeout(() => p.disconnect(), 800);
+      }
+    },
+  };
+  document.getElementById('muteBtn').addEventListener('click', () => Snd.toggleMute());
+
+  // ----------------------------------------------------------------
+  // PÒTAY — the ritual
+  // ----------------------------------------------------------------
+  function normalize(s) { return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, ''); }
+  function isOne(s) { const n = normalize(s); return n === 'one' || /^h?on+e+$/.test(n); }
+
+  const portal = document.getElementById('portal');
   let entered = false, grannShown = false;
 
+  // first keystroke = the hand on the door = audio unlock
+  document.getElementById('knock').addEventListener('input', () => Snd.init(), { once: true });
+  document.getElementById('knock').addEventListener('focus', () => {}, { once: true });
+
   const whisperTimer = setTimeout(() => {
-    whisper.innerHTML = 'ou rive devan yon kay… &middot; you have arrived at a door… &middot; te voil&agrave; devant une porte…';
-    whisper.classList.add('visible');
+    const w = document.getElementById('whisper');
+    w.innerHTML = 'ou rive devan yon kay… &middot; you have arrived at a door… &middot; te voil&agrave; devant une porte…';
+    w.classList.add('visible');
   }, 7000);
   const grannTimer = setTimeout(() => { if (!grannShown && !entered) showGrann('silence'); }, 20000);
+
+  // Grann: photograph if provided, presence-glow until then
+  (function grannPhoto() {
+    const img = new Image();
+    img.onload = () => {
+      const f = document.getElementById('grannFace');
+      f.style.backgroundImage = `url(assets/portal/grann.jpg)`;
+      f.classList.add('photo');
+    };
+    img.src = 'assets/portal/grann.jpg';
+  })();
 
   const COUNSEL = {
     silence: [
       { cls: 'kreyol', text: 'Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa.' },
-      { cls: 'echo', text: 'My child… you cannot stand at a door in silence. &middot; Mon enfant… on ne reste pas muet devant une porte.' },
+      { cls: 'echo', text: 'My child… you cannot stand at a door in silence. &middot; On ne reste pas muet devant une porte.' },
       { cls: 'kreyol', text: 'Isit la, ou mande: <strong>«&nbsp;Onè&nbsp;»</strong>. Epi kay la va reponn ou: «&nbsp;Respè&nbsp;».' },
-      { cls: 'echo', text: 'Here, you ask for honor — «&nbsp;Onè&nbsp;» — and the house grants respect — «&nbsp;Respè&nbsp;». Then you enter.' },
+      { cls: 'echo', text: 'You ask for honor — «&nbsp;Onè&nbsp;» — and the house grants respect — «&nbsp;Respè&nbsp;». Then you enter.' },
     ],
     wrong: [
       { cls: 'kreyol', text: 'Tande, pitit… se pa konsa nou fè l isit la.' },
       { cls: 'echo', text: 'Listen, child… that is not how we do it here. &middot; Ce n’est pas comme ça qu’on fait ici.' },
       { cls: 'kreyol', text: 'Lè ou rive devan yon kay, ou mande: <strong>«&nbsp;Onè&nbsp;»</strong>. Kay la va reponn: «&nbsp;Respè&nbsp;». Apre sa, ou antre.' },
-      { cls: 'echo', text: 'You ask: «&nbsp;Onè&nbsp;» — honor. The house answers: «&nbsp;Respè&nbsp;». Then, you enter. Esèye ankò.' },
+      { cls: 'echo', text: 'You ask: «&nbsp;Onè&nbsp;». The house answers: «&nbsp;Respè&nbsp;». Then, you enter. Esèye ankò.' },
     ]
   };
 
   function showGrann(mode) {
     grannShown = true;
+    Snd.init();
     clearTimeout(whisperTimer); clearTimeout(grannTimer);
-    knockZone.style.display = 'none';
-    grannZone.classList.add('visible');
+    document.getElementById('knockZone').style.display = 'none';
+    document.getElementById('grannZone').classList.add('visible');
+    const counsel = document.getElementById('counsel');
     counsel.innerHTML = '';
+    // her voice, if the recording exists
+    const voice = new Audio('assets/portal/grann-konsey.mp3');
+    voice.addEventListener('canplaythrough', () => voice.play().catch(() => {}), { once: true });
+    voice.load();
     const lines = COUNSEL[mode];
     lines.forEach((l, i) => {
       const p = document.createElement('p');
@@ -555,14 +547,19 @@
   function enter() {
     if (entered) return;
     entered = true;
+    Snd.init();
     clearTimeout(whisperTimer); clearTimeout(grannTimer);
-    ritual.classList.add('gone');
-    respeFlash.classList.add('visible');
+    portal.classList.add('gone');
+    const flash = document.getElementById('respeFlash');
+    flash.classList.add('visible');
+    Snd.drum();
+    bootSky();
     setTimeout(() => {
-      respeFlash.classList.remove('visible');
-      document.body.classList.remove('locked');
-      initScroll();
-    }, 3200);
+      flash.classList.remove('visible');
+      Snd.setDuck(0.35); // the night quiets; the sky whispers
+      document.getElementById('skyHint').classList.add('visible');
+      setTimeout(() => document.getElementById('skyHint').classList.add('gone'), 9000);
+    }, 3400);
   }
 
   function attempt(v) {
@@ -571,20 +568,19 @@
     else if (!grannShown) showGrann('wrong');
     else document.getElementById('knock2').value = '';
   }
-
   document.getElementById('knockForm').addEventListener('submit', e => { e.preventDefault(); attempt(document.getElementById('knock').value); });
   document.getElementById('knockForm2').addEventListener('submit', e => { e.preventDefault(); attempt(document.getElementById('knock2').value); });
   document.getElementById('knock').focus();
 
-  // voice input
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SR) {
+  const SRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SRec) {
     const micBtn = document.getElementById('mic');
     micBtn.hidden = false;
-    const rec = new SR();
+    const rec = new SRec();
     rec.lang = 'fr-FR'; rec.interimResults = false; rec.maxAlternatives = 5;
     let listening = false;
     micBtn.addEventListener('click', () => {
+      Snd.init();
       if (listening) { rec.stop(); return; }
       try { rec.start(); listening = true; micBtn.classList.add('listening'); } catch (e) {}
     });
@@ -596,156 +592,49 @@
       if (hit) enter(); else attempt(alts[0] || '');
     };
   }
+  document.getElementById('grannBtn').addEventListener('click', () => {
+    if (window.openChanmById) window.openChanmById('grann', true);
+  });
 
-  // Grann bio from the ritual
-  document.getElementById('grannBtn').addEventListener('click', () => openAncestor('grann'));
+  // material grain: use the real 16mm scan the moment it exists
+  (function realGrain() {
+    const v = document.getElementById('grainVid');
+    v.addEventListener('canplaythrough', () => {
+      v.style.display = 'block';
+      document.querySelector('.grain').style.display = 'none';
+      v.play().catch(() => {});
+    }, { once: true });
+    v.src = 'assets/textures/gren-16mm.mp4';
+  })();
 
-  // ---------------- ANCESTOR BRANCHES ----------------
-  const ANCESTORS = {
-    grann: { name: 'Grann', body: 'She was the one who taught that a door is never just a door. You announce yourself; honor is asked; respect is granted; only then do you cross. [Her photographs, her voice, her proverbs — her whole branch grows here.]' },
-    manman: { name: 'Manman', body: '[Placeholder — her story, her voice, her branch of the tree.]' },
-    papa: { name: 'Papa', body: '[Placeholder — his story, his voice, his branch of the tree.]' },
-  };
-  document.querySelectorAll('.ancestor').forEach(b =>
-    b.addEventListener('click', () => openAncestor(b.dataset.ancestor)));
+  // ----------------------------------------------------------------
+  // SYÈL LA — the sky
+  // ----------------------------------------------------------------
+  let skyBooted = false, nodes = [], camApi = null;
 
-  function openAncestor(id) {
-    const a = ANCESTORS[id];
-    openOverlay(`<span class="kind">zansèt — yon lòt pyebwa, another tree</span><h2>${a.name}</h2><p>${a.body}</p><p class="note">each guide opens their own branch of the family tree</p>`);
+  function bootSky() {
+    if (skyBooted) return;
+    skyBooted = true;
+    (function loadThree(i) {
+      const urls = [
+        'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+        'https://unpkg.com/three@0.128.0/build/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+      ];
+      if (i >= urls.length) return;
+      const s = document.createElement('script');
+      s.src = urls[i];
+      s.onload = () => buildSky();
+      s.onerror = () => loadThree(i + 1);
+      document.head.appendChild(s);
+    })(0);
   }
 
-  // ---------------- OVERLAY ----------------
-  const openFrag = document.getElementById('openFrag');
-  const openInner = document.getElementById('openInner');
-  function openOverlay(html) {
-    openInner.innerHTML = html;
-    openFrag.classList.add('visible');
-    document.getElementById('openClose').focus();
-  }
-  function closeOverlay() {
-    openFrag.classList.remove('visible');
-    if (window.mapZoomOut) window.mapZoomOut();
-  }
-  document.getElementById('openClose').addEventListener('click', closeOverlay);
-  addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
-
-  // ---------------- SCROLL LAYER ----------------
-  function initScroll() {
-    // reveals
-    const io = new IntersectionObserver(es => {
-      es.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-    // manifesto word lighting
-    const man = document.getElementById('manifesto');
-    man.innerHTML = man.textContent.trim().split(/\s+/).map(w => `<span class="word">${w}</span>`).join(' ');
-    const words = man.querySelectorAll('.word');
-    function lightWords() {
-      const r = man.getBoundingClientRect();
-      const p = Math.max(0, Math.min(1, 1 - (r.top - innerHeight * 0.15) / (innerHeight * 0.6)));
-      const n = Math.floor(p * words.length);
-      words.forEach((w, i) => w.classList.toggle('lit', i < n));
-    }
-    addEventListener('scroll', lightWords, { passive: true });
-    lightWords();
-
-    // works strip drag
-    const strip = document.getElementById('strip');
-    let sDrag = false, sX = 0, sPos = 0, sStart = 0;
-    const maxDrag = () => Math.max(0, strip.scrollWidth - innerWidth + innerWidth * 0.16);
-    function sDown(e) { sDrag = true; sX = (e.touches ? e.touches[0].clientX : e.clientX); sStart = sPos; strip.classList.add('dragging'); }
-    function sMove(e) {
-      if (!sDrag) return;
-      const x = (e.touches ? e.touches[0].clientX : e.clientX);
-      sPos = Math.max(-maxDrag(), Math.min(0, sStart + x - sX));
-      strip.style.transform = `translateX(${sPos}px)`;
-    }
-    function sUp() { sDrag = false; strip.classList.remove('dragging'); }
-    strip.addEventListener('mousedown', sDown);
-    addEventListener('mousemove', sMove);
-    addEventListener('mouseup', sUp);
-    strip.addEventListener('touchstart', sDown, { passive: true });
-    strip.addEventListener('touchmove', sMove, { passive: true });
-    strip.addEventListener('touchend', sUp);
-
-    // lazy-boot the map when its section approaches
-    const mapIO = new IntersectionObserver(es => {
-      es.forEach(en => {
-        if (en.isIntersecting) { loadThree(0); mapIO.disconnect(); }
-      });
-    }, { rootMargin: '400px' });
-    mapIO.observe(document.getElementById('mapSection'));
-  }
-
-  // ---------------- THE MAP (galaxy) ----------------
-  let threeLoading = false;
-  function loadThree(i) {
-    if (threeLoading && i === 0) return;
-    threeLoading = true;
-    const urls = [
-      'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
-      'https://unpkg.com/three@0.128.0/build/three.min.js',
-      'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
-    ];
-    if (i >= urls.length) {
-      document.getElementById('mapHint').textContent = 'unable to load the 3D engine — check connection and reload';
-      return;
-    }
-    const s = document.createElement('script');
-    s.src = urls[i];
-    s.onload = () => bootMap();
-    s.onerror = () => loadThree(i + 1);
-    document.head.appendChild(s);
-  }
-
-  function bootMap() {
+  function buildSky() {
     const PAP = { lat: 18.5944, lon: -72.3074 };
-    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184', sous: '#b9c4d6' };
+    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184', sous: '#b9c4d6', zanset: '#e8c9a0' };
 
-    const SOUS = [
-      { name: 'Kafou (Carrefour)', lat: 18.5344, lon: -72.4094, size: 13, stories: 8, body: 'The city beside the city — millions passed through Kafou on their way to everywhere.' },
-      { name: 'Baconnois (Ansavo, Nip)', lat: 18.4700, lon: -73.3500, size: 12, stories: 4, body: 'Plaine de Baconnois, commune of Anse-à-Veau, Nippes — the kind of place the maps forget and the diaspora never does.' },
-      { name: 'Lagonav (Ansagalè)', lat: 18.8342, lon: -72.8662, size: 12, stories: 3, body: 'The island beside the island — La Gonâve, whose children know the water first.' },
-      { name: 'Jakmèl', lat: 18.2341, lon: -72.5345, size: 12, stories: 5, body: 'Jacmel — the painters’ port, the first goodbye of the South-East.' },
-      { name: 'Okap (Cap-Haïtien)', lat: 19.7580, lon: -72.2042, size: 13, stories: 6, body: 'The old capital of the North — Vertières is here.' },
-      { name: 'Gonayiv', lat: 19.4456, lon: -72.6884, size: 12, stories: 4, body: 'Gonaïves — where independence was declared in 1804, and where the kanntè boats later sailed.' },
-      { name: 'Senmak (Saint-Marc)', lat: 19.1080, lon: -72.6939, size: 12, stories: 3, body: 'Saint-Marc — birthplace of Jean Baptiste Point du Sable, who wandered north and founded Chicago.' },
-      { name: 'Jeremi', lat: 18.6500, lon: -74.1167, size: 12, stories: 4, body: 'Jérémie — the city of poets, the beginning of many departures.' },
-      { name: 'Okay (Les Cayes)', lat: 18.1933, lon: -73.7460, size: 12, stories: 3, body: 'Les Cayes — the great South, sender of generations.' },
-      { name: 'Miragwàn', lat: 18.4411, lon: -73.0883, size: 12, stories: 4, body: 'Miragoâne — for decades the boats to Nassau and Florida left from this bay.' },
-      { name: 'Wanament', lat: 19.5497, lon: -71.7264, size: 12, stories: 3, body: 'Ouanaminthe — the river crossing, the eastward road into the Dominican Republic.' },
-    ];
-
-    const CITIES = [
-      { name: 'Flatbush, Brooklyn', lat: 40.6526, lon: -73.9590, type: 'kominote', size: 24, stories: 23, body: 'Flatbush and East Flatbush — the beating heart of Haitian New York, the largest community in the U.S.', sample: '“Sou Church Avenue, sant lakay mwen pa t janm lwen.” — a memory left by a visitor' },
-      { name: 'Springfield Gardens, Queens', lat: 40.6642, lon: -73.7590, type: 'kominote', size: 14, stories: 6, body: 'Queens’ Haitian corridor — Springfield Gardens, Cambria Heights, Queens Village.' },
-      { name: 'Elmont, NY', lat: 40.7009, lon: -73.7126, type: 'kominote', size: 14, stories: 4, body: 'Nassau County, Long Island — where Brooklyn’s children bought houses and stayed.' },
-      { name: 'Spring Valley, NY', lat: 41.1132, lon: -74.0438, type: 'kominote', size: 14, stories: 5, body: 'Rockland County — one of the densest Haitian communities in America.' },
-      { name: 'Miami — Little Haiti', lat: 25.7617, lon: -80.1918, type: 'toude', size: 22, stories: 18, body: 'Little Haiti, Krome, Third Horizon, PAMM. A community and a stage — and a wound (WelKrome).', sample: '“Krome se te premye adrès anpil moun nan Miami.” — a memory left by a visitor' },
-      { name: 'North Miami', lat: 25.8901, lon: -80.1867, type: 'kominote', size: 15, stories: 7, body: 'North Miami and Golden Glades — Little Haiti extended northward.' },
-      { name: 'New Orleans', lat: 29.9511, lon: -90.0715, type: 'kominote', size: 17, stories: 9, body: '1809: ten thousand Saint-Domingue refugees doubled the city. The seed is two centuries deep in this soil.', sample: '“My family has been here since the boats from Cuba. We never called it immigration.” — a memory left by a visitor' },
-      { name: 'Chicago', lat: 41.8781, lon: -87.6298, type: 'kominote', size: 14, stories: 3, body: 'Founded by a Haitian — Jean Baptiste Point du Sable, born in Saint-Marc.' },
-      { name: 'Boston — Mattapan', lat: 42.2771, lon: -71.0914, type: 'kominote', size: 16, stories: 8, body: 'Mattapan, Hyde Park, Brockton — New England’s lakou.' },
-      { name: 'Montréal — Montréal-Nord', lat: 45.5017, lon: -73.5673, type: 'toude', size: 20, stories: 12, body: 'Montréal-Nord, Saint-Michel — and the practice: Choublak at Leonard & Bina Ellen (2024–25).' },
-      { name: 'Toronto', lat: 43.6532, lon: -79.3832, type: 'toude', size: 18, stories: 6, body: 'Where the artist teaches and works — and where this website is being dreamed.' },
-      { name: 'Santo Domingo', lat: 18.4861, lon: -69.9312, type: 'kominote', size: 16, stories: 10, body: 'The nearest elsewhere — the island shared and divided.' },
-      { name: 'La Havane', lat: 23.1136, lon: -82.3666, type: 'travay', size: 16, stories: 5, body: 'Una Sola Sangre — Haitians in Cuba, familial memory across generations.' },
-      { name: 'Santiago de Cuba', lat: 20.0247, lon: -75.8219, type: 'kominote', size: 13, stories: 4, body: 'Descendants of cane-cutters — one blood.' },
-      { name: 'Nassau', lat: 25.0443, lon: -77.3504, type: 'kominote', size: 14, stories: 7, body: 'The Bahamas — the closest crossing, the oldest boats.', sample: '“Papa m te janbe an 1979 sou yon vwalye.” — a memory left by a visitor' },
-      { name: 'Marsh Harbour, Abaco', lat: 26.5412, lon: -77.0636, type: 'kominote', size: 11, stories: 3, body: 'The Mudd and Pigeon Peas — erased by Hurricane Dorian in 2019. The stars remember what the storm took.' },
-      { name: 'Providenciales', lat: 21.7738, lon: -72.2719, type: 'kominote', size: 11, stories: 2, body: 'Turks and Caicos — the islands’ largest minority, mostly unseen.' },
-      { name: 'Pointe-à-Pitre', lat: 16.2415, lon: -61.5328, type: 'kominote', size: 11, stories: 2, body: 'Guadeloupe — kin across the arc of islands.' },
-      { name: 'Cayenne', lat: 4.9224, lon: -52.3134, type: 'kominote', size: 12, stories: 3, body: 'Guyane — a newer route of the seed.' },
-      { name: 'Santiago (Chile)', lat: -33.4489, lon: -70.6693, type: 'kominote', size: 13, stories: 5, body: 'Quilicura — “Petite Haïti” of the southern cone.' },
-      { name: 'São Paulo', lat: -23.5505, lon: -46.6333, type: 'kominote', size: 13, stories: 4, body: 'Brazil — a waystation that became a home, then a departure again.' },
-      { name: 'Tijuana', lat: 32.5149, lon: -117.0382, type: 'travay', size: 16, stories: 6, body: 'What Happens to a Dream Deferred — asylum seekers at the border.' },
-      { name: 'Tapachula', lat: 14.9059, lon: -92.2577, type: 'kominote', size: 12, stories: 3, body: 'Mexico’s southern border — the waiting room of the northward road.' },
-      { name: 'Paris', lat: 48.8566, lon: 2.3522, type: 'kominote', size: 15, stories: 6, body: 'Paris and Saint-Denis — the community across the water.' },
-    ];
-
-    const R_EARTH = 6371;
-    const toRad = d => d * Math.PI / 180;
+    const R_EARTH = 6371, toRad = d => d * Math.PI / 180;
     function distBearing(lat1, lon1, lat2, lon2) {
       const p1 = toRad(lat1), p2 = toRad(lat2), dl = toRad(lon2 - lon1);
       const d = Math.acos(Math.min(1, Math.sin(p1) * Math.sin(p2) + Math.cos(p1) * Math.cos(p2) * Math.cos(dl))) * R_EARTH;
@@ -754,34 +643,24 @@
       return { d, brg: Math.atan2(y, x) };
     }
     const INNER_KM = 300, INNER_R = 165, OUTER_R = 700, MAX_KM = 8200;
-    function projR(dKm) {
-      if (dKm <= INNER_KM) return dKm * (INNER_R / INNER_KM);
-      return INNER_R + (dKm - INNER_KM) * ((OUTER_R - INNER_R) / (MAX_KM - INNER_KM));
-    }
+    const projR = d => d <= INNER_KM ? d * (INNER_R / INNER_KM)
+      : INNER_R + (d - INNER_KM) * ((OUTER_R - INNER_R) / (MAX_KM - INNER_KM));
 
     const canvas = document.getElementById('sky');
-    const section = document.getElementById('mapSection');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    function sizeRenderer() {
-      renderer.setSize(section.clientWidth, section.clientHeight);
-      camera.aspect = section.clientWidth / section.clientHeight;
-      camera.updateProjectionMatrix();
-    }
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x040404, 0.00045);
-    const camera = new THREE.PerspectiveCamera(58, 1, 1, 8000);
-    sizeRenderer();
-    addEventListener('resize', sizeRenderer);
+    const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 1, 8000);
 
     function glowTexture(hex, soft) {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const ctx = c.getContext('2d');
-      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      const c = document.createElement('canvas'); c.width = c.height = 128;
+      const x = c.getContext('2d');
+      const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
       if (soft) { g.addColorStop(0, hex + '55'); g.addColorStop(0.5, hex + '22'); g.addColorStop(1, hex + '00'); }
       else { g.addColorStop(0, hex); g.addColorStop(0.25, hex + 'cc'); g.addColorStop(0.6, hex + '33'); g.addColorStop(1, hex + '00'); }
-      ctx.fillStyle = g; ctx.fillRect(0, 0, 128, 128);
+      x.fillStyle = g; x.fillRect(0, 0, 128, 128);
       return new THREE.CanvasTexture(c);
     }
 
@@ -805,38 +684,41 @@
         const a = (i / 128) * Math.PI * 2;
         pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
       }
-      const g = new THREE.BufferGeometry().setFromPoints(pts);
-      scene.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0xf0ece4, transparent: true, opacity: 0.05 })));
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: 0xf0ece4, transparent: true, opacity: 0.05 })));
     });
 
-    // nodes
-    const nodes = [];
-    function addNode(data, pos, colorKey, size) {
-      const mat = new THREE.SpriteMaterial({ map: glowTexture(COLORS[colorKey]), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    // nodes from the manifest
+    function place(data, type, size) {
+      data.type = type;
+      const { d, brg } = distBearing(PAP.lat, PAP.lon, data.lat, data.lon);
+      data.dist = Math.round(d);
+      const r = projR(d);
+      const mat = new THREE.SpriteMaterial({ map: glowTexture(COLORS[type]), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
       const s = new THREE.Sprite(mat);
-      s.position.copy(pos); s.scale.setScalar(size); s.userData = data;
+      s.position.set(Math.sin(brg) * r, (Math.random() - 0.5) * (type === 'sous' || type === 'zanset' ? 10 : 26), -Math.cos(brg) * r);
+      s.scale.setScalar(size);
+      s.userData = data;
       data.sprite = s; data.baseSize = size; data.phase = Math.random() * Math.PI * 2;
       scene.add(s); nodes.push(data);
+      if (data.tone) data.hum = Snd.addHum(data.tone);
     }
 
-    const core = { name: 'Pòtoprens', kind: 'kè a — the core', type: 'core', stories: 31,
-      body: 'Where every line begins. Every distance and direction on this map is true — measured from here.',
-      sample: '“Mwen pa janm pati. Se mwen ki veye limyè yo.” — a memory left by a visitor', dist: 0 };
-    addNode(core, new THREE.Vector3(0, 0, 0), 'core', 34);
-
-    SOUS.forEach(c => {
-      c.type = 'sous'; c.kind = 'sous — the wellspring';
-      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
-      c.dist = Math.round(d);
-      const r = projR(d);
-      addNode(c, new THREE.Vector3(Math.sin(brg) * r, (Math.random() - 0.5) * 10, -Math.cos(brg) * r), 'sous', c.size);
-    });
-    CITIES.forEach(c => {
-      const { d, brg } = distBearing(PAP.lat, PAP.lon, c.lat, c.lon);
-      c.dist = Math.round(d);
-      c.kind = c.type === 'kominote' ? 'kominote — community' : c.type === 'travay' ? 'travay — the work' : 'kominote + travay';
-      const r = projR(d);
-      addNode(c, new THREE.Vector3(Math.sin(brg) * r, (Math.random() - 0.5) * 26, -Math.cos(brg) * r), c.type, c.size);
+    const core = GP.core;
+    core.type = 'core'; core.dist = 0;
+    {
+      const mat = new THREE.SpriteMaterial({ map: glowTexture(COLORS.core), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+      const s = new THREE.Sprite(mat);
+      s.position.set(0, 0, 0); s.scale.setScalar(34); s.userData = core;
+      core.sprite = s; core.baseSize = 34; core.phase = 0;
+      scene.add(s); nodes.push(core);
+      if (core.tone) core.hum = Snd.addHum(core.tone);
+    }
+    GP.sous.forEach(p => { p.kind = 'sous — the wellspring'; place(p, 'sous', p.size); });
+    GP.zanset.forEach(p => { p.kind = 'zansèt — ancestor'; place(p, 'zanset', p.size); });
+    GP.places.forEach(p => {
+      p.kind = p.type === 'kominote' ? 'kominote — community' : p.type === 'travay' ? 'travay — the work' : 'kominote + travay';
+      place(p, p.type, p.size);
     });
 
     // filaments
@@ -846,8 +728,8 @@
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.Float32BufferAttribute(new Array(25 * 3).fill(0), 3));
       const line = new THREE.Line(g, new THREE.LineBasicMaterial({
-        color: new THREE.Color(COLORS[n.type]), transparent: true,
-        opacity: n.type === 'kominote' ? 0.22 : n.type === 'sous' ? 0.16 : 0.34,
+        color: new THREE.Color(COLORS[n.type] || '#d9a066'), transparent: true,
+        opacity: n.type === 'kominote' ? 0.22 : n.type === 'sous' ? 0.16 : n.type === 'zanset' ? 0.12 : 0.34,
         blending: THREE.AdditiveBlending,
       }));
       scene.add(line);
@@ -873,7 +755,7 @@
     }
 
     // dust
-    (function () {
+    {
       const N = 3000, pos = new Float32Array(N * 3);
       for (let i = 0; i < N; i++) {
         const r = 900 + Math.random() * 3000, t = Math.random() * Math.PI * 2, p = Math.acos(2 * Math.random() - 1);
@@ -884,16 +766,18 @@
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0x8a8a8a, size: 1.3, transparent: true, opacity: 0.3 })));
-    })();
+    }
 
-    // camera
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let theta = -0.4, phi = 0.95, radius = 1150;
-    let tTheta = theta, tPhi = phi, tRadius = radius;
+    // camera — falls in from far when the door opens
+    let theta = -0.4, phi = 0.95, radius = 2600;
+    let tTheta = theta, tPhi = phi, tRadius = 1150;
     const lookAt = new THREE.Vector3(0, 0, 0), tLookAt = new THREE.Vector3(0, 0, 0);
     let interacted = false;
 
-    window.mapZoomOut = function () { tLookAt.set(0, 0, 0); tRadius = 1150; };
+    camApi = {
+      flyTo(n) { tLookAt.copy(n.sprite.position); tRadius = 240; },
+      home() { tLookAt.set(0, 0, 0); tRadius = 1150; },
+    };
 
     let dragging = false, moved = 0, last = null, pinchDist = null;
     const pxy = e => e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
@@ -906,7 +790,7 @@
         tPhi = Math.min(1.45, Math.max(0.25, tPhi - (p.y - last.y) * 0.004));
         moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
         last = p; interacted = true;
-      } else if (isOverMap(e)) onHover(e);
+      } else if (!chanmOpen) onHover(e);
     });
     addEventListener('mouseup', () => { dragging = false; canvas.classList.remove('dragging'); });
     canvas.addEventListener('wheel', e => {
@@ -928,6 +812,7 @@
       } else if (dragging) {
         const p = pxy(e);
         tTheta += (p.x - last.x) * 0.006;
+        tPhi = Math.min(1.45, Math.max(0.25, tPhi - (p.y - last.y) * 0.005));
         moved += Math.abs(p.x - last.x) + Math.abs(p.y - last.y);
         last = p;
       }
@@ -938,23 +823,14 @@
     });
     canvas.addEventListener('click', e => { if (moved <= 8) tryPick(e.clientX, e.clientY); });
 
-    function isOverMap(e) {
-      const r = canvas.getBoundingClientRect();
-      return e.clientY >= r.top && e.clientY <= r.bottom;
-    }
-
-    // picking
     const ray = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     const label = document.getElementById('label');
-    const labelText = document.getElementById('labelText');
-    const labelKind = document.getElementById('labelKind');
     let hovered = null;
 
     function pick(x, y) {
-      const r = canvas.getBoundingClientRect();
-      mouse.x = ((x - r.left) / r.width) * 2 - 1;
-      mouse.y = -((y - r.top) / r.height) * 2 + 1;
+      mouse.x = (x / innerWidth) * 2 - 1;
+      mouse.y = -(y / innerHeight) * 2 + 1;
       ray.setFromCamera(mouse, camera);
       const hits = ray.intersectObjects(nodes.map(n => n.sprite));
       return hits.length ? hits[0].object.userData : null;
@@ -963,11 +839,10 @@
       const n = pick(e.clientX, e.clientY);
       hovered = n;
       if (n) {
-        const r = canvas.getBoundingClientRect();
-        labelText.textContent = n.name;
-        labelKind.textContent = (n.kind || '') + (n.dist ? ' · ' + n.dist.toLocaleString() + ' km' : '');
-        label.style.left = (e.clientX - r.left) + 'px';
-        label.style.top = (e.clientY - r.top) + 'px';
+        document.getElementById('labelText').textContent = n.name;
+        document.getElementById('labelKind').textContent = (n.kind || '') + (n.dist ? ' · ' + n.dist.toLocaleString() + ' km' : '');
+        label.style.left = e.clientX + 'px';
+        label.style.top = e.clientY + 'px';
         label.classList.add('visible');
         canvas.style.cursor = 'pointer';
       } else {
@@ -976,32 +851,20 @@
       }
     }
     function tryPick(x, y) {
+      if (chanmOpen) return;
       const n = pick(x, y);
-      if (!n) return;
-      tLookAt.copy(n.sprite.position);
-      tRadius = 260;
-      setTimeout(() => {
-        const stories = n.stories || 0;
-        openOverlay(
-          `<span class="kind">${n.kind}</span><h2>${n.name}</h2>` +
-          (n.dist ? `<p class="dist">${n.dist.toLocaleString()} km soti Pòtoprens</p>` : '') +
-          `<p>${n.body}</p>` +
-          (n.sample ? `<p class="memory">${n.sample}</p>` : '') +
-          `<p class="dist">✶ ${stories} istwa kite isit — memories left here</p>` +
-          `<button class="leave-btn" onclick="this.textContent='— the reciprocal ritual opens here in the production build —'">Kite yon souvni — leave a memory</button>`
-        );
-      }, 700);
+      if (n) openChanm(n);
     }
 
     // loop
     let t = 0;
     (function frame() {
       t += 0.016;
-      if (!interacted && !reduced) tTheta += 0.0005;
-      theta += (tTheta - theta) * 0.06;
-      phi += (tPhi - phi) * 0.06;
-      radius += (tRadius - radius) * 0.06;
-      lookAt.lerp(tLookAt, 0.06);
+      if (!interacted && !reduced && !chanmOpen) tTheta += 0.0005;
+      theta += (tTheta - theta) * 0.05;
+      phi += (tPhi - phi) * 0.05;
+      radius += (tRadius - radius) * 0.045;
+      lookAt.lerp(tLookAt, 0.05);
       camera.position.set(
         lookAt.x + radius * Math.sin(phi) * Math.cos(theta),
         lookAt.y + radius * Math.cos(phi),
@@ -1011,12 +874,364 @@
       nodes.forEach(n => {
         const pulse = 1 + Math.sin(t * 1.1 + n.phase) * (n.type === 'core' ? 0.1 : 0.07);
         n.sprite.scale.setScalar(n.baseSize * pulse * (hovered === n ? 1.5 : 1));
+        // proximity whisper
+        if (n.hum && Snd.ctx) {
+          const d = camera.position.distanceTo(n.sprite.position);
+          const g = Math.max(0, 1 - d / 900) * 0.035;
+          n.hum.gain.setTargetAtTime(chanmOpen ? 0 : g, Snd.ctx.currentTime, 0.3);
+        }
       });
       updateFilaments();
       nebulae.forEach(s => { s.material.rotation += s.userData.rot; });
       renderer.render(scene, camera);
       requestAnimationFrame(frame);
     })();
+
+    addEventListener('resize', () => {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    canvas.classList.add('on');
+  }
+
+  // ----------------------------------------------------------------
+  // CHANM — the possession sequence
+  // ----------------------------------------------------------------
+  let chanmOpen = false, currentPlace = null, fragIndex = 0, activeMedia = [];
+  const chanmEl = document.getElementById('chanm');
+  const stage = document.getElementById('chanmStage');
+  const visited = new Set();
+
+  window.openChanmById = function (id) {
+    const all = [GP.core, ...GP.sous, ...GP.zanset, ...GP.places];
+    const p = all.find(x => x.id === id);
+    if (p) openChanm(p);
+  };
+
+  function fragmentsOf(place) {
+    const frags = (place.fragments || []).slice();
+    // aleatory: dreams don't repeat in the same order
+    if (visited.has(place.id) && frags.length > 1) {
+      for (let i = frags.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [frags[i], frags[j]] = [frags[j], frags[i]];
+      }
+    }
+    // every chamber ends with the memories and the offering
+    frags.push({ type: 'souvni', place });
+    return frags;
+  }
+
+  function openChanm(place) {
+    if (chanmOpen) return;
+    chanmOpen = true;
+    currentPlace = place;
+    fragIndex = 0;
+    if (camApi && place.sprite) camApi.flyTo(place);
+    Snd.setDuck(0.12);
+    setTimeout(() => {
+      tearVeil(() => {
+        chanmEl.classList.add('visible');
+        place._frags = fragmentsOf(place);
+        visited.add(place.id);
+        document.getElementById('chanmPlace').textContent =
+          place.name + (place.dist ? ' · ' + place.dist.toLocaleString() + ' km soti Pòtoprens' : '');
+        showFragment();
+      });
+    }, 900);
+  }
+
+  function closeChanm() {
+    if (!chanmOpen) return;
+    clearStage();
+    Snd.stopProjector();
+    // boule — the film burns in the gate
+    const burn = document.getElementById('burn');
+    burn.style.transition = 'none'; burn.style.opacity = '0';
+    requestAnimationFrame(() => {
+      burn.style.transition = 'opacity 0.28s ease';
+      burn.style.opacity = '1';
+      setTimeout(() => {
+        chanmEl.classList.remove('visible');
+        burn.style.transition = 'opacity 0.9s ease';
+        burn.style.opacity = '0';
+        chanmOpen = false;
+        Snd.setDuck(0.35);
+        if (camApi) camApi.home();
+      }, 300);
+    });
+  }
+  document.getElementById('chanmClose').addEventListener('click', e => { e.stopPropagation(); closeChanm(); });
+  addEventListener('keydown', e => {
+    if (!chanmOpen) return;
+    if (e.key === 'Escape') closeChanm();
+    if (e.key === 'ArrowRight' || e.key === ' ') nextFragment();
+  });
+  chanmEl.addEventListener('click', e => {
+    if (e.target.closest('.leave-btn') || e.target.closest('.chanm-close')) return;
+    nextFragment();
+  });
+
+  function nextFragment() {
+    fragIndex++;
+    if (fragIndex >= currentPlace._frags.length) closeChanm();
+    else showFragment();
+  }
+
+  function clearStage() {
+    activeMedia.forEach(m => { try { m.pause && m.pause(); m._stop && m._stop(); } catch (e) {} });
+    activeMedia = [];
+    Snd.stopProjector();
+    stage.innerHTML = '';
+    document.querySelector('.chanm-title')?.remove();
+  }
+
+  function titleBlock(t, y) {
+    const d = document.createElement('div');
+    d.className = 'chanm-title';
+    d.innerHTML = `<div class="t">${t}</div>` + (y ? `<div class="y">${y}</div>` : '');
+    chanmEl.appendChild(d);
+  }
+
+  function showFragment() {
+    clearStage();
+    const f = currentPlace._frags[fragIndex];
+    document.getElementById('chanmNext').textContent =
+      fragIndex < currentPlace._frags.length - 1 ? 'klike — next' : 'klike — tounen nan syèl la';
+
+    if (f.type === 'fim') renderFim(f);
+    else if (f.type === 'vwa') renderVwa(f);
+    else if (f.type === 'teks') renderTeks(f);
+    else if (f.type === 'imaj') renderImaj(f);
+    else if (f.type === 'zanset') renderZanset(f);
+    else if (f.type === 'souvni') renderSouvni(f);
+  }
+
+  // ---- fim: real file > vimeo > 16mm leader placeholder ----
+  function renderFim(f) {
+    titleBlock(f.title, f.year);
+    if (f.vimeo) {
+      const ifr = document.createElement('iframe');
+      ifr.src = `https://player.vimeo.com/video/${f.vimeo}?autoplay=1&title=0&byline=0&portrait=0`;
+      ifr.allow = 'autoplay; fullscreen';
+      stage.appendChild(ifr);
+      return;
+    }
+    const v = document.createElement('video');
+    v.autoplay = true; v.playsInline = true; v.controls = false;
+    v.addEventListener('error', () => { v.remove(); renderLeader(f); }, { once: true });
+    v.addEventListener('ended', () => nextFragment(), { once: true });
+    v.src = f.src || 'about:invalid';
+    stage.appendChild(v);
+    activeMedia.push(v);
+  }
+
+  // the leader: what a star projects while it waits for its reel
+  function renderLeader(f) {
+    const c = document.createElement('canvas');
+    stage.appendChild(c);
+    const x = c.getContext('2d');
+    let run = true, t0 = performance.now();
+    function size() { c.width = stage.clientWidth; c.height = stage.clientHeight; }
+    size();
+    Snd.startProjector();
+    (function draw(now) {
+      if (!run || !c.isConnected) { run = false; return; }
+      const t = (now - t0) / 1000;
+      const W = c.width, H = c.height;
+      // base flicker
+      const fl = 0.88 + Math.random() * 0.12;
+      x.fillStyle = `rgb(${14 * fl | 0},${11 * fl | 0},${9 * fl | 0})`;
+      x.fillRect(0, 0, W, H);
+      // gate weave
+      const wx = Math.sin(t * 7.3) * 3 + (Math.random() - 0.5) * 2;
+      x.save(); x.translate(wx, 0);
+      // countdown circle (8..1, looping)
+      const n = 8 - Math.floor(t % 8);
+      const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.27;
+      x.strokeStyle = 'rgba(240,236,228,0.5)'; x.lineWidth = 2;
+      x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.stroke();
+      x.beginPath(); x.arc(cx, cy, R * 0.985, -Math.PI / 2, -Math.PI / 2 + ((t % 1) * Math.PI * 2));
+      x.strokeStyle = 'rgba(240,236,228,0.25)'; x.lineWidth = R * 0.03 + 1; x.stroke();
+      x.fillStyle = 'rgba(240,236,228,0.75)';
+      x.font = `${R * 1.1 | 0}px 'EB Garamond', serif`;
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(n, cx, cy + R * 0.05);
+      // crosshair
+      x.strokeStyle = 'rgba(240,236,228,0.18)'; x.lineWidth = 1;
+      x.beginPath(); x.moveTo(cx - R * 1.6, cy); x.lineTo(cx + R * 1.6, cy);
+      x.moveTo(cx, cy - R * 1.6); x.lineTo(cx, cy + R * 1.6); x.stroke();
+      // scratches
+      for (let i = 0; i < 3; i++) {
+        if (Math.random() < 0.35) {
+          const sx = Math.random() * W;
+          x.strokeStyle = `rgba(240,236,228,${0.05 + Math.random() * 0.12})`;
+          x.lineWidth = Math.random() < 0.1 ? 2 : 1;
+          x.beginPath(); x.moveTo(sx, 0); x.lineTo(sx + (Math.random() - 0.5) * 8, H); x.stroke();
+        }
+      }
+      // dust
+      for (let i = 0; i < 14; i++) {
+        x.fillStyle = `rgba(240,236,228,${Math.random() * 0.25})`;
+        x.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+      }
+      // occasional frame slip
+      if (Math.random() < 0.02) { x.drawImage(c, 0, H * 0.4, W, H * 0.6, 0, H * 0.45, W, H * 0.6); }
+      x.restore();
+      // caption
+      x.fillStyle = 'rgba(138,138,138,0.8)';
+      x.font = `500 ${Math.max(10, W * 0.009) | 0}px 'Space Grotesk', sans-serif`;
+      x.textAlign = 'left';
+      x.fillText(('AP TANN BOBIN NAN — AWAITING THE REEL').split('').join(String.fromCharCode(8202)), 24, H - 70);
+      requestAnimationFrame(draw);
+    })(t0);
+    activeMedia.push({ _stop: () => { run = false; } });
+  }
+
+  // ---- vwa: real audio (amplitude-driven visual) or synthesized signal ----
+  function renderVwa(f) {
+    titleBlock(f.label || 'vwa');
+    const c = document.createElement('canvas');
+    stage.appendChild(c);
+    const x = c.getContext('2d');
+    c.width = stage.clientWidth; c.height = stage.clientHeight;
+    let analyser = null, synth = false, run = true;
+
+    if (f.src && Snd.ctx) {
+      const el = new Audio(f.src);
+      el.addEventListener('canplaythrough', () => {
+        const srcNode = Snd.ctx.createMediaElementSource(el);
+        analyser = Snd.ctx.createAnalyser(); analyser.fftSize = 256;
+        srcNode.connect(analyser); analyser.connect(Snd.master);
+        el.play().catch(() => {});
+        el.addEventListener('ended', () => nextFragment(), { once: true });
+      }, { once: true });
+      el.addEventListener('error', () => { synth = true; }, { once: true });
+      el.load();
+      activeMedia.push(el);
+    } else synth = true;
+
+    const data = new Uint8Array(128);
+    let t = 0;
+    (function draw() {
+      if (!run || !c.isConnected) { run = false; return; }
+      t += 0.016;
+      const W = c.width, H = c.height;
+      x.fillStyle = 'rgba(6,5,5,0.28)'; x.fillRect(0, 0, W, H);
+      let amp;
+      if (analyser) { analyser.getByteFrequencyData(data); amp = data.reduce((a, b) => a + b, 0) / data.length / 255; }
+      else amp = 0.25 + Math.abs(Math.sin(t * 0.8)) * 0.3 + Math.random() * 0.06;
+      // horizontal signal scratches — the voice as worn optical track
+      const rows = 22;
+      for (let i = 0; i < rows; i++) {
+        const y = H * (0.5 + (i - rows / 2) * 0.018);
+        const a = Math.max(0, amp - Math.abs(i - rows / 2) / rows) * 0.9;
+        if (a <= 0.02) continue;
+        x.strokeStyle = i % 5 === 0 ? `rgba(217,160,102,${a})` : `rgba(240,236,228,${a * 0.6})`;
+        x.lineWidth = 1;
+        x.beginPath();
+        for (let px = 0; px < W; px += 7) {
+          const jitter = (Math.random() - 0.5) * amp * 26;
+          px === 0 ? x.moveTo(px, y + jitter) : x.lineTo(px, y + jitter);
+        }
+        x.stroke();
+      }
+      requestAnimationFrame(draw);
+    })();
+    activeMedia.push({ _stop: () => { run = false; } });
+  }
+
+  // ---- teks: lines tear in, Kreyòl first ----
+  function renderTeks(f) {
+    const d = document.createElement('div');
+    d.className = 'chanm-teks';
+    const words = f.kreyol.split(/\s+/).map(w => `<span class="w">${w}</span>`).join(' ');
+    d.innerHTML = `<p class="kreyol">${words}</p><p class="echo">${f.echo || ''}</p>`;
+    stage.appendChild(d);
+    const ws = d.querySelectorAll('.w');
+    ws.forEach((w, i) => setTimeout(() => w.classList.add('in'), 200 + i * 110 + Math.random() * 90));
+    setTimeout(() => d.querySelector('.echo').classList.add('in'), 200 + ws.length * 110);
+  }
+
+  // ---- imaj ----
+  function renderImaj(f) {
+    const img = document.createElement('img');
+    img.src = f.src; img.alt = f.caption || '';
+    img.addEventListener('error', () => { img.remove(); renderTeks({ kreyol: f.caption || '…', echo: '' }); }, { once: true });
+    stage.appendChild(img);
+    if (f.caption) titleBlock(f.caption);
+  }
+
+  // ---- zanset: presence + their words (voice when it exists) ----
+  function renderZanset(f) {
+    const d = document.createElement('div');
+    d.className = 'chanm-teks';
+    d.innerHTML =
+      `<div class="grann-presence" style="margin-bottom:2.4rem"></div>` +
+      `<p class="kreyol" style="font-size:clamp(1.2rem,2.6vw,1.8rem); max-width:44ch">${f.body}</p>`;
+    stage.appendChild(d);
+    titleBlock(f.name, 'zansèt — yon lòt pyebwa, another tree');
+    if (f.src && Snd.ctx) {
+      const el = new Audio(f.src);
+      el.addEventListener('canplaythrough', () => el.play().catch(() => {}), { once: true });
+      el.load();
+      activeMedia.push(el);
+    }
+  }
+
+  // ---- souvni: what was left here + the offering ----
+  function renderSouvni(f) {
+    const p = f.place;
+    const d = document.createElement('div');
+    d.className = 'chanm-souvni';
+    d.innerHTML =
+      (p.souvni ? `<p class="memory">${p.souvni}</p>` : `<p class="memory" style="color:var(--light-grey)">pa gen souvni isit la poko — no memories here yet</p>`) +
+      `<p class="count">✶ ${p.istwa || 0} istwa kite isit — memories left here</p>` +
+      `<button class="leave-btn">Kite yon souvni — leave a memory</button>`;
+    d.querySelector('.leave-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      e.target.textContent = '— the reciprocal ritual opens here in the production build —';
+    });
+    stage.appendChild(d);
+  }
+
+  // ---- the veil: seize the real frame and tear it ----
+  function tearVeil(done) {
+    const skyCanvas = document.getElementById('sky');
+    const veil = document.getElementById('veil');
+    const x = veil.getContext('2d');
+    veil.width = innerWidth; veil.height = innerHeight;
+    veil.style.display = 'block';
+    let start = null;
+    const DUR = reduced ? 120 : 680;
+    function draw(now) {
+      if (!start) start = now;
+      const p = Math.min(1, (now - start) / DUR);
+      const W = veil.width, H = veil.height;
+      x.clearRect(0, 0, W, H);
+      const slices = 26;
+      for (let i = 0; i < slices; i++) {
+        const sy = (H / slices) * i;
+        const off = (Math.random() - 0.5) * 2 * p * p * W * 0.22;
+        try { x.drawImage(skyCanvas, 0, sy, W, H / slices, off, sy, W, H / slices); } catch (e) {}
+      }
+      // rgb ghost
+      if (!reduced && Math.random() < 0.7) {
+        x.globalCompositeOperation = 'lighter';
+        x.globalAlpha = 0.08 * p;
+        try { x.drawImage(skyCanvas, 6 * p, 0); } catch (e) {}
+        x.globalAlpha = 1;
+        x.globalCompositeOperation = 'source-over';
+      }
+      // collapsing dark
+      x.fillStyle = `rgba(4,3,3,${p * 0.9})`;
+      x.fillRect(0, 0, W, H);
+      if (p < 1) requestAnimationFrame(draw);
+      else { veil.style.display = 'none'; done(); }
+    }
+    requestAnimationFrame(draw);
   }
   </script>
 </body>
