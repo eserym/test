@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital@0;1&family=Cutive+Mono&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap');
+
+    /* ---- self-hosted, REAL ---- */
+    @font-face {
+      font-family: 'Climate Crisis';
+      src: url('../assets/fonts/ClimateCrisis-Regular.ttf') format('truetype');
+      font-display: swap;
+    }
+    /* ---- drop-in: activate the instant the OFL files land in assets/fonts/ ---- */
+    @font-face {
+      font-family: 'Pilowlava';
+      src: url('../assets/fonts/Pilowlava-Regular.woff2') format('woff2'),
+           url('../assets/fonts/Pilowlava-Regular.otf') format('opentype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Solide Mirage';
+      src: url('../assets/fonts/SolideMirageRegular.woff2') format('woff2'),
+           url('../assets/fonts/SolideMirageRegular.otf') format('opentype');
+      font-display: swap;
+    }
+
+    :root {
+      --ground: #14100c;
+      --ink: #e8dcc8;
+      --red: #a5402d;
+      --ochre: #c99b5f;
+      --green: #7a8f4f;
+      --quiet: #8a7a5f;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(165,64,45,0.06), transparent),
+        radial-gradient(ellipse 50% 60% at 85% 85%, rgba(201,155,95,0.045), transparent),
+        var(--ground);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.55s steps(6) infinite;
+    }
+    @keyframes grain { 0%,100%{transform:translate(0,0)}20%{transform:translate(-4%,-8%)}40%{transform:translate(4%,-4%)}60%{transform:translate(-4%,6%)}80%{transform:translate(6%,2%)} }
+
+    .mono { font-family: 'Courier Prime', monospace; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 10vh 6vw; }
+
+    .k { font-family: 'Courier Prime', monospace; font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--quiet); display: block; margin-bottom: 1.2rem; }
+    h1 { font-family: 'Newsreader', serif; font-weight: 300; font-size: clamp(2rem,5vw,3.2rem); font-style: italic; }
+    .lede { font-family: 'Spectral', serif; font-weight: 300; color: #b3a68c; line-height: 1.8; margin-top: 1.4rem; max-width: 62ch; font-size: 1.05rem; }
+
+    .card { border-top: 1px solid rgba(232,220,200,0.09); padding: 8vh 0; }
+    .card .num { font-family: 'Courier Prime', monospace; font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); }
+    .card .fname { font-family: 'Newsreader', serif; font-style: italic; font-size: clamp(1.4rem,3vw,2rem); margin: 0.5rem 0 0.4rem; }
+    .card .meta { font-family: 'Courier Prime', monospace; font-size: 0.66rem; letter-spacing: 0.06em; color: var(--quiet); margin-bottom: 0.4rem; }
+    .card .status { font-family: 'Courier Prime', monospace; font-size: 0.64rem; letter-spacing: 0.1em; }
+    .status.live { color: var(--green); }
+    .status.drop { color: var(--ochre); }
+    .card .why { font-family: 'Spectral', serif; font-weight: 300; color: #b3a68c; line-height: 1.75; max-width: 60ch; margin: 1.4rem 0 2.8rem; }
+
+    .demo-name { font-size: clamp(2.4rem, 8vw, 5.5rem); line-height: 1.05; margin-bottom: 1.6rem; color: var(--ink); }
+    .demo-prov { font-size: clamp(1.4rem, 3.6vw, 2.4rem); line-height: 1.3; margin-bottom: 1.4rem; max-width: 22ch; }
+    .demo-prov em { color: var(--ochre); font-style: normal; }
+    .demo-respe { font-size: clamp(3rem, 12vw, 8rem); color: var(--ink); line-height: 1; }
+
+    .ff-climate { font-family: 'Climate Crisis', 'Newsreader', serif; }
+    .ff-pilow  { font-family: 'Pilowlava', 'Newsreader', serif; }
+    .ff-solide { font-family: 'Solide Mirage', 'Newsreader', serif; }
+    .standin { position: relative; }
+    .standin::after {
+      content: 'stand-in — drop the OFL file to see the real face';
+      display: block; font-family: 'Courier Prime', monospace; font-size: 0.6rem;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--ochre); opacity: 0.6; margin-top: 0.6rem;
+    }
+
+    /* pairing block */
+    .pair { border-top: 1px solid rgba(232,220,200,0.09); padding: 8vh 0; }
+    .pair h2 { font-family: 'Newsreader', serif; font-style: italic; font-weight: 300; font-size: clamp(1.6rem,3.6vw,2.4rem); margin-bottom: 2.4rem; }
+    .option { margin-bottom: 4rem; }
+    .option .otag { font-family: 'Courier Prime', monospace; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); display:block; margin-bottom: 1rem; }
+    .counsel-serif { font-family: 'Spectral', serif; font-weight: 300; font-size: clamp(1.05rem,2.2vw,1.35rem); line-height: 1.8; max-width: 52ch; color: #cbbc9f; }
+    .counsel-mono { font-family: 'Courier Prime', monospace; font-size: clamp(0.9rem,1.9vw,1.05rem); line-height: 1.9; max-width: 54ch; color: #cbbc9f; }
+    .counsel-serif strong, .counsel-mono strong { color: var(--red); font-weight: 500; }
+    .label-line { font-family: 'Courier Prime', monospace; font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--quiet); margin-top: 1.4rem; }
+
+    .rec { border-top: 1px solid rgba(232,220,200,0.09); padding: 8vh 0 14vh; }
+    .rec h2 { font-family: 'Newsreader', serif; font-style: italic; font-weight: 300; font-size: clamp(1.6rem,3.6vw,2.4rem); margin-bottom: 1.6rem; }
+    .rec p { font-family: 'Spectral', serif; font-weight: 300; color: #b3a68c; line-height: 1.85; max-width: 62ch; margin-bottom: 1.2rem; }
+    .rec strong { color: var(--ink); font-weight: 400; }
+    .rec .sys { font-family: 'Courier Prime', monospace; font-size: 0.8rem; line-height: 2.2; color: var(--ochre); background: rgba(0,0,0,0.25); padding: 1.6rem 2rem; border-left: 2px solid var(--red); margin: 2rem 0; }
+
+    @media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="wrap">
+
+    <header>
+      <span class="k">type study · grenn pwomennen · gemini's three + the honest read</span>
+      <h1>Three display faces, and the reading voice they still need.</h1>
+      <p class="lede">Gemini is right: Velvetyne-family display faces are the correct register — raw, textured, fragmented, made for research-creation, not for legibility. But all three are <em>display</em> faces. Grann's counsel is a paragraph a stranger must actually read; the chamber echoes are full sentences. So the real decision isn't one font — it's a <em>system</em>: one experimental voice for the big moments, one honest voice for reading, one typewriter for the archive labels. Below: each face on your own words, then the pairing question.</p>
+    </header>
+
+    <!-- SOLIDE MIRAGE -->
+    <section class="card">
+      <span class="num">01 · Solide Mirage · Velvetyne</span>
+      <div class="fname">jagged, gapped, poetic-fragment</div>
+      <div class="meta">SIL OFL · not on Google Fonts · velvetyne.fr</div>
+      <div class="status drop">◇ drop-in — awaiting assets/fonts/SolideMirageRegular.woff2</div>
+      <p class="why">The best all-round <strong>display voice</strong> for this site. Fragmented (the brief's own word) but still reads as letters — jagged terminals, unexpected gaps, a rhythm that breaks. Set the proverb, the chamber titles, and the name in this. Shown below in a stand-in until the file lands.</p>
+      <div class="ff-solide standin">
+        <div class="demo-name">Grenn Pwomennen</div>
+        <div class="demo-prov">Bwa pi wo di li wè lwen, men <em>grenn pwomennen</em> di li wè pi lwen.</div>
+      </div>
+    </section>
+
+    <!-- PILOWLAVA -->
+    <section class="card">
+      <span class="num">02 · Pilowlava · Velvetyne</span>
+      <div class="fname">molten, bulbous, irreverent</div>
+      <div class="meta">SIL OFL · not on Google Fonts · velvetyne.fr</div>
+      <div class="status drop">◇ drop-in — awaiting assets/fonts/Pilowlava-Regular.woff2</div>
+      <p class="why">Enormous personality — liquid, swelling, alive. Too loud to repeat on every chamber title, but it could be the <strong>logotype</strong>: the name <em>Grenn Pwomennen</em> as a single molten mark at the portal, and nowhere else. A seed that looks like it's still growing.</p>
+      <div class="ff-pilow standin">
+        <div class="demo-name">Grenn Pwomennen</div>
+        <div class="demo-respe">RESPÈ</div>
+      </div>
+    </section>
+
+    <!-- CLIMATE CRISIS -->
+    <section class="card">
+      <span class="num">03 · Climate Crisis · Helsingin Sanomat</span>
+      <div class="fname">blocky, eroding, ecological</div>
+      <div class="meta">SIL OFL · on Google Fonts (static only)</div>
+      <div class="status live">● live — self-hosted right here</div>
+      <p class="why">The only one rendering for real on this page. Its power is the <strong>variable erosion axis</strong> — letters that melt and fragment as an axis shifts — which maps perfectly to your instability/threshold moments (RESPÈ eroding into being, the veil tearing). <strong>The catch:</strong> that axis lives in the variable font on GitHub, which this sandbox can't reach; Google Fonts only gives the static heaviest weight (shown below). And honestly — the letterforms are a cold Arctic sans, ecologically themed. Powerful as a <em>mechanic</em> on threshold moments; wrong as the everyday warm voice. My read: keep it for erosion, not for reading.</p>
+      <div class="ff-climate">
+        <div class="demo-respe">RESPÈ</div>
+        <div class="demo-name" style="font-size:clamp(1.8rem,5vw,3.4rem)">Grenn Pwomennen</div>
+      </div>
+    </section>
+
+    <!-- THE PAIRING -->
+    <section class="pair">
+      <h2>The reading voice — the decision Gemini's list leaves open</h2>
+
+      <div class="option">
+        <span class="otag">Option A — display + typewriter (brutalist / archival)</span>
+        <p class="counsel-mono">Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa. Isit la, ou mande: <strong>« Onè »</strong>. Epi kay la va reponn ou: « Respè ». Se konsa nou antre lakay moun.</p>
+        <p class="label-line">tijuana · travay — the work · 3,412 km soti pòtoprens</p>
+        <p class="why" style="margin-top:1.4rem">Grann speaks in monospace — the whole site reads as a transcript, a field recording, an archive. Cold but coherent; the ethnographic register of the practice. Two fonts total.</p>
+      </div>
+
+      <div class="option">
+        <span class="otag">Option B — display + warm serif (literary)</span>
+        <p class="counsel-serif">Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa. Isit la, ou mande: <strong>« Onè »</strong>. Epi kay la va reponn ou: « Respè ». Se konsa nou antre lakay moun.</p>
+        <p class="label-line">tijuana · travay — the work · 3,412 km soti pòtoprens</p>
+        <p class="why" style="margin-top:1.4rem">Grann speaks in <span class="mono" style="font-size:0.85em">Spectral</span> — a warm, slightly literary serif that lets the counsel breathe with feeling. The jagged display face carries the rupture; the serif carries the tenderness. Three fonts, more range.</p>
+      </div>
+    </section>
+
+    <!-- RECOMMENDATION -->
+    <section class="rec">
+      <h2>What I'd build</h2>
+      <p><strong>Solide Mirage</strong> as the display voice everywhere it counts — the proverb, chamber titles, place names when they announce. <strong>Pilowlava</strong> for exactly one thing: the name at the portal, a molten logotype. <strong>Climate Crisis</strong> not as a font you read but as a <em>mechanic</em> — the erosion axis driving RESPÈ into being and the veil tearing, on threshold moments only (needs the variable file dropped in).</p>
+      <p>For the reading voice I lean <strong>Option B</strong> — the counsel is the emotional core of the door; monospace would freeze it. Warm serif for Grann, typewriter kept strictly for the archive labels (km, place-kind, stamps). That's the tension the whole work lives in: rupture and tenderness, held in two type voices.</p>
+      <div class="sys">
+display   →  Solide Mirage        (proverb, chamber titles, announcements)<br>
+logotype  →  Pilowlava            (the name, portal only)<br>
+mechanic  →  Climate Crisis       (erosion on RESPÈ + veil; variable file)<br>
+reading   →  Spectral / Newsreader (Grann's counsel, echoes, longer text)<br>
+label     →  Courier Prime        (km, place-kind, stamps, the archive voice)
+      </div>
+      <p style="color:var(--quiet); font-size:0.95rem;">Drop <span class="mono">Pilowlava-Regular.woff2</span> and <span class="mono">SolideMirageRegular.woff2</span> into <span class="mono">website/assets/fonts/</span> (download from velvetyne.fr — both SIL OFL, free to self-host) and reload; the stand-ins retire themselves. Tell me which reading option, and whether you want all three display faces or just Solide Mirage — then I thread it through the real site.</p>
+    </section>
+
+  </div>
+</body>
+</html>
