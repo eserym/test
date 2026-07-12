@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Directions — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Alegreya:ital,wght@0,400;0,500;1,400&family=Courier+Prime:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Cutive+Mono&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0c0a08;
+      color: #e8dcc8;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.55s steps(6) infinite;
+    }
+    @keyframes grain {
+      0%,100% { transform: translate(0,0); } 20% { transform: translate(-4%,-8%); }
+      40% { transform: translate(4%,-4%); } 60% { transform: translate(-4%,6%); } 80% { transform: translate(6%,2%); }
+    }
+
+    .intro { padding: 12vh 8vw 6vh; max-width: 860px; }
+    .intro h1 { font-family: 'Fraunces', serif; font-weight: 400; font-size: clamp(2rem, 5vw, 3.4rem); }
+    .intro p { font-family: 'Alegreya', serif; margin-top: 1.4rem; line-height: 1.8; color: #b3a68c; font-size: 1.05rem; max-width: 60ch; }
+    .intro .k { font-family: 'Courier Prime', monospace; font-size: 0.72rem; letter-spacing: 0.28em; text-transform: uppercase; color: #8a7a5f; display: block; margin-bottom: 1.4rem; }
+
+    /* ============ direction band ============ */
+    .band { padding: 12vh 8vw 14vh; position: relative; border-top: 1px solid rgba(232,220,200,0.08); }
+
+    .band .dir-label { font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; display: block; margin-bottom: 0.6rem; }
+    .band .dir-name { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 0.8rem; }
+    .band .dir-why { max-width: 58ch; line-height: 1.75; font-size: 1rem; margin-bottom: 4rem; }
+
+    .swatches { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 4.5rem; }
+    .sw { width: 120px; }
+    .sw .chip { height: 68px; border-radius: 2px; box-shadow: inset 0 0 18px rgba(0,0,0,0.25); }
+    .sw .code { font-family: 'Courier Prime', monospace; font-size: 0.64rem; margin-top: 0.5rem; letter-spacing: 0.06em; }
+    .sw .role { font-family: 'Courier Prime', monospace; font-size: 0.6rem; opacity: 0.55; }
+
+    .sample { max-width: 900px; }
+    .sample .proverb { font-size: clamp(1.9rem, 4.6vw, 3.4rem); line-height: 1.25; margin-bottom: 2.6rem; }
+    .sample .counsel { font-size: 1.15rem; line-height: 1.85; max-width: 54ch; margin-bottom: 2.4rem; }
+    .sample .label { font-size: 0.68rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2.4rem; }
+    .sample .btn {
+      display: inline-block; background: none; cursor: pointer;
+      font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
+      padding: 0.9rem 1.6rem; transition: all 0.3s ease;
+    }
+
+    /* ---------- DIRECTION 1 : KAFE ---------- */
+    .kafe {
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 15%, rgba(165,64,45,0.07), transparent),
+        radial-gradient(ellipse 50% 60% at 85% 80%, rgba(201,155,95,0.05), transparent),
+        radial-gradient(circle 130px at 78% 22%, transparent 58%, rgba(120,80,50,0.10) 60%, rgba(120,80,50,0.03) 63%, transparent 66%),
+        #14100c;
+      color: #e8dcc8;
+    }
+    .kafe .dir-label { font-family: 'Courier Prime', monospace; color: #a5402d; }
+    .kafe .dir-name { font-family: 'Fraunces', serif; font-weight: 400; }
+    .kafe .dir-why { font-family: 'Alegreya', serif; color: #b3a68c; }
+    .kafe .sw .code, .kafe .sw .role { color: #b3a68c; }
+    .kafe .proverb {
+      font-family: 'Fraunces', serif; font-weight: 300; font-style: italic;
+      color: #e8dcc8;
+      text-shadow: 0 0 1px rgba(232,220,200,0.6), 0 0 14px rgba(201,155,95,0.12);
+    }
+    .kafe .proverb em { font-style: normal; color: #c99b5f; }
+    .kafe .counsel { font-family: 'Alegreya', serif; color: #cbbc9f; }
+    .kafe .counsel strong { color: #a5402d; font-weight: 500; }
+    .kafe .label { font-family: 'Courier Prime', monospace; color: #8a7a5f; }
+    .kafe .btn {
+      font-family: 'Courier Prime', monospace; color: #c99b5f;
+      border: 1px solid rgba(201,155,95,0.35); border-radius: 1px;
+    }
+    .kafe .btn:hover { border-color: #c99b5f; color: #e8dcc8; background: rgba(165,64,45,0.08); }
+
+    /* ---------- DIRECTION 2 : FITOGRAM ---------- */
+    .fitogram {
+      background:
+        radial-gradient(ellipse 55% 45% at 80% 20%, rgba(122,143,79,0.08), transparent),
+        radial-gradient(ellipse 45% 55% at 15% 75%, rgba(216,169,62,0.05), transparent),
+        radial-gradient(ellipse 30% 22% at 55% 55%, rgba(176,84,48,0.06), transparent),
+        #0d100b;
+      color: #ece5d3;
+    }
+    .fitogram .dir-label { font-family: 'Cutive Mono', monospace; color: #7a8f4f; }
+    .fitogram .dir-name { font-family: 'Cormorant Garamond', serif; font-weight: 400; }
+    .fitogram .dir-why { font-family: 'EB Garamond', serif; color: #adad93; }
+    .fitogram .sw .code, .fitogram .sw .role { color: #adad93; font-family: 'Cutive Mono', monospace; }
+    .fitogram .proverb {
+      font-family: 'Cormorant Garamond', serif; font-weight: 400; font-style: italic;
+      color: #ece5d3; filter: url(#roughen);
+    }
+    .fitogram .proverb em { font-style: normal; color: #d8a93e; }
+    .fitogram .counsel { font-family: 'EB Garamond', serif; color: #c4bda4; }
+    .fitogram .counsel strong { color: #b05430; font-weight: 500; }
+    .fitogram .label { font-family: 'Cutive Mono', monospace; color: #7d8a68; }
+    .fitogram .btn {
+      font-family: 'Cutive Mono', monospace; color: #a3b573;
+      border: 1px dashed rgba(122,143,79,0.5); border-radius: 0;
+    }
+    .fitogram .btn:hover { border-style: solid; color: #ece5d3; background: rgba(122,143,79,0.1); }
+
+    /* ---------- DIRECTION 3 : ENDIGO ---------- */
+    .endigo {
+      background:
+        radial-gradient(ellipse 65% 45% at 30% 80%, rgba(46,58,89,0.22), transparent),
+        radial-gradient(ellipse 40% 30% at 80% 15%, rgba(177,58,42,0.06), transparent),
+        linear-gradient(180deg, #0b0e16, #10141f);
+      color: #eee6d8;
+    }
+    .endigo .dir-label { font-family: 'Courier Prime', monospace; color: #6d7f9c; }
+    .endigo .dir-name { font-family: 'EB Garamond', serif; font-weight: 400; }
+    .endigo .dir-why { font-family: 'EB Garamond', serif; color: #9aa0a8; }
+    .endigo .sw .code, .endigo .sw .role { color: #9aa0a8; }
+    .endigo .proverb {
+      font-family: 'EB Garamond', serif; font-style: italic; color: #eee6d8;
+      text-shadow: 0 0 2px rgba(238,230,216,0.4), 0 0 22px rgba(109,127,156,0.2);
+    }
+    .endigo .proverb em { font-style: normal; color: #c8a97a; }
+    .endigo .counsel { font-family: 'EB Garamond', serif; color: #c2bba9; }
+    .endigo .counsel strong { color: #b13a2a; font-weight: 500; }
+    .endigo .label { font-family: 'Courier Prime', monospace; color: #6d7f9c; }
+    .endigo .btn {
+      font-family: 'Courier Prime', monospace; color: #c8a97a;
+      border: 1px solid rgba(200,169,122,0.3);
+    }
+    .endigo .btn:hover { border-color: #c8a97a; color: #eee6d8; background: rgba(46,58,89,0.25); }
+
+    /* ============ text-texture treatments ============ */
+    .treatments { padding: 12vh 8vw 14vh; border-top: 1px solid rgba(232,220,200,0.08); background: #0c0a08; }
+    .treatments h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: clamp(1.6rem, 3.6vw, 2.4rem); margin-bottom: 0.8rem; }
+    .treatments > p { font-family: 'Alegreya', serif; color: #b3a68c; max-width: 60ch; line-height: 1.75; margin-bottom: 5rem; }
+    .treat { margin-bottom: 5rem; max-width: 900px; }
+    .treat .t-label { font-family: 'Courier Prime', monospace; font-size: 0.66rem; letter-spacing: 0.28em; text-transform: uppercase; color: #8a7a5f; display: block; margin-bottom: 1.2rem; }
+    .treat .demo { font-size: clamp(1.8rem, 4.4vw, 3.2rem); font-family: 'Fraunces', serif; font-weight: 300; }
+    .treat .note { font-family: 'Alegreya', serif; font-size: 0.92rem; color: #8f8672; margin-top: 1rem; line-height: 1.7; max-width: 58ch; }
+
+    .t-rough .demo { filter: url(#roughen); font-style: italic; }
+    .t-bleed .demo {
+      font-style: italic;
+      text-shadow: 0 0 1px currentColor, 0.02em 0.015em 2px rgba(232,220,200,0.35), 0 0 18px rgba(201,155,95,0.14);
+    }
+    .t-stamp .demo {
+      font-family: 'Courier Prime', monospace; font-size: clamp(1rem, 2.4vw, 1.6rem);
+      letter-spacing: 0.34em; text-transform: uppercase; color: #a5402d;
+      filter: url(#roughen-hard);
+    }
+    .t-unstable .demo .ch { display: inline-block; }
+    .t-unstable .demo .ch:nth-child(3n) { transform: translateY(-0.045em) rotate(0.7deg); }
+    .t-unstable .demo .ch:nth-child(4n) { transform: translateY(0.04em) rotate(-0.6deg); }
+    .t-unstable .demo .ch:nth-child(7n) { transform: translateY(0.07em); color: #c99b5f; }
+    .t-under .demo { font-style: italic; display: inline-block; position: relative; }
+    .t-under .demo::after {
+      content: ''; position: absolute; left: -1%; right: -1%; bottom: 0.02em; height: 0.09em;
+      background: #a5402d; opacity: 0.75;
+      clip-path: polygon(0 45%, 4% 20%, 12% 60%, 22% 30%, 33% 70%, 45% 25%, 56% 65%, 68% 35%, 79% 75%, 90% 30%, 100% 55%, 100% 100%, 0 100%);
+    }
+
+    .verdict { padding: 10vh 8vw 14vh; border-top: 1px solid rgba(232,220,200,0.08); }
+    .verdict h2 { font-family: 'Fraunces', serif; font-weight: 400; font-size: clamp(1.6rem, 3.6vw, 2.4rem); margin-bottom: 1.6rem; }
+    .verdict p { font-family: 'Alegreya', serif; color: #b3a68c; max-width: 62ch; line-height: 1.85; margin-bottom: 1.2rem; }
+    .verdict strong { color: #e8dcc8; font-weight: 500; }
+
+    @media (prefers-reduced-motion: reduce) { .grain { animation: none; } }
+  </style>
+</head>
+<body>
+  <!-- SVG text-roughening filters: ink eaten by paper -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="roughen">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+    </filter>
+    <filter id="roughen-hard">
+      <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="4" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+    </filter>
+  </svg>
+
+  <div class="grain"></div>
+
+  <header class="intro">
+    <span class="k">design directions · grenn pwomennen</span>
+    <h1>Three skins, one body.</h1>
+    <p>Each direction below is a complete system — ground, ink, accents, and three type voices (display / body / typed label) — applied to the site's real words. All three come from the material world of the practice: coffee-processed film, phytogram chemistry, indigo dye. Scroll through and notice which one feels like the work.</p>
+  </header>
+
+  <!-- ================= 1 : KAFE ================= -->
+  <section class="band kafe">
+    <span class="dir-label">direction 01 — recommended</span>
+    <h2 class="dir-name">KAFE — coffee-processed film</h2>
+    <p class="dir-why">From <em>Katherine</em>: film re-processed in coffee. Warm blacks like a darkroom tray, kraft-paper bone, oxidized red instead of bright red. Type: <strong>Fraunces</strong> (a soft, slightly wonky serif with ink-traps — it already looks printed by hand) for display, <strong>Alegreya</strong> for reading, <strong>Courier Prime</strong> for labels — the typewriter of field notes and film-can stickers.</p>
+
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#14100c"></div><div class="code">#14100c</div><div class="role">ground — tray black</div></div>
+      <div class="sw"><div class="chip" style="background:#e8dcc8"></div><div class="code">#e8dcc8</div><div class="role">ink — kraft bone</div></div>
+      <div class="sw"><div class="chip" style="background:#a5402d"></div><div class="code">#a5402d</div><div class="role">accent — oxidized red</div></div>
+      <div class="sw"><div class="chip" style="background:#c99b5f"></div><div class="code">#c99b5f</div><div class="role">warm — faded ochre</div></div>
+      <div class="sw"><div class="chip" style="background:#5c6b4f"></div><div class="code">#5c6b4f</div><div class="role">counter — moss</div></div>
+      <div class="sw"><div class="chip" style="background:#8a7a5f"></div><div class="code">#8a7a5f</div><div class="role">quiet — dry earth</div></div>
+    </div>
+
+    <div class="sample">
+      <p class="proverb">Bwa pi wo di li wè lwen, men <em>grenn pwomennen</em> di li wè pi lwen.</p>
+      <p class="counsel">Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa. Isit la, ou mande: <strong>« Onè »</strong>. Epi kay la va reponn ou: « Respè ».</p>
+      <p class="label">tijuana · travay — the work · 3,412 km soti pòtoprens</p>
+      <button class="btn">Kite yon souvni — leave a memory</button>
+    </div>
+  </section>
+
+  <!-- ================= 2 : FITOGRAM ================= -->
+  <section class="band fitogram">
+    <span class="dir-label">direction 02</span>
+    <h2 class="dir-name">FITOGRAM — plant chemistry on emulsion</h2>
+    <p class="dir-why">From <em>The Marks Remember</em>: phytograms — leaves laid on film, plant chemistry eating the emulsion. Green-blacks, chlorophyll, rust, one acid-amber. Type: <strong>Cormorant Garamond</strong> (thin, fragile, almost botanical) roughened by the filter so its edges are eaten like emulsion, <strong>EB Garamond</strong> body, <strong>Cutive Mono</strong> — an older, rougher typewriter — for labels.</p>
+
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0d100b"></div><div class="code">#0d100b</div><div class="role">ground — leaf black</div></div>
+      <div class="sw"><div class="chip" style="background:#ece5d3"></div><div class="code">#ece5d3</div><div class="role">ink — unbleached</div></div>
+      <div class="sw"><div class="chip" style="background:#7a8f4f"></div><div class="code">#7a8f4f</div><div class="role">accent — chlorophyll</div></div>
+      <div class="sw"><div class="chip" style="background:#b05430"></div><div class="code">#b05430</div><div class="role">warm — rust</div></div>
+      <div class="sw"><div class="chip" style="background:#d8a93e"></div><div class="code">#d8a93e</div><div class="role">flare — acid amber</div></div>
+      <div class="sw"><div class="chip" style="background:#4a5d3a"></div><div class="code">#4a5d3a</div><div class="role">quiet — deep leaf</div></div>
+    </div>
+
+    <div class="sample">
+      <p class="proverb">Bwa pi wo di li wè lwen, men <em>grenn pwomennen</em> di li wè pi lwen.</p>
+      <p class="counsel">Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa. Isit la, ou mande: <strong>« Onè »</strong>. Epi kay la va reponn ou: « Respè ».</p>
+      <p class="label">tijuana · travay — the work · 3,412 km soti pòtoprens</p>
+      <button class="btn">Kite yon souvni — leave a memory</button>
+    </div>
+  </section>
+
+  <!-- ================= 3 : ENDIGO ================= -->
+  <section class="band endigo">
+    <span class="dir-label">direction 03</span>
+    <h2 class="dir-name">ENDIGO — dye vat, night sea</h2>
+    <p class="dir-why">The crossing palette: indigo — an organic dye with its own Caribbean plantation history — unbleached cotton, madder red, raw sisal. The coldest of the three, but cold like open water at night, not like a screen. Type stays closest to the current build: <strong>EB Garamond</strong> carrying both display and body, <strong>Courier Prime</strong> labels.</p>
+
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0b0e16"></div><div class="code">#0b0e16</div><div class="role">ground — vat night</div></div>
+      <div class="sw"><div class="chip" style="background:#eee6d8"></div><div class="code">#eee6d8</div><div class="role">ink — cotton</div></div>
+      <div class="sw"><div class="chip" style="background:#2e3a59"></div><div class="code">#2e3a59</div><div class="role">depth — indigo</div></div>
+      <div class="sw"><div class="chip" style="background:#b13a2a"></div><div class="code">#b13a2a</div><div class="role">accent — madder</div></div>
+      <div class="sw"><div class="chip" style="background:#c8a97a"></div><div class="code">#c8a97a</div><div class="role">warm — raw sisal</div></div>
+      <div class="sw"><div class="chip" style="background:#6d7f9c"></div><div class="code">#6d7f9c</div><div class="role">quiet — washed blue</div></div>
+    </div>
+
+    <div class="sample">
+      <p class="proverb">Bwa pi wo di li wè lwen, men <em>grenn pwomennen</em> di li wè pi lwen.</p>
+      <p class="counsel">Pitit mwen… ou rive devan yon kay, ou pa ka rete bèbè konsa. Isit la, ou mande: <strong>« Onè »</strong>. Epi kay la va reponn ou: « Respè ».</p>
+      <p class="label">tijuana · travay — the work · 3,412 km soti pòtoprens</p>
+      <button class="btn">Kite yon souvni — leave a memory</button>
+    </div>
+  </section>
+
+  <!-- ================= TEXT TEXTURE ================= -->
+  <section class="treatments">
+    <h2>How the type gets its texture</h2>
+    <p>Five treatments, all live CSS/SVG — no images, no gloss. Each is tied to a moment in the experience, never used everywhere at once. (The roughen filters render in Chrome and Firefox; Safari falls back to clean edges — acceptable degradation, the grain layer still carries texture there.)</p>
+
+    <div class="treat t-rough">
+      <span class="t-label">01 — eaten edges · svg displacement</span>
+      <p class="demo">yon fenèt kite louvri</p>
+      <p class="note">An SVG turbulence filter displaces the letterforms' edges — ink eaten by wet paper, emulsion eaten by plant chemistry. For: chamber titles, the proverb, Grann's key line.</p>
+    </div>
+
+    <div class="treat t-bleed">
+      <span class="t-label">02 — ink bleed · layered shadow</span>
+      <p class="demo">ou antre.</p>
+      <p class="note">A tight halo plus one warm, offset blur — the letter pressed slightly too hard into soft paper. For: RESPÈ, arrival words, anything that lands.</p>
+    </div>
+
+    <div class="treat t-stamp">
+      <span class="t-label">03 — the stamp · typewriter caps, roughened</span>
+      <p class="demo">tijuana · 3,412 km · travay</p>
+      <p class="note">Labels stop being UI and become archive markings — the stamp on a film can, the customs mark in a passport. Replaces every Space Grotesk label in the current build.</p>
+    </div>
+
+    <div class="treat t-unstable">
+      <span class="t-label">04 — unstable baseline · letters sit wrong</span>
+      <p class="demo" id="unstable">Grenn Pwomennen</p>
+      <p class="note">Every nth letter sits a hair high or low, rotated a fraction — hand-set type, a worn press. Subtle enough to feel rather than see. For: the name, one or two display moments only.</p>
+    </div>
+
+    <div class="treat t-under">
+      <span class="t-label">05 — torn underline · clip-path</span>
+      <p class="demo">kite yon souvni</p>
+      <p class="note">Underlines are torn strips, not rules. For: links and the offering button — the only two interactive text forms in the site.</p>
+    </div>
+  </section>
+
+  <!-- ================= VERDICT ================= -->
+  <section class="verdict">
+    <h2>My recommendation</h2>
+    <p><strong>KAFE as the body of the site, with FITOGRAM's chlorophyll green adopted as the fifth color</strong> (replacing KAFE's moss) — the darkroom warmth of coffee-processed film everywhere, with the plant-chemistry green reserved for one thing only: the <em>sous</em> stars, the wellsprings. Living green for the places that send life outward.</p>
+    <p>Type: <strong>Fraunces</strong> for display (its ink-traps and slight wonk are organic at the letterform level — texture that survives even where SVG filters don't), <strong>Alegreya</strong> for reading, <strong>Courier Prime</strong> for every label — the entire "UI voice" becomes typewriter, and the interface starts reading as an annotated archive rather than an app.</p>
+    <p>ENDIGO doesn't die: it becomes the <em>chamber palette for crossing stories</em> — when a fragment is about water and passage (Nassau, Miami by boat, the kanntè), the chamber cools into indigo. The site's ground stays coffee; the sea appears only when the story enters it.</p>
+  </section>
+
+  <script>
+    // unstable baseline: split into letters
+    const el = document.getElementById('unstable');
+    el.innerHTML = el.textContent.split('').map(c =>
+      c === ' ' ? '<span class="ch">&nbsp;</span>' : `<span class="ch">${c}</span>`).join('');
+  </script>
+</body>
+</html>
