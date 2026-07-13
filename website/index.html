@@ -5,16 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grenn Pwomennen</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital@0;1&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap');
+
+    /* self-hosted, real */
+    @font-face { font-family: 'Climate Crisis'; src: url('assets/fonts/ClimateCrisis-Regular.ttf') format('truetype'); font-display: swap; }
+    /* drop-in — activate the instant the OFL files land in assets/fonts/ (velvetyne.fr, SIL OFL) */
+    @font-face { font-family: 'Pilowlava'; src: url('assets/fonts/Pilowlava-Regular.woff2') format('woff2'), url('assets/fonts/Pilowlava-Regular.otf') format('opentype'); font-display: swap; }
+    @font-face { font-family: 'Solide Mirage'; src: url('assets/fonts/SolideMirageRegular.woff2') format('woff2'), url('assets/fonts/SolideMirageRegular.otf') format('opentype'); font-display: swap; }
 
     :root {
-      --ink: #060505;
-      --bone: #f0ece4;
-      --choublak: #c4402f;
-      --grey: #4a4a4a;
-      --light-grey: #8a8a8a;
-      --warm: #d9a066;
-      --sous: #b9c4d6;
+      /* KAFE — coffee-processed film */
+      --ink: #14100c;         /* darkroom-tray black */
+      --bone: #e8dcc8;        /* kraft-paper bone */
+      --choublak: #a5402d;    /* oxidized red */
+      --grey: #6b5d47;        /* dry earth */
+      --light-grey: #8a7a5f;  /* dry earth, lighter */
+      --warm: #c99b5f;        /* faded ochre */
+      --sous: #7a8f4f;        /* chlorophyll — the wellsprings */
+      /* type system (Option B) */
+      --f-display: 'Solide Mirage', 'Newsreader', serif;  /* fragmented display */
+      --f-read: 'Spectral', 'EB Garamond', serif;         /* reading — Grann, echoes */
+      --f-label: 'Courier Prime', monospace;              /* archive labels, stamps */
+      --f-mech: 'Climate Crisis', 'Newsreader', serif;    /* erosion mechanic — RESPÈ */
+      --f-logo: 'Pilowlava', 'Newsreader', serif;         /* the name, portal only */
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,7 +36,7 @@
     body {
       background: var(--ink);
       color: var(--bone);
-      font-family: 'EB Garamond', serif;
+      font-family: var(--f-read);
       overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
@@ -63,7 +76,7 @@
     .knock-form:focus-within { border-color: rgba(240,236,228,0.6); }
     .knock-input {
       background: none; border: none; outline: none;
-      color: var(--bone); font-family: 'EB Garamond', serif;
+      color: var(--bone); font-family: var(--f-read);
       font-size: clamp(1.6rem, 4vw, 2.6rem); text-align: center;
       width: min(60vw, 420px); caret-color: var(--choublak);
     }
@@ -105,7 +118,7 @@
     @keyframes presence { 0%,100% { transform: scale(1); } 50% { transform: scale(1.035); } }
     .grann-name {
       display: block; margin-top: 0.8rem;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      font-family: var(--f-label); font-size: 0.58rem;
       letter-spacing: 0.35em; text-transform: uppercase; color: var(--warm);
     }
     .counsel-line {
@@ -114,7 +127,7 @@
     }
     .counsel-line.visible { opacity: 1; transform: translateY(0); }
     .counsel-line.kreyol { font-size: clamp(1.1rem, 2.4vw, 1.45rem); font-style: italic; line-height: 1.6; }
-    .counsel-line.echo { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; color: var(--light-grey); line-height: 1.8; }
+    .counsel-line.echo { font-family: var(--f-label); font-size: 0.75rem; color: var(--light-grey); line-height: 1.8; }
 
     .respe-flash {
       position: fixed; inset: 0; z-index: 85;
@@ -125,6 +138,7 @@
     }
     .respe-flash.visible { opacity: 1; visibility: visible; }
     .respe-word {
+      font-family: var(--f-mech);
       font-size: clamp(3.5rem, 14vw, 11rem); letter-spacing: 0.04em;
       transform: scale(0.96); opacity: 0;
       transition: transform 2.2s cubic-bezier(0.16,1,0.3,1), opacity 2.2s ease;
@@ -147,7 +161,7 @@
       transform: translate(-50%, -200%); white-space: nowrap; text-align: center;
     }
     #label .kind {
-      display: block; font-family: 'Space Grotesk', sans-serif; font-style: normal;
+      display: block; font-family: var(--f-label); font-style: normal;
       font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
       color: var(--warm); margin-top: 0.3rem;
     }
@@ -165,7 +179,7 @@
     .mute {
       position: fixed; bottom: 1.6rem; right: 1.8rem; z-index: 92;
       background: none; border: none; cursor: pointer;
-      color: var(--grey); font-family: 'Space Grotesk', sans-serif;
+      color: var(--grey); font-family: var(--f-label);
       font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
       padding: 0.5rem; transition: color 0.3s ease; display: none;
     }
@@ -203,15 +217,15 @@
 
     .chanm-place {
       position: absolute; top: 2rem; left: 2.2rem; z-index: 3; pointer-events: none;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      font-family: var(--f-label); font-size: 0.6rem;
       letter-spacing: 0.35em; text-transform: uppercase; color: rgba(240,236,228,0.5);
     }
     .chanm-title {
       position: absolute; bottom: 2.4rem; left: 2.2rem; right: 2.2rem; z-index: 3; pointer-events: none;
     }
-    .chanm-title .t { font-style: italic; font-size: clamp(1.3rem, 3vw, 2rem); text-shadow: 0 0 18px rgba(0,0,0,0.9); }
+    .chanm-title .t { font-family: var(--f-display); font-style: italic; font-size: clamp(1.4rem, 3.2vw, 2.2rem); text-shadow: 0 0 18px rgba(0,0,0,0.9); }
     .chanm-title .y {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.6rem;
+      font-family: var(--f-label); font-size: 0.6rem;
       letter-spacing: 0.3em; color: var(--light-grey); margin-top: 0.4rem;
     }
 
@@ -220,12 +234,12 @@
       align-items: center; justify-content: center; text-align: center; padding: 8vw;
     }
     .chanm-teks .kreyol {
-      font-style: italic; font-size: clamp(1.6rem, 4vw, 3rem); line-height: 1.4; max-width: 24ch;
+      font-family: var(--f-display); font-size: clamp(1.6rem, 4vw, 3rem); line-height: 1.35; max-width: 24ch;
     }
     .chanm-teks .kreyol .w { display: inline-block; opacity: 0; transform: translateY(0.3em); }
     .chanm-teks .kreyol .w.in { opacity: 1; transform: none; transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
     .chanm-teks .echo {
-      margin-top: 2rem; font-family: 'Space Grotesk', sans-serif;
+      margin-top: 2rem; font-family: var(--f-label);
       font-size: 0.85rem; color: var(--light-grey); line-height: 1.9; max-width: 60ch;
       opacity: 0; transition: opacity 1.4s ease 0.8s;
     }
@@ -241,12 +255,12 @@
       border-left: 2px solid rgba(217,160,102,0.4); padding-left: 1.4rem; text-align: left;
     }
     .chanm-souvni .count {
-      margin-top: 2.2rem; font-family: 'Space Grotesk', sans-serif;
+      margin-top: 2.2rem; font-family: var(--f-label);
       font-size: 0.66rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--grey);
     }
     .leave-btn {
       background: none; border: 1px solid rgba(217,160,102,0.4);
-      color: var(--warm); font-family: 'Space Grotesk', sans-serif;
+      color: var(--warm); font-family: var(--f-label);
       font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
       padding: 0.85rem 1.5rem; cursor: pointer; margin-top: 2rem;
       transition: border-color 0.3s ease, color 0.3s ease;
@@ -255,13 +269,13 @@
 
     .chanm-next {
       position: absolute; bottom: 2.4rem; right: 2.2rem; z-index: 3; pointer-events: none;
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.58rem;
+      font-family: var(--f-label); font-size: 0.58rem;
       letter-spacing: 0.3em; text-transform: uppercase; color: rgba(240,236,228,0.35);
     }
     .chanm-close {
       position: absolute; top: 1.8rem; right: 2rem; z-index: 4;
       background: none; border: none; cursor: pointer;
-      color: var(--light-grey); font-family: 'Space Grotesk', sans-serif;
+      color: var(--light-grey); font-family: var(--f-label);
       font-size: 0.66rem; letter-spacing: 0.25em; text-transform: uppercase;
       padding: 0.5rem; transition: color 0.3s ease;
     }
@@ -632,7 +646,7 @@
 
   function buildSky() {
     const PAP = { lat: 18.5944, lon: -72.3074 };
-    const COLORS = { core: '#f0ece4', kominote: '#d9a066', travay: '#c4402f', toude: '#e0b184', sous: '#b9c4d6', zanset: '#e8c9a0' };
+    const COLORS = { core: '#e8dcc8', kominote: '#c99b5f', travay: '#a5402d', toude: '#d9a066', sous: '#7a8f4f', zanset: '#e8c9a0' };
 
     const R_EARTH = 6371, toRad = d => d * Math.PI / 180;
     function distBearing(lat1, lon1, lat2, lon2) {
@@ -1056,7 +1070,7 @@
       x.beginPath(); x.arc(cx, cy, R * 0.985, -Math.PI / 2, -Math.PI / 2 + ((t % 1) * Math.PI * 2));
       x.strokeStyle = 'rgba(240,236,228,0.25)'; x.lineWidth = R * 0.03 + 1; x.stroke();
       x.fillStyle = 'rgba(240,236,228,0.75)';
-      x.font = `${R * 1.1 | 0}px 'EB Garamond', serif`;
+      x.font = `${R * 1.1 | 0}px 'Spectral', serif`;
       x.textAlign = 'center'; x.textBaseline = 'middle';
       x.fillText(n, cx, cy + R * 0.05);
       // crosshair
@@ -1082,7 +1096,7 @@
       x.restore();
       // caption
       x.fillStyle = 'rgba(138,138,138,0.8)';
-      x.font = `500 ${Math.max(10, W * 0.009) | 0}px 'Space Grotesk', sans-serif`;
+      x.font = `500 ${Math.max(10, W * 0.009) | 0}px 'Courier Prime', monospace`;
       x.textAlign = 'left';
       x.fillText(('AP TANN BOBIN NAN — AWAITING THE REEL').split('').join(String.fromCharCode(8202)), 24, H - 70);
       requestAnimationFrame(draw);
