@@ -14,14 +14,20 @@
     @font-face { font-family: 'Solide Mirage'; src: url('assets/fonts/SolideMirageRegular.woff2') format('woff2'), url('assets/fonts/SolideMirageRegular.otf') format('opentype'); font-display: swap; }
 
     :root {
-      /* KAFE — coffee-processed film */
-      --ink: #14100c;         /* darkroom-tray black */
-      --bone: #e8dcc8;        /* kraft-paper bone */
-      --choublak: #a5402d;    /* oxidized red */
+      /* PALÈT LWA — each domain glows with the spirit who governs it */
+      --ink: #0f0b07;         /* the cosmos — dark crossroads earth */
+      --bone: #ece2cc;        /* Legba bone white */
+      --choublak: #b23124;    /* Ogou red — fire, iron */
       --grey: #6b5d47;        /* dry earth */
       --light-grey: #8a7a5f;  /* dry earth, lighter */
-      --warm: #c99b5f;        /* faded ochre */
-      --sous: #7a8f4f;        /* chlorophyll — the wellsprings */
+      --warm: #cf9f43;        /* Legba gold — the crossroads at dusk */
+      --sous: #6f8a4a;        /* Gran Bwa green — the land, the wellsprings */
+      --legba-ground: #16100a;/* Legba's dark path */
+      --legba-oxblood: #9a3f27;
+      --agwe: #4f97a0;        /* the sea — communities across water */
+      --danto: #34518f;       /* Ezili Dantò — both community and work */
+      --gede: #7b5aa0;        /* Gede — the ancestors */
+      --danbala: #f2ede2;     /* Danbala white — the core, the origin */
       /* type system (Option B) */
       --f-display: 'Solide Mirage', 'Newsreader', serif;  /* fragmented display */
       --f-read: 'Spectral', 'EB Garamond', serif;         /* reading — Grann, echoes */
@@ -61,7 +67,10 @@
     /* =================== PÒTAY — the portal =================== */
     .portal {
       position: fixed; inset: 0; z-index: 80;
-      background: var(--ink);
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 42%, rgba(207,159,67,0.09), transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 44%, rgba(154,63,39,0.10), transparent 70%),
+        var(--legba-ground);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; padding: 2rem;
       transition: opacity 2s ease, visibility 2s ease;
@@ -78,7 +87,7 @@
       background: none; border: none; outline: none;
       color: var(--bone); font-family: var(--f-read);
       font-size: clamp(1.6rem, 4vw, 2.6rem); text-align: center;
-      width: min(60vw, 420px); caret-color: var(--choublak);
+      width: min(60vw, 420px); caret-color: var(--warm);
     }
     .mic {
       background: none; border: 1px solid rgba(240,236,228,0.2);
@@ -86,9 +95,9 @@
       color: var(--light-grey); display: flex; align-items: center; justify-content: center;
       transition: border-color 0.3s ease, color 0.3s ease; flex-shrink: 0;
     }
-    .mic:hover { border-color: var(--choublak); color: var(--bone); }
-    .mic.listening { border-color: var(--choublak); color: var(--choublak); animation: micPulse 1.2s ease-in-out infinite; }
-    @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(196,64,47,0.35); } 50% { box-shadow: 0 0 0 10px rgba(196,64,47,0); } }
+    .mic:hover { border-color: var(--warm); color: var(--bone); }
+    .mic.listening { border-color: var(--warm); color: var(--warm); animation: micPulse 1.2s ease-in-out infinite; }
+    @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(207,159,67,0.35); } 50% { box-shadow: 0 0 0 10px rgba(207,159,67,0); } }
     .mic svg { width: 18px; height: 18px; }
 
     .whisper {
@@ -646,7 +655,7 @@
 
   function buildSky() {
     const PAP = { lat: 18.5944, lon: -72.3074 };
-    const COLORS = { core: '#e8dcc8', kominote: '#c99b5f', travay: '#a5402d', toude: '#d9a066', sous: '#7a8f4f', zanset: '#e8c9a0' };
+    const COLORS = { core: '#f2ede2', kominote: '#4f97a0', travay: '#b23124', toude: '#34518f', sous: '#6f8a4a', zanset: '#7b5aa0' };  // Danbala / Agwe / Ogou / Dantò / Gran Bwa / Gede
 
     const R_EARTH = 6371, toRad = d => d * Math.PI / 180;
     function distBearing(lat1, lon1, lat2, lon2) {
@@ -679,7 +688,7 @@
     }
 
     // nebula
-    const nebTex = [glowTexture('#d9a066', true), glowTexture('#c4402f', true), glowTexture('#6a6f8a', true)];
+    const nebTex = [glowTexture('#cf9f43', true), glowTexture('#b23124', true), glowTexture('#4f97a0', true)];
     const nebulae = [];
     for (let i = 0; i < 14; i++) {
       const m = new THREE.SpriteMaterial({ map: nebTex[i % 3], transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 });

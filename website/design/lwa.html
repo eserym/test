@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palèt Lwa — Grenn Pwomennen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital@0;1&family=Spectral:ital,wght@0,300;0,400;1,300&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f0b07; color: #ece2cc;
+      font-family: 'Spectral', serif; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    .grain {
+      position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 90; opacity: 0.06;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain 0.55s steps(6) infinite;
+    }
+    @keyframes grain { 0%,100%{transform:translate(0,0)}20%{transform:translate(-4%,-8%)}40%{transform:translate(4%,-4%)}60%{transform:translate(-4%,6%)}80%{transform:translate(6%,2%)} }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 10vh 6vw 16vh; }
+    .k { font-family: 'Courier Prime', monospace; font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: #8a7a5f; display: block; margin-bottom: 1.2rem; }
+    h1 { font-family: 'Newsreader', serif; font-weight: 300; font-style: italic; font-size: clamp(2rem,5vw,3.2rem); }
+    .lede { font-weight: 300; color: #b9ab8c; line-height: 1.8; margin-top: 1.4rem; max-width: 64ch; font-size: 1.05rem; }
+    .lede em { color: #cf9f43; font-style: italic; }
+
+    .row {
+      display: grid; grid-template-columns: 220px 1fr; gap: 2rem;
+      padding: 5vh 0; border-top: 1px solid rgba(236,226,204,0.09); align-items: start;
+    }
+    .row.portal { border-top: 2px solid #cf9f43; }
+    .swatch { height: 150px; border-radius: 3px; position: relative; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.4); }
+    .swatch .star {
+      position: absolute; top: 50%; left: 50%; width: 60px; height: 60px; transform: translate(-50%,-50%);
+      border-radius: 50%; filter: blur(1px);
+    }
+    .chips { display: flex; gap: 4px; margin-top: 0.7rem; }
+    .chips span { flex: 1; height: 26px; border-radius: 2px; }
+    .codes { font-family: 'Courier Prime', monospace; font-size: 0.58rem; color: #8a7a5f; margin-top: 0.4rem; letter-spacing: 0.04em; line-height: 1.6; }
+
+    .meta .lwa { font-family: 'Newsreader', serif; font-style: italic; font-size: clamp(1.4rem,3vw,1.9rem); }
+    .meta .domain { font-family: 'Courier Prime', monospace; font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; margin: 0.5rem 0 1rem; }
+    .meta p { font-weight: 300; color: #b9ab8c; line-height: 1.75; max-width: 56ch; }
+    .meta .maps { font-family: 'Courier Prime', monospace; font-size: 0.64rem; color: #6f8a4a; margin-top: 0.9rem; letter-spacing: 0.08em; }
+
+    .note { border-top: 1px solid rgba(236,226,204,0.09); margin-top: 6vh; padding-top: 4vh; }
+    .note p { font-weight: 300; color: #8a7a5f; line-height: 1.8; max-width: 60ch; font-style: italic; }
+    @media (max-width: 680px){ .row{ grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce){ .grain{ animation:none } }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="wrap">
+    <header>
+      <span class="k">palèt lwa · grenn pwomennen · a cosmology of color</span>
+      <h1>Each kind of place glows with the lwa who governs it.</h1>
+      <p class="lede">Not arbitrary — a mapping. <em>Legba</em> stands at the gate, because he is the one who opens the way. The communities scattered across the water glow with the sea-spirits who carried them. The work burns with <em>Ogou's</em> iron and fire. The land glows with <em>Gran Bwa's</em> green. The ancestors, with <em>Gede's</em> violet. The color of a star tells you what kind of crossing it holds.</p>
+    </header>
+
+    <!-- LEGBA -->
+    <div class="row portal">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #3a2a12, #16100a)">
+          <div class="star" style="background:radial-gradient(circle,#cf9f43,#cf9f4300 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#16100a"></span><span style="background:#cf9f43"></span><span style="background:#ece2cc"></span><span style="background:#9a3f27"></span></div>
+        <div class="codes">#16100a ground · #cf9f43 gold · #ece2cc bone · #9a3f27 oxblood</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Papa Legba</div>
+        <div class="domain" style="color:#cf9f43">the portal · the threshold · the crossroads</div>
+        <p>Guardian of the gate, master of the crossroads, the first lwa saluted in any ceremony — <em>“Papa Legba, ouvri baryè pou mwen.”</em> Open the gate for me. The whole site opens on his rite: Onè asked, Respè granted, the way unbarred. His colors are the straw-gold of the crossroads at dusk, bone white, dried-blood red, the dark earth of the path.</p>
+        <div class="maps">→ PÒTAY — the door, the ritual, the whisper, RESPÈ</div>
+      </div>
+    </div>
+
+    <!-- DANBALA -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #1c1a14, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#f2ede2,#f2ede200 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#f2ede2"></span><span style="background:#d6dcd2"></span></div>
+        <div class="codes">#f2ede2 white · #d6dcd2 silver</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Danbala Wèdo</div>
+        <div class="domain" style="color:#d6dcd2">the core · the origin · Pòtoprens</div>
+        <p>The white serpent, oldest of the lwa, source and purity — the still center around which everything coils. At the heart of the sky sits Pòtoprens, from which every distance is measured. It burns Danbala's white: the origin, luminous and undivided.</p>
+        <div class="maps">→ the core star — Ayiti at the center</div>
+      </div>
+    </div>
+
+    <!-- GRAN BWA -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #17190f, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#6f8a4a,#6f8a4a00 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#6f8a4a"></span><span style="background:#4a5d32"></span></div>
+        <div class="codes">#6f8a4a leaf · #4a5d32 deep</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Gran Bwa</div>
+        <div class="domain" style="color:#6f8a4a">the wellsprings · the land · sending regions</div>
+        <p>Lwa of the deep forest, of leaves and roots and healing herbs — the wild green from which everything grows. Ayiti's own inner constellation, the towns and regions that send their children out, glow with his green. The seed comes from the tree; the tree stands in Gran Bwa's woods.</p>
+        <div class="maps">→ sous stars — Kafou, Jakmèl, Baconnois, Lagonav…</div>
+      </div>
+    </div>
+
+    <!-- OGOU -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #1e130f, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#b23124,#b2312400 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#b23124"></span><span style="background:#7d2318"></span></div>
+        <div class="codes">#b23124 fire · #7d2318 iron</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Ogou Feray</div>
+        <div class="domain" style="color:#b23124">the work · the films · what was forged</div>
+        <p>Warrior lwa of iron, fire, and force — the blacksmith, the one who cuts and forges. The films and the exhibitions, the work made and shown, burn with Ogou's red: creation as heat and labor, the cane fields, the flicker of the projector's gate.</p>
+        <div class="maps">→ travay stars — Tijuana, Havana, the works</div>
+      </div>
+    </div>
+
+    <!-- AGWE / LASIRÈN -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #0f1a1c, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#4f97a0,#4f97a000 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#4f97a0"></span><span style="background:#2e6470"></span></div>
+        <div class="codes">#4f97a0 sea · #2e6470 deep water</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Agwe &amp; Lasirèn</div>
+        <div class="domain" style="color:#4f97a0">the communities · across the water</div>
+        <p>Sovereign of the sea and the mermaid of its depths — the waters every migrant crossed. The diaspora communities, scattered by boat and plane across the ocean, glow with Agwe's blue-green. The sea that took them is the sea that holds them; their color is the water between.</p>
+        <div class="maps">→ kominote stars — Flatbush, Nassau, Montréal, Paris…</div>
+      </div>
+    </div>
+
+    <!-- EZILI DANTÒ -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #12141f, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#34518f,#34518f00 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#34518f"></span><span style="background:#b23124"></span></div>
+        <div class="codes">#34518f royal blue · #b23124 her red</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Ezili Dantò</div>
+        <div class="domain" style="color:#5f79b8">both at once · community + work</div>
+        <p>The fierce mother, protector, hard worker — she carries both blue and red, both tenderness and the scar. The places that are <em>both</em> a community and a site of the work (Miami, Montréal, Toronto) take Dantò's deep blue: the crossing and the labor held in one body.</p>
+        <div class="maps">→ toude stars — Miami, Montréal, Toronto</div>
+      </div>
+    </div>
+
+    <!-- GEDE -->
+    <div class="row">
+      <div>
+        <div class="swatch" style="background:radial-gradient(ellipse at 40% 30%, #16101c, #0f0b07)">
+          <div class="star" style="background:radial-gradient(circle,#7b5aa0,#7b5aa000 70%)"></div>
+        </div>
+        <div class="chips"><span style="background:#7b5aa0"></span><span style="background:#4a3363"></span></div>
+        <div class="codes">#7b5aa0 violet · #4a3363 deep</div>
+      </div>
+      <div class="meta">
+        <div class="lwa">Gede · Bawon</div>
+        <div class="domain" style="color:#7b5aa0">the ancestors · the guides · the dead who walk</div>
+        <p>Lwa of death and resurrection, of the ancestors who are never truly gone — irreverent, funny, wise. Grann, Manman, Papa: the guides who appear at the thresholds, who walk beside the seed. They glow with Gede's violet, the color of the ancestral dead who counsel the living.</p>
+        <div class="maps">→ zanset stars — Grann, Manman, Papa</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p>Colors vary by house, by rite (Rada / Petwo), by region. These are the widely-held associations — a starting cosmology, not a fixed doctrine. Tell me where your lineage sees it differently, and the sky changes with you.</p>
+    </div>
+  </div>
+</body>
+</html>
